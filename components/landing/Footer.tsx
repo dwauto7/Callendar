@@ -7,6 +7,7 @@ export function Footer() {
     <footer className="bg-[#0D0F12] border-t border-[#1E2128] py-12">
       <div className="max-w-6xl mx-auto px-5">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+          
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <p
@@ -72,15 +73,25 @@ export function Footer() {
               Legal
             </p>
             <ul className="space-y-2.5">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((l) => (
-                <li key={l}>
-                  <span className="text-sm text-[#64748B]">{l}</span>
+              {[
+                { label: 'Privacy Policy', href: '/privacy-policy' },
+                { label: 'Terms of Service', href: '/terms-of-service' },
+                { label: 'Cookie Policy', href: '/cookie-policy' }
+              ].map((l) => (
+                <li key={l.label}>
+                  <Link
+                    href={l.href}
+                    className="text-sm text-[#64748B] hover:text-[#F1F5F9] transition-colors"
+                  >
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
+        {/* Bottom Bar */}
         <div className="border-t border-[#1E2128] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-[#64748B]">
             © {year} Callendar. All rights reserved.
