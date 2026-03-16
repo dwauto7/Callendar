@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import { Phone, CalendarCheck, Clock, TrendingUp } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { CreditsWidget } from '@/components/dashboard/CreditsWidget'
@@ -8,7 +7,7 @@ import { MonthSummary } from '@/components/dashboard/MonthSummary'
 import { formatRM, formatMins } from '@/lib/utils'
 
 export const metadata = {
-  title: 'Overview — Callendar',
+  title: 'Intelligence Overview — AI Blizzard',
 }
 
 export default async function OverviewPage() {
@@ -21,45 +20,35 @@ export default async function OverviewPage() {
 
   const { data: clinicUser } = await supabase
     .from('clinic_users')
-    .select('clinic_config_id')
+    .select(`
+      clinic_config_id,
+      clinic_configs (
+        clinic_name
+      )
+    `)
     .eq('user_id', user.id)
     .single()
 
   if (!clinicUser?.clinic_config_id) redirect('/onboarding')
 
+  // @ts-expect-error - handling nested supabase join
+  const clinicName = clinicUser.clinic_configs?.clinic_name ?? 'Partner'
   const id = clinicUser.clinic_config_id
 
-  // Parallel fetch — all reads hit Supabase concurrently
-  const [statsRes, creditsRes, reportsRes, callsRes] = await Promise.all([
-    supabase
-      .from('global_stats')
-      .select('*')
-      .eq('clinic_config_id', id)
-      .single(),
-    supabase
-      .from('credits')
-      .select('*')
-      .eq('clinic_config_id', id)
-      .single(),
-    supabase
-      .from('monthly_reports')
-      .select('*')
-      .eq('clinic_config_id', id)
-      .order('report_month', { ascending: false })
-      .limit(1)
-      .single(),
-    supabase
-      .from('call_logs')
-      .select('id, client_name, patient_phone, duration_min, created_at, is_after_hours, appointment_id')
-      .eq('clinic_config_id', id)
-      .order('created_at', { ascending: false })
-      .limit(5),
+  // Parallel fetch hitting Supabase concurrently
+  const [statsRes, creditsRes, reportsRes, callsRes, settingsRes] = await Promise.all([
+    supabase.from('global_stats').select('*').eq('clinic_config_id', id).single(),
+    supabase.from('credits').select('*').eq('clinic_config_id', id).single(),
+    supabase.from('monthly_reports').select('*').eq('clinic_config_id', id).order('report_month', { ascending: false }).limit(1).single(),
+    supabase.from('call_logs').select('id, client_name, patient_phone, duration_min, created_at, is_after_hours, appointment_id').eq('clinic_config_id', id).order('created_at', { ascending: false }).limit(5),
+    supabase.from('clinic_settings').select('*').eq('clinic_config_id', id).single(),
   ])
 
   const stats = statsRes.data
   const credits = creditsRes.data
   const report = reportsRes.data ?? null
   const calls = callsRes.data ?? []
+  const settings = settingsRes.data
 
   // Greeting based on KL time
   const hour = new Date().toLocaleString('en-MY', {
@@ -68,80 +57,101 @@ export default async function OverviewPage() {
     hour12: false,
   })
   const h = parseInt(hour)
-  const greeting =
-    h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
+  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
 
   return (
-    <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-7xl mx-auto">
+    <div className="px-6 py-8 lg:px-10 lg:py-12 max-w-[1600px] mx-auto relative">
       {/* Page header */}
-      <div className="mb-8">
-        <p className="text-sm text-[#64748B] font-medium">{greeting}</p>
-        <h1
-          className="text-2xl font-bold text-[#F1F5F9] mt-0.5"
-          style={{ fontFamily: 'var(--font-syne)' }}
-        >
-          Overview
-        </h1>
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="size-2 rounded-full bg-[#40E0FF] animate-pulse" />
+            <p className="text-[10px] text-[#40E0FF] font-black uppercase tracking-[0.2em]">
+              {greeting}, {clinicName}
+            </p>
+          </div>
+          <h1
+            className="text-3xl md:text-4xl font-bold text-white tracking-tighter"
+            style={{ fontFamily: 'var(--font-syne)' }}
+          >
+            Intelligence <span className="text-white/20">Overview</span>
+          </h1>
+        </div>
+
+        <div className="hidden md:block text-right">
+          <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">
+            System Status
+          </p>
+          <div className="flex items-center justify-end gap-2 mt-1">
+            <div
+              className={`size-2 rounded-full animate-pulse ${
+                settings?.answering_mode === 'always_on'
+                  ? 'bg-emerald-500'
+                  : settings?.answering_mode === 'after_hours'
+                  ? 'bg-amber-400'
+                  : 'bg-red-500'
+              }`}
+            />
+            <p className="text-sm text-white/60 font-medium">
+              {settings?.answering_mode === 'always_on'
+                ? 'Full Autonomy Active'
+                : settings?.answering_mode === 'after_hours'
+                ? 'Standing by for After-Hours'
+                : 'System Paused'}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Stat cards — 2 col mobile / 4 col desktop */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          title="Total Calls"
+          title="Voice Transactions"
           value={stats?.total_calls?.toLocaleString() ?? '—'}
-          description="all time"
-          icon={Phone}
-          accentColor="#3B82F6"
-          accentBg="rgba(59,130,246,0.10)"
+          description="Total calls processed"
+          iconName="phone"
+          accentColor="#40E0FF"
         />
         <StatCard
-          title="Appointments"
+          title="Autonomous Bookings"
           value={stats?.total_appointments?.toLocaleString() ?? '—'}
-          description="booked by Aya"
-          icon={CalendarCheck}
-          accentColor="#10B981"
-          accentBg="rgba(16,185,129,0.10)"
+          description="Confirmed by AI Blizzard"
+          iconName="calendar"
+          accentColor="#40E0FF"
         />
         <StatCard
-          title="Minutes Saved"
-          value={
-            stats?.total_minutes_saved != null
-              ? formatMins(stats.total_minutes_saved)
-              : '—'
-          }
-          description="staff time returned"
-          icon={Clock}
-          accentColor="#8B5CF6"
-          accentBg="rgba(139,92,246,0.10)"
+          title="Human Capital Saved"
+          value={stats?.total_minutes_saved != null ? formatMins(stats.total_minutes_saved) : '—'}
+          description="Staff labor reclaimed"
+          iconName="clock"
+          accentColor="#40E0FF"
         />
         <StatCard
-          title="Revenue"
-          value={
-            stats?.total_revenue != null ? formatRM(stats.total_revenue) : '—'
-          }
-          description="projected from calls"
-          icon={TrendingUp}
-          accentColor="#10B981"
-          accentBg="rgba(16,185,129,0.10)"
+          title="Captured Revenue"
+          value={stats?.total_revenue != null ? formatRM(stats.total_revenue) : '—'}
+          description="Projected value"
+          iconName="trending"
+          accentColor="#40E0FF"
         />
       </div>
 
-      {/* Credits widget — full width */}
+      {/* Engine Status / Credits widget */}
       {credits && (
-        <div className="mb-4">
+        <div className="mb-6">
           <CreditsWidget
             balance={credits.balance ?? 0}
             minutesUsed={credits.minutes_used ?? 0}
             totalCredits={credits.total_credits_mins ?? 0}
             status={credits.status ?? 'Unknown'}
-            systemEnabled={credits.system_enabled ?? false}
+            // Fix: Pass the new answeringMode prop to the widget
+            answeringMode={settings?.answering_mode ?? 'disabled'}
             agentId={credits.agent_id}
           />
         </div>
       )}
 
-      {/* Two-column: recent calls + month summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RecentCallsTable calls={calls} />
         <MonthSummary report={report} />
       </div>

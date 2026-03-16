@@ -3,7 +3,7 @@ import { CalendarCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { AppointmentsClient } from '@/components/dashboard/appointments/AppointmentsClient'
 
-export const metadata = { title: 'Appointments — Callendar' }
+export const metadata = { title: 'Patient Schedule — AI Blizzard' }
 
 export default async function AppointmentsPage() {
   const supabase = await createClient()
@@ -15,9 +15,10 @@ export default async function AppointmentsPage() {
     .select('clinic_config_id')
     .eq('user_id', user.id)
     .single()
+    
   if (!clinicUser?.clinic_config_id) redirect('/onboarding')
 
-  // appointments uses `clinic_id` (not clinic_config_id) per schema
+  // Note: Using 'clinic_id' to match your schema logic
   const { data: appointments } = await supabase
     .from('appointments')
     .select(
@@ -28,23 +29,29 @@ export default async function AppointmentsPage() {
     .limit(300)
 
   return (
-    <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <CalendarCheck className="size-5 text-[#10B981]" />
+    <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-7xl mx-auto fade-in-up">
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          {/* Cyan Glow Icon */}
+          <div className="p-2 bg-[#40E0FF]/10 rounded-lg cyan-glow">
+            <CalendarCheck className="size-5 text-[#40E0FF]" />
+          </div>
           <h1
-            className="text-2xl font-bold text-[#F1F5F9]"
-            style={{ fontFamily: 'var(--font-syne)' }}
+            className="text-3xl font-bold text-white tracking-tighter"
+            style={{ fontFamily: 'var(--font-display)' }}
           >
-            Appointments
+            Booking <span className="text-[#40E0FF]">Pipeline</span>
           </h1>
         </div>
-        <p className="text-sm text-[#64748B]">
-          All appointments booked by Aya — filter by status, date, or confirmation.
+        <p className="text-sm text-[#8B949E] max-w-2xl">
+          Live feed of appointments secured by the Closer Agent. Data is synchronized with your clinic&apos;s primary calendar node.
         </p>
       </div>
 
-      <AppointmentsClient appointments={appointments ?? []} />
+      {/* Wrapping the client component in your signature glass panel */}
+      <div className="glass-panel rounded-3xl overflow-hidden border border-white/5 p-1">
+         <AppointmentsClient appointments={appointments ?? []} />
+      </div>
     </div>
   )
 }

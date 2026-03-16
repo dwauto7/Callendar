@@ -81,7 +81,7 @@ export function SettingsForm({ config }: SettingsFormProps) {
     setSaving(true)
     const supabase = createClient()
     const { error } = await supabase
-      .from('clinic_config')
+      .from('clinic_configs')
       .update({
         clinic_name: form.clinic_name || null,
         owner_phone: form.owner_phone || null,

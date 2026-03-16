@@ -1,103 +1,99 @@
+'use client'
+
 import {
-  FileText, CalendarCheck, Moon, Zap, BarChart3, MessageSquare,
+  CalendarCheck, Moon, ShieldCheck, BarChart3, MessageSquare, Search, Zap
 } from 'lucide-react'
 
 const features = [
   {
-    icon: FileText,
-    title: 'Call Logs & Transcripts',
+    icon: Search,
+    title: 'High-Value Lead Priority',
     description:
-      'Every call is recorded and transcribed. AI summaries let you catch up in seconds, not minutes.',
-    color: '#3B82F6',
+      'The "Red Tag" system identifies high-ticket inquiries (like implants or surgery) for immediate staff follow-up.',
   },
   {
     icon: CalendarCheck,
-    title: 'Direct Calendar Booking',
+    title: 'Autopilot Scheduling',
     description:
-      'Aya books appointments straight into Google Calendar — no double-entry, no errors, no delays.',
-    color: '#10B981',
+      'Seamlessly books appointments into your existing calendar - eliminating manual entry and double-bookings.',
+  },
+  {
+    icon: CalendarCheck,
+    title: 'Self-Service Rescheduling',
+    description:
+      'Patients can reschedule or confirm appointments without staff intervention, reducing no-shows.',
   },
   {
     icon: Moon,
-    title: 'After-Hours Handling',
+    title: '24/7 Revenue Capture',
     description:
-      'Aya works 24/7. Patients calling at midnight get the same seamless experience as peak hours.',
-    color: '#8B5CF6',
+      'Captures patient leads during peak hours, lunch breaks, and late nights. Your clinic never truly closes.',
   },
   {
-    icon: Zap,
-    title: 'Credits & Usage Tracking',
+    icon: ShieldCheck,
+    title: 'PDPA 2010 Compliance',
     description:
-      'Know exactly how many minutes you\'ve used. Low-balance alerts keep you from running dry.',
-    color: '#F59E0B',
+      'Built with Malaysian data laws in mind. Automated data purging and secure local encryption for patient privacy.',
   },
   {
     icon: BarChart3,
-    title: 'Monthly Performance Reports',
+    title: 'Intelligence Dashboards',
     description:
-      'Calls, bookings, revenue generated, ROI — all in one clean monthly report card.',
-    color: '#10B981',
+      'Track ROI, peak call times, and conversion rates with high-fidelity performance reports delivered monthly.',
   },
   {
     icon: MessageSquare,
-    title: 'WhatsApp Notifications',
+    title: 'Instant WhatsApp Alerts',
     description:
-      'Your team gets instant WhatsApp alerts for every new booking — no app to check, no refresh needed.',
-    color: '#10B981',
+      'Your staff receives live notifications for every booking, including a summary of the patient’s specific needs.',
   },
 ]
 
 export function Features() {
   return (
-    <section id="features" className="py-24 bg-[#0A0A0A]">
-      <div className="max-w-6xl mx-auto px-5">
-        <div className="text-center mb-16 fade-in-up">
-          <p className="text-xs font-bold text-[#10B981] uppercase tracking-widest mb-3">
-            Features
-          </p>
+    <section id="features" className="py-32 bg-background relative">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 bg-[#40E0FF]/10 border border-[#40E0FF]/20 rounded-full px-4 py-1.5 mb-6">
+            <Zap className="size-3 text-[#40E0FF]" />
+            <span className="text-[10px] font-bold text-[#40E0FF] uppercase tracking-widest">Capabilities</span>
+          </div>
           <h2
-            className="text-3xl sm:text-4xl font-bold text-[#F1F5F9] mb-4"
+            className="text-4xl md:text-5xl font-bold text-white mb-6"
             style={{ fontFamily: 'var(--font-syne)' }}
           >
-            Everything your front desk does.{' '}
-            <span className="text-[#10B981]">Automated.</span>
+            Convert more calls.{' '}
+            <span className="text-[#40E0FF]">Delight every patient.</span>
           </h2>
-          <p className="text-[#64748B] max-w-lg mx-auto">
-            Aya handles inbound calls, books appointments, and gives your clinic a full audit trail — all without lifting a finger.
+          <p className="text-white/40 max-w-2xl mx-auto text-lg leading-relaxed">
+            Aya captures intent, qualifies high-value leads, and books directly into your workflow - without new software for your team to learn.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map(({ icon: Icon, title, description, color }, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="relative rounded-xl border border-[#1E2128] bg-[#111318] p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-[#10B981]/40 group"
-              style={{ background: `linear-gradient(135deg, #111318 70%, ${color}06 100%)` }}
+              className="relative rounded-2xl border border-white/5 bg-white/[0.02] p-8 transition-all duration-500 hover:-translate-y-2 group glass-panel overflow-hidden"
             >
-              {/* Animated top line on hover */}
-              <div className="absolute top-0 left-0 right-0 h-0.5 rounded-t-xl overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#10B981] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-              </div>
-
-              {/* Glow effect on hover */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#10B981]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-
+              {/* Hover Glow Effect */}
+              <div className="absolute -bottom-10 -right-10 size-32 bg-[#40E0FF]/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
               <div className="relative z-10">
                 <div
-                  className="size-10 rounded-xl flex items-center justify-center mb-4 transition-all duration-200 group-hover:shadow-lg"
-                  style={{
-                    background: `${color}15`,
-                  }}
+                  className="size-12 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:cyan-glow bg-white/5 border border-white/10"
                 >
-                  <Icon className="size-5" style={{ color }} />
+                  <Icon className="size-6 text-[#40E0FF]" />
                 </div>
                 <h3
-                  className="text-base font-bold text-[#F1F5F9] mb-2"
+                  className="text-lg font-bold text-white mb-3 tracking-tight"
                   style={{ fontFamily: 'var(--font-syne)' }}
                 >
                   {title}
                 </h3>
-                <p className="text-sm text-[#64748B] leading-relaxed">{description}</p>
+                <p className="text-sm text-white/50 leading-relaxed group-hover:text-white/70 transition-colors">
+                  {description}
+                </p>
               </div>
             </div>
           ))}

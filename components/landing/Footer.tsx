@@ -1,42 +1,53 @@
+'use client'
+
 import Link from 'next/link'
+import { Zap } from 'lucide-react'
 
 export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-[#0D0F12] border-t border-[#1E2128] py-12">
-      <div className="max-w-6xl mx-auto px-5">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+    <footer className="bg-background border-t border-white/5 py-20 relative overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute bottom-0 right-0 size-64 bg-[#40E0FF]/5 blur-[100px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
           
-          {/* Brand */}
+          {/* Brand Identity */}
           <div className="col-span-2 md:col-span-1">
-            <p
-              className="text-xl font-bold text-[#F1F5F9] mb-3 tracking-tight"
-              style={{ fontFamily: 'var(--font-syne)' }}
-            >
-              Callendar
-            </p>
-            <p className="text-sm text-[#64748B] leading-relaxed max-w-[200px]">
-              AI receptionist for Malaysian clinics. Always on, never misses a call.
+            <div className="flex items-center gap-2 mb-6">
+              <div className="size-6 bg-[#40E0FF] rounded flex items-center justify-center">
+                <Zap className="size-4 text-[#0B0D10] fill-current" />
+              </div>
+              <span 
+                className="text-lg font-black text-white tracking-tighter uppercase"
+                style={{ fontFamily: 'var(--font-syne)' }}
+              >
+                AI Blizzard
+              </span>
+            </div>
+            <p className="text-sm text-white/40 leading-relaxed max-w-[240px]">
+              High-performance AI architecture for elite dental and chiropractic clinics in Malaysia. 
             </p>
           </div>
 
-          {/* Product */}
+          {/* Product Architecture */}
           <div>
-            <p className="text-xs font-bold text-[#F1F5F9] uppercase tracking-widest mb-4">
-              Product
+            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-6">
+              Solutions
             </p>
-            <ul className="space-y-2.5">
+            <ul className="space-y-4">
               {[
-                { label: 'Features', href: '#features' },
-                { label: 'Pricing', href: '#pricing' },
-                { label: 'How It Works', href: '#how-it-works' },
-                { label: 'Dashboard', href: '#dashboard' }
+                { label: 'Voice Systems', href: '#how-it-works' },
+                { label: 'Clinical Intelligence', href: '#features' },
+                { label: 'Revenue Engine', href: '#pricing' },
+                { label: 'Client Portal', href: '/dashboard' }
               ].map((l) => (
                 <li key={l.label}>
                   <a
                     href={l.href}
-                    className="text-sm text-[#64748B] hover:text-[#F1F5F9] transition-colors"
+                    className="text-sm text-white/40 hover:text-[#40E0FF] transition-colors duration-300"
                   >
                     {l.label}
                   </a>
@@ -45,43 +56,43 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Consultancy & Partnership */}
           <div>
-            <p className="text-xs font-bold text-[#F1F5F9] uppercase tracking-widest mb-4">
-              Company
+            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-6">
+              Consultancy
             </p>
-            <ul className="space-y-2.5">
-              {['About', 'Blog', 'Careers'].map((l) => (
+            <ul className="space-y-4">
+              {['AI Automation Audit', 'Custom Workflows', 'Staff Training'].map((l) => (
                 <li key={l}>
-                  <span className="text-sm text-[#64748B]">{l}</span>
+                  <span className="text-sm text-white/40">{l}</span>
                 </li>
               ))}
               <li>
                 <Link
                   href="/contact"
-                  className="text-sm text-[#64748B] hover:text-[#F1F5F9] transition-colors"
+                  className="text-sm text-[#40E0FF] font-bold hover:underline"
                 >
-                  Contact
+                  Book Consultation
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Legal Intelligence */}
           <div>
-            <p className="text-xs font-bold text-[#F1F5F9] uppercase tracking-widest mb-4">
-              Legal
+            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-6">
+              Compliance
             </p>
-            <ul className="space-y-2.5">
+            <ul className="space-y-4">
               {[
-                { label: 'Privacy Policy', href: '/privacy-policy' },
+                { label: 'Privacy & PDPA', href: '/privacy-policy' },
                 { label: 'Terms of Service', href: '/terms-of-service' },
-                { label: 'Cookie Policy', href: '/cookie-policy' }
+                { label: 'Data Security', href: '/security' }
               ].map((l) => (
                 <li key={l.label}>
                   <Link
                     href={l.href}
-                    className="text-sm text-[#64748B] hover:text-[#F1F5F9] transition-colors"
+                    className="text-sm text-white/40 hover:text-white transition-colors"
                   >
                     {l.label}
                   </Link>
@@ -92,13 +103,23 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-[#1E2128] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-[#64748B]">
-            © {year} Callendar. All rights reserved.
-          </p>
-          <p className="text-xs text-[#64748B]">
-            Built for Malaysian clinics 🇲🇾
-          </p>
+        <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
+              © {year} AI Blizzard
+            </p>
+            <span className="text-white/10 text-xs">|</span>
+            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
+              aiblizzard.work
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/5">
+            <span className="size-1.5 rounded-full bg-[#40E0FF] animate-pulse" />
+            <p className="text-[10px] font-bold text-white/40 uppercase tracking-tighter">
+              Operating in PJ & KL, Malaysia 🇲🇾
+            </p>
+          </div>
         </div>
       </div>
     </footer>

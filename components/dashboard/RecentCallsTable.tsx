@@ -1,7 +1,10 @@
+'use client'
+
 import Link from 'next/link'
-import { PhoneCall, Clock, ArrowRight } from 'lucide-react'
+import { PhoneCall, Clock, ArrowRight, ShieldCheck } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { formatDateTime } from '@/lib/utils'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 interface CallLog {
   id: string
@@ -19,81 +22,90 @@ interface RecentCallsTableProps {
 
 export function RecentCallsTable({ calls }: RecentCallsTableProps) {
   return (
-    <div className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#1E2128]">
-        <div className="flex items-center gap-2">
-          <PhoneCall className="size-4 text-[#10B981]" />
+    <Card className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden glass-panel flex flex-col">
+      <CardHeader className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-white/[0.01]">
+        <div className="flex items-center gap-3">
+          <div className="size-8 rounded-lg bg-[#40E0FF]/10 flex items-center justify-center border border-[#40E0FF]/20">
+            <PhoneCall className="size-4 text-[#40E0FF]" />
+          </div>
           <h2
-            className="text-sm font-semibold text-[#F1F5F9]"
+            className="text-sm font-black text-white uppercase tracking-widest"
             style={{ fontFamily: 'var(--font-syne)' }}
           >
-            Recent Calls
+            Live Stream <span className="text-white/20">/ Logs</span>
           </h2>
         </div>
         <Link
           href="/dashboard/calls"
-          className="flex items-center gap-1 text-xs text-[#64748B] hover:text-[#10B981] transition-colors duration-200"
+          className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-[#40E0FF] transition-all"
         >
-          View all
-          <ArrowRight className="size-3" />
+          Detailed Records
+          <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
         </Link>
-      </div>
+      </CardHeader>
 
       {/* Rows */}
       {calls.length === 0 ? (
-        <div className="px-5 py-10 text-center text-sm text-[#64748B]">
-          No calls yet
-        </div>
+        <CardContent className="px-6 py-12 text-center text-xs font-bold uppercase tracking-widest text-white/20 italic">
+          Waiting for system activity...
+        </CardContent>
       ) : (
-        <div className="divide-y divide-[#1E2128]">
+        <CardContent className="p-0 divide-y divide-white/5">
           {calls.map((call) => (
             <div
               key={call.id}
-              className="flex items-center justify-between px-5 py-3.5 hover:bg-[#161B22] transition-colors duration-200"
+              className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition-all duration-300 group"
             >
-              <div className="flex items-center gap-3 min-w-0">
-                {/* Avatar letter */}
-                <div className="size-8 rounded-full bg-[#1E2128] flex items-center justify-center shrink-0">
-                  <span className="text-xs font-semibold text-[#F1F5F9]">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="size-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:border-[#40E0FF]/30 transition-colors">
+                  <span className="text-xs font-black text-white/60">
                     {(call.client_name?.[0] ?? '?').toUpperCase()}
                   </span>
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#F1F5F9] truncate">
-                    {call.client_name || 'Unknown'}
+                  <p className="text-sm font-bold text-white tracking-tight truncate">
+                    {call.client_name || call.patient_phone || 'Incoming Signal...'}
                   </p>
-                  <p className="text-xs text-[#64748B] truncate">
+                  <p className="text-[10px] font-mono text-white/30 tracking-tighter truncate">
                     {call.patient_phone}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 shrink-0 ml-3">
-                {call.is_after_hours && (
-                  <Badge className="bg-[#F59E0B]/15 text-[#F59E0B] border-0 text-[10px] font-semibold hidden sm:inline-flex">
-                    After-hours
-                  </Badge>
-                )}
-                {call.appointment_id && (
-                  <Badge className="bg-[#10B981]/15 text-[#10B981] border-0 text-[10px] font-semibold hidden sm:inline-flex">
-                    Booked
-                  </Badge>
-                )}
-                <div className="flex items-center gap-1 text-xs text-[#64748B]">
-                  <Clock className="size-3 shrink-0" />
-                  <span className="tabular-nums">
-                    {Number(call.duration_min).toFixed(1)}m
-                  </span>
+              <div className="flex items-center gap-4 shrink-0 ml-4">
+                <div className="hidden sm:flex items-center gap-2">
+                  {call.is_after_hours && (
+                    <Badge className="bg-amber-500/10 text-amber-500 border-0 text-[9px] font-black uppercase tracking-widest rounded-md">
+                      After-Hours
+                    </Badge>
+                  )}
+                  {call.appointment_id && (
+                    <Badge className="bg-[#40E0FF]/10 text-[#40E0FF] border-0 text-[9px] font-black uppercase tracking-widest rounded-md">
+                      Success
+                    </Badge>
+                  )}
                 </div>
-                <p className="text-[10px] text-[#64748B] whitespace-nowrap hidden md:block">
-                  {formatDateTime(call.created_at)}
-                </p>
+                
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-white/50 tabular-nums">
+                    <Clock className="size-3 text-[#40E0FF]" />
+                    {Number(call.duration_min).toFixed(1)}m
+                  </div>
+                  <p className="text-[9px] font-black text-white/20 uppercase tracking-tighter">
+                    {formatDateTime(call.created_at)}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
-        </div>
+        </CardContent>
       )}
-    </div>
+      
+      {/* Footer Decoration */}
+      <div className="mt-auto px-6 py-3 bg-white/[0.01] border-t border-white/5 flex items-center gap-2">
+        <ShieldCheck className="size-3 text-[#40E0FF]/40" />
+        <span className="text-[9px] font-black text-white/10 uppercase tracking-[0.2em]">End-to-End Encrypted Intelligence</span>
+      </div>
+    </Card>
   )
 }

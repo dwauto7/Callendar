@@ -1,197 +1,165 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/client'
-import { CheckCircle2, Zap } from 'lucide-react'
+import { CheckCircle2, ShieldCheck } from 'lucide-react'
 
 const tiers = [
   {
-    name: 'Starter',
-    price: 'RM 1,999',
+    name: 'Launch',
+    price: 'RM 1,800',
     period: '/ month',
-    setupFee: 'RM 1,500 setup',
-    description: 'Full Aya experience for active clinics.',
-    credits: '1,000 minutes/mo',
+    setupFee: 'RM 3,000 Setup',
+    description: 'For clinics starting 24/7 call capture.',
+    credits: '500 Monthly Minutes',
+    highlight: false,
+    cta: 'Book Demo',
+    features: [
+      'Dashboard + Insights',
+      'WhatsApp Reminders + Booking Confirmation',
+      'Full Call Transcripts & Summaries',
+      '24/7 Availability',
+      'English Language (Bahasa soon)',
+      'Overage RM 2.0/min',
+    ],
+  },
+  {
+    name: 'Growth',
+    price: 'RM 3,200',
+    period: '/ month',
+    setupFee: 'RM 4,500 Setup',
+    description: 'Most popular for high-volume clinics.',
+    credits: '1,500 Monthly Minutes',
     highlight: true,
-    cta: 'Get Started',
+    cta: 'Book Demo',
     features: [
-      '1,000 mins of Aya calls',
-      'WhatsApp appointment reminders',
-      'Full call logs, transcripts & summaries',
-      'Google Calendar booking',
-      'After-hours handling',
-      'Monthly dashboard & analytics',
-      'Overage at RM 1.50/min',
+      'Dashboard + Insights',
+      'WhatsApp Reminders + Booking Confirmation',
+      'Full Call Transcripts & Summaries',
+      '24/7 Availability',
+      'English Language (Bahasa soon)',
+      'Overage RM 1.8/min',
     ],
   },
   {
-    name: 'Scale',
-    price: 'RM 3,499',
+    name: 'Network',
+    price: 'RM 5,500',
     period: '/ month',
-    setupFee: 'RM 3,000 setup',
-    description: 'For growing clinics requiring extended coverage..',
-    credits: '2,000 minutes/mo',
+    setupFee: 'RM 6,000 Setup',
+    description: 'Best for multi-branch clinics.',
+    credits: '3,000 Monthly Minutes',
     highlight: false,
-    cta: 'Get Started',
+    cta: 'Book Demo',
     features: [
-      '2,000 mins of Aya calls',
-      'Everything in Starter',
-      'Dual language availability (English, Bahasa Melayu )',
-      'Priority support',
-      'Overage at RM 1.50/min',
-    ],
-  },
-  {
-    name: 'Pro',
-    price: 'RM 6,399',
-    period: '/ month',
-    setupFee: 'RM 5,000 setup',
-    description: 'Enterprise-grade coverage for large clinics.',
-    credits: '4,000 minutes/mo',
-    highlight: false,
-    cta: 'Get Started',
-    features: [
-      '4,000 mins of Aya calls',
-      'Everything in Growth',
-      'Multilingual availability (English, Bahasa Melayu, Mandarin)',
-      'Dedicated account manager',
-      'SLA response guarantee',
-      'Overage at RM 1.50/min',
+      'Dashboard + Insights',
+      'WhatsApp Reminders + Booking Confirmation',
+      'Full Call Transcripts & Summaries',
+      '24/7 Availability',
+      'Multi-branch Synchronization',
+      'Overage RM 1.5/min',
     ],
   },
 ]
 
 export function Pricing() {
-  const router = useRouter()
-
-  async function handleCTA() {
-    const supabase = createClient()
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) {
-      router.push('/dashboard/overview')
-      return
-    }
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    })
-  }
-
   return (
-    <section id="pricing" className="py-24 bg-[#0D0F12]">
-      <div className="max-w-6xl mx-auto px-5">
-        <div className="text-center mb-16 fade-in-up">
-          <p className="text-xs font-bold text-[#10B981] uppercase tracking-widest mb-3">
-            Pricing
-          </p>
-          <h2
-            className="text-3xl sm:text-4xl font-bold text-[#F1F5F9] mb-4"
-            style={{ fontFamily: 'var(--font-syne)' }}
-          >
-            Simple, credits-based pricing.
+    <section id="pricing" className="py-32 bg-background relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-[#40E0FF]/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="relative max-w-6xl mx-auto px-6">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 bg-[#40E0FF]/10 border border-[#40E0FF]/20 rounded-full px-4 py-1.5 mb-6">
+            <span className="text-[10px] font-bold text-[#40E0FF] uppercase tracking-[0.2em]">ROI Focused</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: 'var(--font-syne)' }}>
+            Invest in predictable <span className="text-[#40E0FF]">patient flow.</span>
           </h2>
-          <p className="text-[#64748B] max-w-md mx-auto">
-            Pay for what you use. Every subscription includes the full Aya experience — no hidden fees.
+          <p className="text-white/50 max-w-2xl mx-auto text-lg">
+            Transparent pricing for clinics that want more bookings, less admin time, and a premium patient experience.
+          </p>
+          <p className="mt-4 text-white/40 text-xs uppercase tracking-widest">
+            Annual Prepay: 15-20% off first-year monthly
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
-          {tiers.map((tier, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+          {tiers.map((tier) => (
             <div
               key={tier.name}
-              className={`relative rounded-2xl border p-7 transition-all duration-300 ${
-                tier.highlight
-                  ? 'border-[#10B981]/40 bg-[#111318] shadow-2xl shadow-[#10B981]/25 border-pulse-animate'
-                  : 'border-[#1E2128] bg-[#111318] hover:-translate-y-1 hover:shadow-lg hover:shadow-black/40'
+              className={`relative flex flex-col rounded-3xl p-8 transition-all duration-500 glass-panel border border-white/10 ${
+                tier.highlight ? 'ring-2 ring-[#40E0FF] scale-105 z-10 shadow-2xl shadow-[#40E0FF]/20' : 'hover:border-white/20'
               }`}
-              style={
-                tier.highlight
-                  ? { background: 'linear-gradient(160deg, #111318 60%, rgba(16,185,129,0.06) 100%)' }
-                  : undefined
-              }
             >
-              {/* Animated gradient border for Starter */}
               {tier.highlight && (
-                <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{
-                  padding: '1px',
-                  background: 'linear-gradient(90deg, #10B981 0%, #14B8A6 50%, #10B981 100%)',
-                  backgroundSize: '200% 100%',
-                  animation: 'gradient-shift 3s ease-in-out infinite',
-                  opacity: 0.3,
-                  borderRadius: '16px'
-                }} />
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-[#40E0FF] text-[#0B0D10] text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full">
+                    Recommended for Clinics
+                  </span>
+                </div>
               )}
 
-              <div className="relative z-10">
-                {tier.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-                    <span className="flex items-center gap-1.5 bg-[#10B981] text-[#0A0A0A] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg shadow-[#10B981]/30">
-                      <Zap className="size-3" />
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-
-                <div className="mb-6">
-                  <p
-                    className="text-sm font-bold text-[#64748B] uppercase tracking-widest mb-2"
-                  >
-                    {tier.name}
-                  </p>
-                  <div className="flex items-baseline gap-1.5 mb-1">
-                    <span
-                      className="text-4xl font-bold text-[#F1F5F9]"
-                      style={{ fontFamily: 'var(--font-syne)' }}
-                    >
-                      {tier.price}
-                    </span>
-                    <span className="text-sm text-[#64748B]">{tier.period}</span>
-                  </div>
-                  <p className="text-xs text-[#10B981] font-semibold mb-2">
-                    {tier.credits}
-                  </p>
-                  <span
-                    className={`inline-block px-2 py-0.5 rounded bg-[#1E2128] text-xs font-medium mb-3 ${
-                      tier.name === 'Pilot'
-                        ? 'text-[#10B981]'
-                        : 'text-[#F1F5F9]'
-                    }`}
-                  >
-                    {tier.setupFee}
+              <div className="mb-8">
+                <p className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] mb-4">
+                  {tier.name}
+                </p>
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-4xl font-bold text-white" style={{ fontFamily: 'var(--font-syne)' }}>
+                    {tier.price}
                   </span>
-                  <p className="text-sm text-[#64748B]">{tier.description}</p>
+                  <span className="text-sm text-white/40 font-medium">{tier.period}</span>
                 </div>
+                <div className="inline-block px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-[#40E0FF] mb-4">
+                  {tier.setupFee}
+                </div>
+                <p className="text-sm text-white/60 leading-relaxed">{tier.description}</p>
+              </div>
 
-                <Button
-                  onClick={() => window.open('https://calendly.com/dwautomate7/30min', '_blank')}
-                  className={`w-full font-semibold mb-7 ${
-                    tier.highlight
-                      ? 'bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] shadow-lg shadow-[#10B981]/20'
-                      : 'bg-[#1E2128] hover:bg-[#2A3040] text-[#F1F5F9] border border-[#2A3040]'
-                  }`}
-                >
-                  {tier.cta}
-                </Button>
+              <Button
+                onClick={() => window.open('https://calendly.com/dwautomate7/30min', '_blank')}
+                className={`w-full h-12 rounded-xl font-bold text-sm mb-8 transition-all ${
+                  tier.highlight
+                    ? 'bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] cyan-glow'
+                    : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
+                }`}
+              >
+                {tier.cta}
+              </Button>
 
-                <ul className="space-y-3">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5">
-                      <CheckCircle2 className="size-4 text-[#10B981] shrink-0 mt-0.5" />
-                      <span className="text-sm text-[#64748B]">{f}</span>
-                    </li>
-                  ))}
-                </ul>
+              <ul className="space-y-4 mb-8 flex-1">
+                {tier.features.map((f) => (
+                  <li key={f} className="flex items-start gap-3">
+                    <CheckCircle2 className="size-4 text-[#40E0FF] shrink-0 mt-0.5" />
+                    <span className="text-sm text-white/70 font-medium leading-snug">{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="pt-6 border-t border-white/5">
+                <div className="flex items-center gap-2 opacity-50">
+                  <ShieldCheck className="size-3 text-[#40E0FF]" />
+                  <span className="text-[9px] font-bold text-white uppercase tracking-tighter">{tier.credits}</span>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <p className="text-center text-xs text-[#64748B] mt-8">
-          All plans include overage billing at RM 1.50/min.
-          <br />
-          Questions? WhatsApp us at (+60) 111 - 4399 466.
-        </p>
+        <div className="mt-12 text-center">
+          <div className="inline-flex items-center gap-2 bg-[#40E0FF]/10 border border-[#40E0FF]/20 rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#40E0FF]">
+            Launch Promo
+          </div>
+          <p className="mt-3 text-white/60 text-sm">
+            First 10 clinics: 50% off setup fee for sign-ups in the next 30 days.
+          </p>
+        </div>
+
+        <div className="mt-12 text-center space-y-4">
+          <p className="text-white/40 text-xs">
+            All deployments include on-site staff training for PJ/KL clinics. 
+            <br />
+            Need a custom setup? WhatsApp: <span className="text-white font-bold">(+60) 111-4399 466</span>
+          </p>
+        </div>
       </div>
     </section>
   )

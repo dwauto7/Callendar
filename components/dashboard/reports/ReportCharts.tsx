@@ -2,119 +2,59 @@
 
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 
-interface ReportPoint {
+const blizzardTooltip = {
+  contentStyle: {
+    background: '#0D0F12',
+    border: '1px solid rgba(64, 224, 255, 0.2)',
+    borderRadius: '16px',
+    color: '#FFFFFF',
+    fontSize: '11px',
+    fontFamily: 'var(--font-mono)',
+    backdropFilter: 'blur(10px)',
+  },
+  cursor: { fill: 'rgba(64, 224, 255, 0.03)' },
+}
+
+type ChartPoint = {
   period: string
   calls: number
   bookings: number
-  revenue: number
-  investment: number
+  revenue?: number
+  investment?: number
 }
 
-interface ReportChartsProps {
-  data: ReportPoint[]
-}
-
-const tooltipStyle = {
-  contentStyle: {
-    background: '#111318',
-    border: '1px solid #1E2128',
-    borderRadius: '8px',
-    color: '#F1F5F9',
-    fontSize: '12px',
-    padding: '8px 12px',
-  },
-  cursor: { fill: '#1E2128', opacity: 0.4 },
-}
-
-const legendStyle = {
-  wrapperStyle: { paddingTop: 12, fontSize: 11, color: '#64748B' },
-}
-
-export function CallsTrendChart({ data }: ReportChartsProps) {
-  if (data.length === 0) {
-    return (
-      <div className="h-[200px] flex items-center justify-center text-sm text-[#64748B]">
-        No data
-      </div>
-    )
-  }
+export function CallsTrendChart({ data }: { data: ChartPoint[] }) {
+  if (data.length === 0) return <div className="h-[200px] flex items-center justify-center text-xs font-mono text-white/20 uppercase tracking-widest">Awaiting Data</div>
+  
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <LineChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1E2128" vertical={false} />
-        <XAxis
-          dataKey="period"
-          tick={{ fill: '#64748B', fontSize: 10 }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          tick={{ fill: '#64748B', fontSize: 10 }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <Tooltip {...tooltipStyle} />
-        <Line
-          type="monotone"
-          dataKey="calls"
-          stroke="#10B981"
-          strokeWidth={2}
-          dot={{ fill: '#10B981', r: 3 }}
-          activeDot={{ r: 5 }}
-          name="Calls"
-        />
-        <Line
-          type="monotone"
-          dataKey="bookings"
-          stroke="#3B82F6"
-          strokeWidth={2}
-          dot={{ fill: '#3B82F6', r: 3 }}
-          activeDot={{ r: 5 }}
-          name="Bookings"
-        />
+    <ResponsiveContainer width="100%" height={240}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+        <XAxis dataKey="period" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+        <Tooltip {...blizzardTooltip} />
+        <Line type="monotone" dataKey="calls" stroke="#40E0FF" strokeWidth={4} dot={false} name="Total Calls" />
+        <Line type="monotone" dataKey="bookings" stroke="#10B981" strokeWidth={4} dot={false} name="Bookings" />
       </LineChart>
     </ResponsiveContainer>
   )
 }
 
-export function BookingsRevenueChart({ data }: ReportChartsProps) {
-  if (data.length === 0) {
-    return (
-      <div className="h-[200px] flex items-center justify-center text-sm text-[#64748B]">
-        No data
-      </div>
-    )
-  }
+export function BookingsRevenueChart({ data }: { data: ChartPoint[] }) {
+  if (data.length === 0) return null
+  
   return (
     <ResponsiveContainer width="100%" height={240}>
-      <BarChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1E2128" vertical={false} />
-        <XAxis
-          dataKey="period"
-          tick={{ fill: '#64748B', fontSize: 10 }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          tick={{ fill: '#64748B', fontSize: 10 }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <Tooltip
-          {...tooltipStyle}
-          formatter={(v, name) =>
-            name === 'Revenue' || name === 'Investment'
-              ? [`RM ${Number(v ?? 0).toLocaleString()}`, name]
-              : [v, name]
-          }
-        />
-        <Legend {...legendStyle} />
-        <Bar dataKey="bookings" name="Bookings" fill="#10B981" radius={[3, 3, 0, 0]} maxBarSize={24} />
-        <Bar dataKey="investment" name="Investment" fill="#F59E0B" radius={[3, 3, 0, 0]} maxBarSize={24} />
-        <Bar dataKey="revenue" name="Revenue" fill="#3B82F6" radius={[3, 3, 0, 0]} maxBarSize={24} />
+      <BarChart data={data} barGap={12}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+        <XAxis dataKey="period" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+        <Tooltip {...blizzardTooltip} formatter={(v, name) => [typeof v === 'number' ? `RM ${v.toLocaleString()}` : v, name]} />
+        <Bar dataKey="investment" name="Cost" fill="rgba(255,255,255,0.05)" radius={[6, 6, 0, 0]} maxBarSize={20} />
+        <Bar dataKey="revenue" name="Revenue" fill="#40E0FF" radius={[6, 6, 0, 0]} maxBarSize={20} className="cyan-glow-bar" />
       </BarChart>
     </ResponsiveContainer>
   )

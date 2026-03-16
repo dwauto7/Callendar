@@ -5,13 +5,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
-  { label: 'How It Works', href: '/#how-it-works' },
-  { label: 'Features', href: '/#features' },
-  { label: 'Pricing', href: '/#pricing' },
+  { label: 'Systems', href: '/#how-it-works' },
+  { label: 'Intelligence', href: '/#features' },
+  { label: 'Investment', href: '/#pricing' },
   { label: 'Contact', href: '/contact' },
 ]
 
@@ -42,80 +42,87 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
         scrolled
-          ? 'bg-[#0A0A0A]/90 backdrop-blur-md border-b border-[#1E2128]'
-          : 'bg-transparent',
+          ? 'py-3 bg-background/80 backdrop-blur-xl border-b border-white/5 shadow-2xl'
+          : 'py-5 bg-transparent',
       )}
     >
-      <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-        {/* Logo */}
+      <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+        {/* Logo - AI Blizzard Branding */}
         <Link
           href="/"
-          className="text-xl font-bold text-[#F1F5F9] tracking-tight"
-          style={{ fontFamily: 'var(--font-syne)' }}
+          className="flex items-center gap-2 group"
         >
-          Callendar
+          <div className="size-8 bg-[#40E0FF] rounded-lg flex items-center justify-center cyan-glow transition-transform group-hover:rotate-12">
+            <Zap className="size-5 text-[#0B0D10] fill-current" />
+          </div>
+          <span 
+            className="text-xl font-black text-white tracking-tighter uppercase"
+            style={{ fontFamily: 'var(--font-syne)' }}
+          >
+            AI Blizzard
+          </span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        {/* Desktop Nav - High-end wording */}
+        <nav className="hidden md:flex items-center gap-8">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-[#64748B] hover:text-[#F1F5F9] transition-colors duration-200"
+              className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 hover:text-[#40E0FF] transition-colors duration-300"
             >
               {l.label}
             </a>
           ))}
         </nav>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* Desktop CTAs */}
+        <div className="hidden md:flex items-center gap-4">
           <Button
             variant="ghost"
             onClick={handleAuth}
-            className="text-sm text-[#64748B] hover:text-[#F1F5F9] hover:bg-[#1E2128]"
+            className="text-xs font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5"
           >
-            Login
+            Portal
           </Button>
           <Button
-            onClick={handleAuth}
-            className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold text-sm px-5"
+            onClick={() => window.open('https://calendly.com/dwautomate7/30min', '_blank')}
+            className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black text-xs uppercase tracking-widest px-6 h-10 rounded-lg cyan-glow transition-all"
           >
-            Get Started
+            Book Demo
           </Button>
         </div>
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden text-[#64748B] hover:text-[#F1F5F9]"
+          className="md:hidden text-white/60 hover:text-[#40E0FF] transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
-          {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          {mobileOpen ? <X className="size-6" /> : <Menu className="size-6" />}
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#0D0F12] border-b border-[#1E2128] px-5 py-4 space-y-3">
+        <div className="md:hidden glass-panel border-b border-white/10 px-6 py-8 space-y-6 animate-fade-in-up">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
               onClick={() => setMobileOpen(false)}
-              className="block text-sm text-[#64748B] hover:text-[#F1F5F9] py-1.5 transition-colors"
+              className="block text-sm font-bold uppercase tracking-widest text-white/60 hover:text-[#40E0FF]"
             >
               {l.label}
             </a>
           ))}
-          <div className="pt-2 flex flex-col gap-2">
-            <Button variant="outline" onClick={handleAuth} className="border-[#1E2128] text-[#F1F5F9] hover:bg-[#1E2128] w-full">
-              Login
+          <div className="pt-4 flex flex-col gap-3">
+            <Button variant="outline" onClick={handleAuth} className="border-white/10 text-white bg-white/5 h-12">
+              Client Portal
             </Button>
-            <Button onClick={handleAuth} className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold w-full">
-              Get Started
+            <Button onClick={() => window.open('https://calendly.com/dwautomate7/30min', '_blank')} className="bg-[#40E0FF] text-[#0B0D10] font-black h-12 cyan-glow">
+              Book Demo
             </Button>
           </div>
         </div>

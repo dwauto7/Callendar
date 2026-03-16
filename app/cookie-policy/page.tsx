@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 export default function CookiePolicyPage() {
   const brandName = "Beacon Horizons Solutions";
   const supportEmail = "dwautomate7@gmail.com";

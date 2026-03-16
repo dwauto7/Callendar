@@ -41,13 +41,13 @@ export async function GET(request: Request) {
   const admin = createAdminClient()
 
   const { data: existingClinic, error: clinicErr } = await admin
-    .from('clinic_config')
+    .from('clinic_configs')
     .select('id')
     .limit(1)
     .single()
 
   if (clinicErr || !existingClinic?.id) {
-    console.error('[auth/callback] No clinic_config found:', clinicErr?.message)
+    console.error('[auth/callback] No clinic_configs found:', clinicErr?.message)
     // No clinic exists yet — send to onboarding
     return NextResponse.redirect(`${origin}/onboarding`)
   }
@@ -65,6 +65,13 @@ export async function GET(request: Request) {
     console.error('[auth/callback] clinic_users insert error:', insertErr.message)
     return NextResponse.redirect(`${origin}/?auth=error`)
   }
+
+  // Ensure clinic_configs has an owner for RLS policies
+  await admin
+    .from('clinic_configs')
+    .update({ user_id: user.id })
+    .eq('id', existingClinic.id)
+    .is('user_id', null)
 
   return NextResponse.redirect(`${origin}/dashboard/overview`)
 }

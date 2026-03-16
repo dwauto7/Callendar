@@ -18,7 +18,7 @@ export default async function SettingsPage() {
   const id = clinicUser.clinic_config_id
 
   const [configRes, closuresRes] = await Promise.all([
-    supabase.from('clinic_config').select('*').eq('id', id).single(),
+    supabase.from('clinic_configs').select('*').eq('id', id).single(),
     supabase
       .from('clinic_settings')
       .select('id, date, reason, is_closed, setting_name')

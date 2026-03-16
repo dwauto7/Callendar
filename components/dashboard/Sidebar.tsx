@@ -13,19 +13,21 @@ import {
   LogOut,
   Menu,
   X,
+  ShieldCheck
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Card, CardContent } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 
 const navItems = [
-  { label: 'Overview',      href: '/dashboard/overview',      icon: LayoutDashboard },
-  { label: 'Call Logs',     href: '/dashboard/calls',         icon: PhoneCall },
-  { label: 'Appointments',  href: '/dashboard/appointments',  icon: CalendarCheck },
-  { label: 'Credits',       href: '/dashboard/credits',       icon: Zap },
-  { label: 'Reports',       href: '/dashboard/reports',       icon: BarChart3 },
-  { label: 'Settings',      href: '/dashboard/settings',      icon: Settings },
+  { label: 'Intelligence Overview', href: '/dashboard/overview',     icon: LayoutDashboard },
+  { label: 'Voice Logs',          href: '/dashboard/calls',        icon: PhoneCall },
+  { label: 'Clinical Calendar',   href: '/dashboard/appointments', icon: CalendarCheck },
+  { label: 'Engine Credits',      href: '/dashboard/credits',      icon: Zap },
+  { label: 'ROI Reports',         href: '/dashboard/reports',      icon: BarChart3 },
+  { label: 'System Settings',     href: '/dashboard/settings',     icon: Settings },
 ]
 
 interface SidebarProps {
@@ -45,101 +47,113 @@ export function Sidebar({ clinicName, userEmail }: SidebarProps) {
     router.refresh()
   }
 
-  const initials = userEmail?.split('@')[0]?.slice(0, 2).toUpperCase() ?? 'CL'
+  const initials = userEmail?.split('@')[0]?.slice(0, 2).toUpperCase() ?? 'AB'
 
   return (
     <>
-      {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 h-14 bg-[#0D0F12] border-b border-[#1E2128]">
-        <span
-          className="text-lg font-bold text-[#F1F5F9] tracking-tight"
-          style={{ fontFamily: 'var(--font-syne)' }}
-        >
-          Callendar
-        </span>
+      {/* Mobile top bar - AI Blizzard Branding */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-5 h-16 bg-[#0B0D10]/80 backdrop-blur-xl border-b border-white/5">
+        <div className="flex items-center gap-2">
+          <div className="size-7 bg-[#40E0FF] rounded flex items-center justify-center shadow-[0_0_15px_rgba(64,224,255,0.3)]">
+            <Zap className="size-4 text-[#0B0D10] fill-current" />
+          </div>
+          <span
+            className="text-lg font-black text-white tracking-tighter uppercase"
+            style={{ fontFamily: 'var(--font-syne)' }}
+          >
+            AI Blizzard
+          </span>
+        </div>
         <Button
           variant="ghost"
-          size="icon-sm"
-          className="text-[#64748B] hover:text-[#F1F5F9]"
+          size="icon"
+          className="text-white/40 hover:text-[#40E0FF]"
           onClick={() => setMobileOpen(true)}
         >
-          <Menu className="size-5" />
+          <Menu className="size-6" />
         </Button>
       </div>
 
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar Container */}
       <aside
         className={cn(
-          'fixed top-0 left-0 z-50 h-screen w-[240px] flex flex-col',
-          'bg-[#0D0F12] border-r border-[#1E2128]',
-          'transition-transform duration-200 ease-in-out',
+          'fixed top-0 left-0 z-50 h-screen w-[260px] flex flex-col',
+          'bg-[#0B0D10] border-r border-white/5 shadow-2xl transition-all duration-500 ease-in-out',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         )}
       >
-        {/* Logo */}
-        <div className="flex items-center justify-between px-5 h-16 border-b border-[#1E2128] shrink-0">
-          <span
-            className="text-xl font-bold text-[#F1F5F9] tracking-tight"
-            style={{ fontFamily: 'var(--font-syne)' }}
-          >
-            Callendar
-          </span>
+        {/* Logo Section */}
+        <div className="flex items-center justify-between px-6 h-20 border-b border-white/5 shrink-0 bg-white/[0.02]">
+          <Link href="/dashboard/overview" className="flex items-center gap-2.5 group">
+            <div className="size-8 bg-[#40E0FF] rounded-lg flex items-center justify-center transition-transform group-hover:rotate-12 shadow-[0_0_20px_rgba(64,224,255,0.4)]">
+              <Zap className="size-5 text-[#0B0D10] fill-current" />
+            </div>
+            <span
+              className="text-xl font-black text-white tracking-tighter uppercase"
+              style={{ fontFamily: 'var(--font-syne)' }}
+            >
+              AI Blizzard
+            </span>
+          </Link>
           <Button
             variant="ghost"
-            size="icon-sm"
-            className="lg:hidden text-[#64748B]"
+            size="icon"
+            className="lg:hidden text-white/20 hover:text-white"
             onClick={() => setMobileOpen(false)}
           >
-            <X className="size-4" />
+            <X className="size-5" />
           </Button>
         </div>
 
-        {/* Clinic name strip */}
-        <div className="px-5 py-3 border-b border-[#1E2128]">
-          <p className="text-[10px] text-[#64748B] uppercase tracking-widest font-semibold">
-            Clinic
-          </p>
-          <p className="text-sm text-[#F1F5F9] font-medium truncate mt-0.5">
+        {/* Clinic Info Strip - High end feel */}
+        <div className="px-6 py-5 bg-gradient-to-b from-white/[0.03] to-transparent border-b border-white/5">
+          <div className="flex items-center gap-2 mb-1.5">
+            <ShieldCheck className="size-3 text-[#40E0FF]/60" />
+            <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-black">
+              Verified Clinic
+            </p>
+          </div>
+          <p className="text-[15px] text-white font-bold truncate leading-tight">
             {clinicName}
           </p>
         </div>
 
         {/* Nav items */}
-        <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto">
           {navItems.map(({ label, href, icon: Icon }) => {
-            const active =
-              pathname === href || pathname.startsWith(href + '/')
+            const active = pathname === href || pathname.startsWith(href + '/')
             return (
               <Link
                 key={href}
                 href={href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium',
-                  'transition-all duration-200 group relative',
+                  'flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-bold tracking-tight',
+                  'transition-all duration-300 group relative',
                   active
-                    ? 'bg-[#10B981]/10 text-[#10B981]'
-                    : 'text-[#64748B] hover:text-[#F1F5F9] hover:bg-[#1E2128]',
+                    ? 'bg-[#40E0FF]/10 text-[#40E0FF] shadow-[inset_0_0_20px_rgba(64,224,255,0.05)]'
+                    : 'text-white/40 hover:text-white hover:bg-white/5',
                 )}
               >
-                {/* Active left-border accent */}
+                {/* Active left indicator - Cyan Glow */}
                 {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#10B981] rounded-r-full" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[4px] h-6 bg-[#40E0FF] rounded-r-full shadow-[0_0_15px_rgba(64,224,255,0.8)]" />
                 )}
+                
                 <Icon
                   className={cn(
-                    'size-4 shrink-0 transition-colors duration-200',
+                    'size-[18px] shrink-0 transition-all duration-300',
                     active
-                      ? 'text-[#10B981]'
-                      : 'text-[#64748B] group-hover:text-[#F1F5F9]',
+                      ? 'text-[#40E0FF] drop-shadow-[0_0_8px_rgba(64,224,255,0.5)]'
+                      : 'text-white/30 group-hover:text-white',
                   )}
                 />
                 {label}
@@ -148,29 +162,34 @@ export function Sidebar({ clinicName, userEmail }: SidebarProps) {
           })}
         </nav>
 
-        {/* User row + logout */}
-        <div className="border-t border-[#1E2128] p-4 shrink-0">
-          <div className="flex items-center gap-3">
-            <Avatar className="size-8 shrink-0">
-              <AvatarFallback className="bg-[#1E2128] text-[#F1F5F9] text-xs font-semibold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-[#F1F5F9] font-medium truncate">
-                {userEmail}
-              </p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="text-[#64748B] hover:text-[#EF4444] hover:bg-[#EF4444]/10 shrink-0 transition-colors duration-200"
-              onClick={handleLogout}
-              title="Sign out"
-            >
-              <LogOut className="size-4" />
-            </Button>
-          </div>
+        {/* User context footer */}
+        <div className="mt-auto p-4 bg-white/[0.02] border-t border-white/5">
+          <Card className="glass-panel border border-white/5 rounded-2xl">
+            <CardContent className="p-3 flex items-center gap-3">
+              <Avatar className="size-9 shrink-0 rounded-xl border border-white/10">
+                <AvatarFallback className="bg-[#40E0FF]/10 text-[#40E0FF] text-[10px] font-black tracking-tighter">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] text-white/30 font-bold uppercase tracking-widest mb-0.5">
+                  Operator
+                </p>
+                <p className="text-sm text-white font-bold truncate tracking-tight">
+                  {userEmail}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white/20 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                onClick={handleLogout}
+                title="Terminate Session"
+              >
+                <LogOut className="size-4" />
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </aside>
     </>

@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import { BarChart3, ArrowRight, TrendingUp, Phone, CalendarCheck, Clock } from 'lucide-react'
 import { formatRM, formatMins } from '@/lib/utils'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 interface MonthlyReport {
   report_period: string
@@ -23,25 +26,25 @@ export function MonthSummary({ report }: MonthSummaryProps) {
 
   const rows = [
     {
-      label: 'Total Calls',
+      label: 'Voice Inquiries',
       value: report?.total_calls?.toLocaleString() ?? '—',
       icon: Phone,
-      color: '#3B82F6',
+      color: '#40E0FF',
     },
     {
-      label: 'Appointments Booked',
+      label: 'System Appointments',
       value: report?.total_bookings?.toLocaleString() ?? '—',
       icon: CalendarCheck,
-      color: '#10B981',
+      color: '#40E0FF',
     },
     {
-      label: 'Revenue Generated',
+      label: 'Gross Revenue Capture',
       value: formatRM(report?.gross_revenue_generated),
       icon: TrendingUp,
-      color: '#10B981',
+      color: '#40E0FF',
     },
     {
-      label: 'Minutes Used',
+      label: 'Engine Minutes',
       value: formatMins(report?.total_minutes_used),
       icon: Clock,
       color: '#64748B',
@@ -49,20 +52,21 @@ export function MonthSummary({ report }: MonthSummaryProps) {
   ]
 
   return (
-    <div className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#1E2128]">
-        <div className="flex items-center gap-2">
-          <BarChart3 className="size-4 text-[#10B981]" />
+    <Card className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden glass-panel">
+      <CardHeader className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-white/[0.01]">
+        <div className="flex items-center gap-3">
+          <div className="size-8 rounded-lg bg-[#40E0FF]/10 flex items-center justify-center border border-[#40E0FF]/20">
+            <BarChart3 className="size-4 text-[#40E0FF]" />
+          </div>
           <div>
             <h2
-              className="text-sm font-semibold text-[#F1F5F9]"
+              className="text-sm font-black text-white uppercase tracking-widest"
               style={{ fontFamily: 'var(--font-syne)' }}
             >
-              This Month
+              Performance Cycle
             </h2>
             {report?.report_period && (
-              <p className="text-[10px] text-[#64748B] mt-0.5">
+              <p className="text-[10px] text-white/30 font-bold uppercase tracking-tighter mt-0.5">
                 {report.report_period}
               </p>
             )}
@@ -70,62 +74,64 @@ export function MonthSummary({ report }: MonthSummaryProps) {
         </div>
         <Link
           href="/dashboard/reports"
-          className="flex items-center gap-1 text-xs text-[#64748B] hover:text-[#10B981] transition-colors duration-200"
+          className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-[#40E0FF] transition-all"
         >
-          All reports
-          <ArrowRight className="size-3" />
+          View Intelligence
+          <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
         </Link>
-      </div>
+      </CardHeader>
 
-      {!report ? (
-        <div className="px-5 py-10 text-center text-sm text-[#64748B]">
-          No report data yet
-        </div>
-      ) : (
-        <>
-          {/* Metric rows */}
-          <div className="divide-y divide-[#1E2128]">
-            {rows.map(({ label, value, icon: Icon, color }) => (
-              <div
-                key={label}
-                className="flex items-center justify-between px-5 py-3.5 hover:bg-[#161B22] transition-colors duration-200"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className="size-6 rounded-md flex items-center justify-center shrink-0"
-                    style={{ background: `${color}18` }}
-                  >
-                    <Icon className="size-3.5" style={{ color }} />
-                  </div>
-                  <span className="text-sm text-[#64748B]">{label}</span>
-                </div>
-                <span
-                  className="text-sm font-semibold text-[#F1F5F9] tabular-nums"
-                  style={{ fontFamily: 'var(--font-syne)' }}
+      <CardContent className="p-0">
+        {!report ? (
+          <div className="px-6 py-12 text-center text-xs font-bold uppercase tracking-widest text-white/20">
+            Syncing local data...
+          </div>
+        ) : (
+          <>
+            {/* Metric rows */}
+            <div className="divide-y divide-white/5">
+              {rows.map(({ label, value, icon: Icon, color }) => (
+                <div
+                  key={label}
+                  className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition-colors duration-300"
                 >
-                  {value}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="size-8 rounded-lg flex items-center justify-center shrink-0 border border-white/5"
+                      style={{ background: `${color}10` }}
+                    >
+                      <Icon className="size-4" style={{ color }} />
+                    </div>
+                    <span className="text-sm font-bold text-white/50 tracking-tight">{label}</span>
+                  </div>
+                  <span
+                    className="text-sm font-bold text-white tabular-nums tracking-tighter"
+                    style={{ fontFamily: 'var(--font-syne)' }}
+                  >
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Conversion rate footer - Cyan styled */}
+            <div className="px-6 py-5 bg-[#40E0FF]/5 border-t border-white/5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-black text-[#40E0FF] uppercase tracking-widest">Efficiency Rating</span>
+                <span className="text-sm font-black text-white tabular-nums">
+                  {conversionRate}%
                 </span>
               </div>
-            ))}
-          </div>
-
-          {/* Conversion rate footer */}
-          <div className="px-5 py-3.5 bg-[#10B981]/5 border-t border-[#1E2128]">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-[#64748B]">Booking conversion</span>
-              <span className="text-xs font-bold text-[#10B981] tabular-nums">
-                {conversionRate}%
-              </span>
+              <div className="h-1.5 rounded-full bg-black/40 overflow-hidden border border-white/5">
+                <div
+                  className="h-full rounded-full bg-[#40E0FF] shadow-[0_0_10px_rgba(64,224,255,0.5)] transition-all duration-1000"
+                  style={{ width: `${conversionRate}%` }}
+                />
+              </div>
             </div>
-            <div className="mt-1.5 h-1 rounded-full bg-[#1E2128] overflow-hidden">
-              <div
-                className="h-full rounded-full bg-[#10B981] transition-all duration-500"
-                style={{ width: `${conversionRate}%` }}
-              />
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   )
 }

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 export default function PrivacyPolicyPage() {
   const brandName = "Beacon Horizons Solutions";
   const doingBusinessAs = "Beacon Horizons";
