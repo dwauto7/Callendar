@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { BarChart3, ArrowRight, TrendingUp, Phone, CalendarCheck, Clock } from 'lucide-react'
 import { formatRM, formatMins } from '@/lib/utils'

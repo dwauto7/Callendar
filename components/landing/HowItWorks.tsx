@@ -1,5 +1,3 @@
-'use client'
-
 import { Phone, Cpu, BellRing, Zap } from 'lucide-react'
 
 const steps = [

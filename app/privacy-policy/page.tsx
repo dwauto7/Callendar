@@ -1,4 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
+'use client'
+
+import { useState } from 'react'
 export default function PrivacyPolicyPage() {
   const brandName = "Beacon Horizons Solutions";
   const doingBusinessAs = "Beacon Horizons";
@@ -7,6 +10,7 @@ export default function PrivacyPolicyPage() {
   const lastUpdated = "March 11, 2026";
   const siteUrl = "https://callendar-zeta.vercel.app/";
   const dsarUrl = "https://app.termly.io/dsar/6284c694-5dc1-457f-923b-4533ad8f0a3f";
+  const [language, setLanguage] = useState<'EN' | 'BM'>('EN')
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12 font-sans bg-white text-[#595959]">
@@ -25,8 +29,39 @@ export default function PrivacyPolicyPage() {
 
       <div className="policy-container">
         <h1>PRIVACY POLICY</h1>
-        <p><strong>Last updated: {lastUpdated}</strong></p>
+        <div className="flex items-center gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setLanguage('EN')}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${language === 'EN' ? 'bg-[#111827] text-white border-[#111827]' : 'bg-white text-[#111827] border-[#e2e8f0]'}`}
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            onClick={() => setLanguage('BM')}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${language === 'BM' ? 'bg-[#111827] text-white border-[#111827]' : 'bg-white text-[#111827] border-[#e2e8f0]'}`}
+          >
+            BM
+          </button>
+        </div>
 
+        {language === 'BM' ? (
+          <section className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 text-[#1f2937]">
+            <p><strong>Dikemas kini: 17 Mac 2026</strong></p>
+            <p>Notis ini disediakan mengikut Akta Perlindungan Data Peribadi (PDPA) 2010 (Pindaan 2024).</p>
+            <p><strong>Maklumat yang Kami Proses:</strong> Kami mengumpul nama, nombor telefon, emel, dan Data Peribadi Sensitif (rakaman suara/biometrik) melalui ejen AI kami, "Aya".</p>
+            <p><strong>Tujuan:</strong> Untuk menguruskan temujanji klinik, pemasaran demonstrasi, dan meningkatkan kualiti perkhidmatan AI.</p>
+            <p><strong>Pemindahan Data ke Luar Negara:</strong> Data anda akan diproses dan disimpan di pelayan (servers) yang terletak di Singapura dan Amerika Syarikat (melalui pembekal perkhidmatan seperti Vultr dan Retell AI). Dengan menggunakan perkhidmatan kami, anda memberi persetujuan nyata bagi pemindahan ini.</p>
+            <p><strong>Hak Anda:</strong> Anda berhak untuk mengakses, membetulkan, atau memadam data anda pada bila-bila masa dengan menghubungi kami di {supportEmail}.</p>
+            <p><strong>Persetujuan Nyata:</strong> Dengan mengklik "Teruskan" atau menggunakan perkhidmatan kami, anda bersetuju dengan pemprosesan data anda seperti yang dinyatakan di atas.</p>
+          </section>
+        ) : (
+          <p><strong>Last updated: {lastUpdated}</strong></p>
+        )}
+
+        {language === 'EN' && (
+        <>
         <hr />
 
         <p>
@@ -113,7 +148,7 @@ export default function PrivacyPolicyPage() {
             <li>Contact preferences</li>
             <li>Contact or authentication data</li>
           </ul>
-          <p><strong>Sensitive Information.</strong> We do not process sensitive information.</p>
+          <p><strong>Sensitive Information.</strong> We process voice recordings and biometric identifiers (voice patterns) when you interact with our AI Voice Products. Under the Malaysian PDPA, this is classified as Sensitive Personal Data. We process this only with your express consent for the purpose of appointment booking and service quality monitoring.</p>
           <p>
             <strong>Social Media Login Data.</strong> We may provide you with the option to register with us using your
             existing social media account details, like your Facebook, X, or other social media account. If you choose to
@@ -205,9 +240,9 @@ export default function PrivacyPolicyPage() {
           </p>
           <ul>
             <li><strong>Advertising &amp; Lead Generation:</strong> Google AdSense</li>
-            <li><strong>AI Service Providers:</strong> OpenAI</li>
+            <li><strong>AI Service Providers:</strong> OpenAI / Anthropic (via Retell/n8n)</li>
             <li><strong>Third-Party Account Connections:</strong> Google account</li>
-            <li><strong>Cloud Computing:</strong> Google Cloud Platform</li>
+            <li><strong>Cloud Computing:</strong> Vultr (Singapore Region)</li>
             <li><strong>Communications:</strong> Twilio</li>
             <li><strong>Data Backup &amp; Security:</strong> Google Drive Backup</li>
             <li><strong>Infrastructure Optimization:</strong> Termly.io and Google Cloud Storage</li>
@@ -217,10 +252,15 @@ export default function PrivacyPolicyPage() {
             <li><strong>Web Analytics:</strong> Google Analytics</li>
             <li><strong>Performance Monitoring:</strong> Sentry</li>
             <li><strong>AI Voice Agent:</strong> Retell AI</li>
-            <li><strong>Workflow Automation:</strong> n8n.io</li>
-            <li><strong>Database &amp; Authentication:</strong> Supabase</li>
+            <li><strong>Workflow Automation:</strong> n8n.io (Self-hosted on Vultr)</li>
+            <li><strong>Storage:</strong> Supabase</li>
             <li><strong>Web Hosting:</strong> Vercel</li>
           </ul>
+          <p>
+            <strong>International Data Transfers:</strong> To provide our Services, your personal and sensitive data (including voice)
+            will be transferred to and processed in Singapore and the United States. We ensure these transfers comply with Section 129
+            of the PDPA and that our sub-processors (Retell, OpenAI, Vultr) maintain security standards equivalent to Malaysian law.
+          </p>
           <p>
             We also may need to share your personal information in connection with any merger, sale of company assets,
             financing, or acquisition of all or a portion of our business to another company.
@@ -258,9 +298,13 @@ export default function PrivacyPolicyPage() {
           <h3>Use of AI Technologies</h3>
           <p>
             We provide the AI Products through third-party service providers ("AI Service Providers"), including
-            ElevenLabs, Cartesia, Deepgram, Google Cloud AI, and OpenAI. Your input, output, and personal information
-            will be shared with and processed by these AI Service Providers. You must not use the AI Products in any way
-            that violates the terms or policies of any AI Service Provider.
+            Retell AI, OpenAI, and Anthropic. Your input, output, and personal information will be shared with and
+            processed by these AI Service Providers. You must not use the AI Products in any way that violates the
+            terms or policies of any AI Service Provider.
+          </p>
+          <p>
+            Users acknowledge that AI-generated outputs may occasionally be inaccurate. We encourage users to verify
+            critical booking information via the provided dashboard.
           </p>
           <h3>Our AI Products</h3>
           <p>Our AI Products are designed for the following functions:</p>
@@ -428,6 +472,11 @@ export default function PrivacyPolicyPage() {
         <section id="request">
           <h2>14. HOW CAN YOU REVIEW, UPDATE, OR DELETE THE DATA WE COLLECT FROM YOU?</h2>
           <p>
+            <strong>International Data Transfers:</strong> To provide our Services, your personal and sensitive data (including voice)
+            will be transferred to and processed in Singapore and the United States. We ensure these transfers comply with Section 129
+            of the PDPA and that our sub-processors (Retell, OpenAI, Vultr) maintain security standards equivalent to Malaysian law.
+          </p>
+          <p>
             Based on the applicable laws of your country, you may have the right to request access to the personal
             information we collect from you, details about how we have processed it, correct inaccuracies, or delete your
             personal information. You may also have the right to withdraw your consent to our processing of your personal
@@ -436,6 +485,9 @@ export default function PrivacyPolicyPage() {
             <a href={dsarUrl} target="_blank" rel="noopener noreferrer">data subject access request</a>.
           </p>
         </section>
+
+        </>
+        )}
 
       </div>
     </main>

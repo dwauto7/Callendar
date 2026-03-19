@@ -8,7 +8,7 @@ import { Footer } from '@/components/landing/Footer'
 export default function LandingPage() {
   return (
     // bg-background uses our new #0B0D10 from globals.css
-    // aurora-bg adds the subtle moving cyan glow
+    // aurora-bg is now static (no animated gradient shift)
     <div className="bg-background min-h-screen flex flex-col aurora-bg relative overflow-hidden">
       {/* Optional: Add a very faint grain overlay for that premium texture */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] grain" />
@@ -39,7 +39,6 @@ export default function LandingPage() {
           background:
             'linear-gradient(90deg, rgba(64,224,255,0.35), rgba(16,185,129,0.15), rgba(64,224,255,0.35))',
           backgroundSize: '200% 200%',
-          animation: 'gradient-shift 18s ease infinite',
         }}
       />
       

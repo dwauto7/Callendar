@@ -1,5 +1,3 @@
-'use client'
-
 import { Button } from '@/components/ui/button'
 import { ArrowRight, CalendarCheck, Clock, TrendingUp, Zap, CheckCircle2, ShieldCheck, Search } from 'lucide-react'
 
@@ -151,18 +149,20 @@ export function Hero() {
 
             <div className="flex flex-wrap gap-4">
               <Button
-                onClick={() => window.open('https://calendly.com/dwautomate7/30min', '_blank')}
+                asChild
                 className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black text-sm h-14 px-8 rounded-xl transition-all cyan-glow"
               >
-                BOOK A DEMO
-                <ArrowRight className="size-4 ml-2" />
+                <a href="https://calendly.com/dwautomate7/30min" target="_blank" rel="noopener noreferrer">
+                  BOOK A DEMO
+                  <ArrowRight className="size-4 ml-2" />
+                </a>
               </Button>
               <Button
+                asChild
                 variant="outline"
-                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 className="border-white/10 bg-white/5 text-white hover:bg-white/10 h-14 px-8 rounded-xl text-sm font-bold backdrop-blur-md"
               >
-                24/7 AVAILABILITY
+                <a href="/#how-it-works">24/7 AVAILABILITY</a>
               </Button>
             </div>
 

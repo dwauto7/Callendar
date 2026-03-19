@@ -1,5 +1,3 @@
-'use client'
-
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, ShieldCheck } from 'lucide-react'
 
@@ -115,14 +113,16 @@ export function Pricing() {
               </div>
 
               <Button
-                onClick={() => window.open('https://calendly.com/dwautomate7/30min', '_blank')}
+                asChild
                 className={`w-full h-12 rounded-xl font-bold text-sm mb-8 transition-all ${
                   tier.highlight
                     ? 'bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] cyan-glow'
                     : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
                 }`}
               >
-                {tier.cta}
+                <a href="https://calendly.com/dwautomate7/30min" target="_blank" rel="noopener noreferrer">
+                  {tier.cta}
+                </a>
               </Button>
 
               <ul className="space-y-4 mb-8 flex-1">

@@ -1,133 +1,416 @@
 import { redirect } from 'next/navigation'
-import { BarChart3, TrendingUp, CalendarCheck, Clock, DollarSign, ArrowUpRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { CallsTrendChart, BookingsRevenueChart } from '@/components/dashboard/reports/ReportCharts'
+import { BarChart3, TrendingUp, Phone, CalendarCheck, Clock, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react'
 import { formatRM, formatMins } from '@/lib/utils'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { CallsTrendChart, BookingsRevenueChart } from '@/components/dashboard/reports/ReportCharts'
+import { cn } from '@/lib/utils'
 
-export const metadata = { title: 'Intelligence — AI Blizzard' }
+export const metadata = {
+  title: 'Performance & ROI — Callendar',
+}
 
-export default async function ReportsPage() {
+export default async function ReportsPage() { 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) redirect('/')
 
   const { data: clinicUser } = await supabase
-    .from('clinic_users').select('clinic_config_id').eq('user_id', user.id).single()
+    .from('clinic_users')
+    .select(`
+      clinic_config_id,
+      clinic_configs (
+        clinic_name
+      )
+    `)
+    .eq('user_id', user.id)
+    .single()
+
   if (!clinicUser?.clinic_config_id) redirect('/onboarding')
 
+  // @ts-expect-error - nested supabase join
+  const clinicName = clinicUser.clinic_configs?.clinic_name ?? 'Partner'
+  const id = clinicUser.clinic_config_id
+
+  // Fetch last 6 months of reports
   const { data: reports } = await supabase
     .from('monthly_reports')
     .select('*')
-    .eq('clinic_config_id', clinicUser.clinic_config_id)
-    .order('report_month', { ascending: true })
+    .eq('clinic_config_id', id)
+    .order('report_month', { ascending: false })
+    .limit(6)
 
   const allReports = reports ?? []
+  const currentReport = allReports[0] ?? null
+  const previousReport = allReports[1] ?? null
 
-  const chartData = allReports.map((r) => ({
-    period: r.report_period ?? r.report_month?.slice(0, 7) ?? '—',
+  // ── Month-on-month delta helpers ─────────────────────────────
+  function delta(current: number | null, previous: number | null) {
+    if (!current || !previous || previous === 0) return null
+    return Math.round(((current - previous) / previous) * 100)
+  }
+
+  const callsDelta    = delta(currentReport?.total_calls, previousReport?.total_calls)
+  const bookingsDelta = delta(currentReport?.total_bookings, previousReport?.total_bookings)
+  const revenueDelta  = delta(currentReport?.gross_revenue_generated, previousReport?.gross_revenue_generated)
+  const minutesDelta  = delta(currentReport?.total_minutes_used, previousReport?.total_minutes_used)
+
+  const conversionRate =
+    currentReport && currentReport.total_calls > 0
+      ? Math.round((currentReport.total_bookings / currentReport.total_calls) * 100)
+      : 0
+
+  // ── Chart data (oldest → newest for left-to-right trend) ─────
+  const chartData = [...allReports].reverse().map((r) => ({
+    period: r.report_period ?? '—',
     calls: r.total_calls ?? 0,
     bookings: r.total_bookings ?? 0,
     revenue: r.gross_revenue_generated ?? 0,
     investment: r.total_monthly_investment ?? 0,
   }))
 
-  const totalRevenue = allReports.reduce((s, r) => s + (r.gross_revenue_generated ?? 0), 0)
-  const totalCalls = allReports.reduce((s, r) => s + (r.total_calls ?? 0), 0)
-  const totalBookings = allReports.reduce((s, r) => s + (r.total_bookings ?? 0), 0)
-  const totalMins = allReports.reduce((s, r) => s + (r.total_minutes_used ?? 0), 0)
+  // ── Snapshot metric rows ──────────────────────────────────────
+  const snapshotRows = [
+    {
+      label: 'Voice Inquiries',
+      value: currentReport?.total_calls?.toLocaleString() ?? '—',
+      icon: Phone,
+      delta: callsDelta,
+    },
+    {
+      label: 'System Appointments',
+      value: currentReport?.total_bookings?.toLocaleString() ?? '—',
+      icon: CalendarCheck,
+      delta: bookingsDelta,
+    },
+    {
+      label: 'Gross Revenue Capture',
+      value: formatRM(currentReport?.gross_revenue_generated),
+      icon: TrendingUp,
+      delta: revenueDelta,
+    },
+    {
+      label: 'Engine Minutes Used',
+      value: formatMins(currentReport?.total_minutes_used),
+      icon: Clock,
+      delta: minutesDelta,
+    },
+  ]
 
   return (
-    <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-7xl mx-auto space-y-8 fade-in">
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-[#40E0FF]/10 rounded-lg cyan-glow">
-          <BarChart3 className="size-5 text-[#40E0FF]" />
+    <div className="px-6 py-8 lg:px-10 lg:py-12 max-w-[1600px] mx-auto">
+
+      {/* ── Page header ── */}
+      <div className="mb-10">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="size-2 rounded-full bg-[#40E0FF] animate-pulse" />
+          <p className="text-[10px] text-[#40E0FF] font-black uppercase tracking-[0.2em]">
+            {clinicName}
+          </p>
         </div>
-        <h1 className="text-3xl font-bold text-white tracking-tighter" style={{ fontFamily: 'var(--font-display)' }}>
-          Intelligence <span className="text-[#40E0FF]">Hub</span>
+        <h1
+          className="text-4xl md:text-5xl font-bold text-white tracking-tighter leading-none"
+          style={{ fontFamily: 'var(--font-syne)' }}
+        >
+          Performance <span className="text-white/20">&amp; ROI</span>
         </h1>
+        <p
+          className="text-base md:text-lg font-semibold text-white/20 tracking-tight mt-1"
+          style={{ fontFamily: 'var(--font-syne)' }}
+        >
+          {currentReport?.report_period ?? 'No data yet'} · Intelligence Cycle
+        </p>
       </div>
 
-      {/* Hero Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { icon: TrendingUp, label: 'Gross Revenue', value: formatRM(totalRevenue), color: '#40E0FF' },
-          { icon: CalendarCheck, label: 'Total Bookings', value: totalBookings.toLocaleString(), color: '#10B981' },
-          { icon: Clock, label: 'Compute Time', value: formatMins(totalMins), color: '#8B5CF6' },
-          { icon: DollarSign, label: 'Total Volume', value: totalCalls.toLocaleString(), color: '#F59E0B' },
-        ].map(({ icon: Icon, label, value, color }) => (
-          <div
-            key={label}
-            className="glass-panel p-6 rounded-3xl border border-white/5 relative overflow-hidden group hover:border-[#40E0FF]/30 transition-all"
-            style={{ background: `linear-gradient(135deg, #0D0F12 60%, ${color}05 100%)` }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="rounded-xl p-2 bg-white/5 group-hover:scale-110 transition-transform">
-                <Icon className="size-4" style={{ color }} />
-              </div>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">{label}</p>
-            </div>
-            <p className="text-3xl font-bold text-white tracking-tighter" style={{ fontFamily: 'var(--font-display)' }}>
-              {value}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Visualization Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-panel p-8 rounded-3xl border border-white/5 bg-[#0D0F12]">
-          <h3 className="text-xs font-black uppercase tracking-widest text-white/40 mb-8 text-center">Conversion Velocity</h3>
-          <CallsTrendChart data={chartData} />
-        </div>
-
-        <div className="glass-panel p-8 rounded-3xl border border-white/5 bg-[#0D0F12]">
-          <h3 className="text-xs font-black uppercase tracking-widest text-white/40 mb-8 text-center">Economics (RM)</h3>
-          <BookingsRevenueChart data={chartData} />
-        </div>
-      </div>
-
-      {/* Monthly Cards */}
-      <div>
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 px-2">Lifecycle Archives</h3>
-        {allReports.length === 0 ? (
-          <div className="glass-panel py-20 text-center rounded-3xl border border-dashed border-white/10">
-            <p className="text-sm text-white/20 font-mono tracking-widest uppercase">No archive data found</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...allReports].reverse().map((report) => {
-              const roi = report.total_monthly_investment && report.total_monthly_investment > 0
-                ? (((report.gross_revenue_generated ?? 0) / report.total_monthly_investment) * 100).toFixed(0)
-                : null
-              return (
-                <div key={report.id} className="glass-panel p-6 rounded-3xl border border-white/5 hover:bg-white/[0.02] transition-all group">
-                  <div className="flex items-center justify-between mb-6">
-                    <p className="text-lg font-bold text-white group-hover:text-[#40E0FF] transition-colors">{report.report_period}</p>
-                    {roi && (
-                      <span className="flex items-center gap-1 text-[10px] font-black text-[#10B981] bg-[#10B981]/10 px-3 py-1 rounded-full uppercase tracking-tighter">
-                        {roi}% ROI <ArrowUpRight className="size-3" />
-                      </span>
-                    )}
+      {/* ─────────────────────────────────────────────────────────
+          1. CURRENT MONTH SNAPSHOT
+      ───────────────────────────────────────────────────────── */}
+      <div className="mb-6">
+        <SectionLabel>Current Cycle Snapshot</SectionLabel>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {snapshotRows.map(({ label, value, icon: Icon, delta: d }) => (
+            <Card
+              key={label}
+              className="rounded-2xl border border-white/5 bg-white/[0.02] glass-panel"
+            >
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="size-9 rounded-xl bg-[#40E0FF]/10 border border-[#40E0FF]/20 flex items-center justify-center">
+                    <Icon className="size-4 text-[#40E0FF]" />
                   </div>
-                  <div className="space-y-3">
-                    {[
-                      { label: 'Volume', value: report.total_calls, color: 'white' },
-                      { label: 'Conversion', value: report.total_bookings, color: '#10B981' },
-                      { label: 'Revenue', value: formatRM(report.gross_revenue_generated), color: '#40E0FF' },
-                      { label: 'Compute', value: formatRM(report.total_monthly_investment), color: '#F59E0B' },
-                    ].map(({ label, value, color }) => (
-                      <div key={label} className="flex justify-between items-center py-1 border-b border-white/[0.03]">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{label}</span>
-                        <span className="text-xs font-bold tabular-nums" style={{ color }}>{value}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <DeltaBadge delta={d} />
                 </div>
-              )
-            })}
-          </div>
-        )}
+                <p
+                  className="text-2xl font-bold text-white tracking-tighter tabular-nums"
+                  style={{ fontFamily: 'var(--font-syne)' }}
+                >
+                  {value}
+                </p>
+                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">
+                  {label}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Efficiency rating bar */}
+        <Card className="mt-4 rounded-2xl border border-white/5 bg-white/[0.02] glass-panel">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-black text-[#40E0FF] uppercase tracking-widest">
+                Booking Efficiency Rating
+              </span>
+              <span className="text-sm font-black text-white tabular-nums">
+                {conversionRate}%
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-black/40 overflow-hidden border border-white/5">
+              <div
+                className="h-full rounded-full bg-[#40E0FF] shadow-[0_0_10px_rgba(64,224,255,0.5)] transition-all duration-1000"
+                style={{ width: `${conversionRate}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-white/20 font-mono mt-2">
+              {currentReport?.total_bookings ?? 0} bookings from {currentReport?.total_calls ?? 0} calls this cycle
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* ─────────────────────────────────────────────────────────
+          2. MULTI-MONTH TREND CHARTS
+      ───────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <Card className="rounded-2xl border border-white/5 bg-white/[0.02] glass-panel">
+          <CardHeader className="px-6 py-5 border-b border-white/5 bg-white/[0.01]">
+            <ChartHeader icon={Phone} title="Calls & Bookings" subtitle="Trend over time" />
+          </CardHeader>
+          <CardContent className="p-6">
+            {chartData.length === 0 ? (
+              <EmptyChart />
+            ) : (
+              <CallsTrendChart data={chartData} />
+            )}
+            <div className="flex items-center gap-4 mt-4">
+              <LegendDot color="#40E0FF" label="Total Calls" />
+              <LegendDot color="#10B981" label="Bookings" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ─────────────────────────────────────────────────────
+            3. COST VS REVENUE ROI
+        ───────────────────────────────────────────────────── */}
+        <Card className="rounded-2xl border border-white/5 bg-white/[0.02] glass-panel">
+          <CardHeader className="px-6 py-5 border-b border-white/5 bg-white/[0.01]">
+            <ChartHeader icon={TrendingUp} title="Revenue vs Investment" subtitle="ROI by cycle" />
+          </CardHeader>
+          <CardContent className="p-6">
+            {chartData.length === 0 ? (
+              <EmptyChart />
+            ) : (
+              <BookingsRevenueChart data={chartData} />
+            )}
+            <div className="flex items-center gap-4 mt-4">
+              <LegendDot color="#40E0FF" label="Revenue" />
+              <LegendDot color="rgba(255,255,255,0.15)" label="Investment" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────
+          4. MONTH-ON-MONTH COMPARISON TABLE
+      ───────────────────────────────────────────────────────── */}
+      <div className="mb-6">
+        <SectionLabel>Month-on-Month Comparison</SectionLabel>
+        <Card className="rounded-2xl border border-white/5 bg-white/[0.02] glass-panel overflow-hidden">
+          {allReports.length === 0 ? (
+            <CardContent className="px-6 py-12 text-center text-xs font-bold uppercase tracking-widest text-white/20">
+              No historical data yet
+            </CardContent>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/5 bg-white/[0.01]">
+                    {['Period', 'Calls', 'Bookings', 'Efficiency', 'Revenue', 'Minutes'].map((h) => (
+                      <th
+                        key={h}
+                        className="px-6 py-4 text-left text-[10px] font-black text-white/30 uppercase tracking-widest"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {allReports.map((r, i) => {
+                    const prev = allReports[i + 1]
+                    const eff =
+                      r.total_calls > 0
+                        ? Math.round((r.total_bookings / r.total_calls) * 100)
+                        : 0
+                    return (
+                      <tr
+                        key={r.id}
+                        className={cn(
+                          'hover:bg-white/[0.02] transition-colors',
+                          i === 0 && 'bg-[#40E0FF]/[0.02]',
+                        )}
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            {i === 0 && (
+                              <span className="text-[9px] font-black text-[#40E0FF] uppercase tracking-widest bg-[#40E0FF]/10 px-2 py-0.5 rounded-full">
+                                Current
+                              </span>
+                            )}
+                            <span className="text-xs font-bold text-white/60">
+                              {r.report_period}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <CellWithDelta
+                            value={r.total_calls?.toLocaleString() ?? '—'}
+                            delta={delta(r.total_calls, prev?.total_calls)}
+                          />
+                        </td>
+                        <td className="px-6 py-4">
+                          <CellWithDelta
+                            value={r.total_bookings?.toLocaleString() ?? '—'}
+                            delta={delta(r.total_bookings, prev?.total_bookings)}
+                          />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 h-1.5 rounded-full bg-black/40 overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-[#40E0FF]"
+                                style={{ width: `${eff}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-bold text-white/50 tabular-nums">
+                              {eff}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <CellWithDelta
+                            value={formatRM(r.gross_revenue_generated)}
+                            delta={delta(r.gross_revenue_generated, prev?.gross_revenue_generated)}
+                          />
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-bold text-white/50 tabular-nums">
+                            {formatMins(r.total_minutes_used)}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+// ── Sub-components ────────────────────────────────────────────
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-3">
+      {children}
+    </p>
+  )
+}
+
+function ChartHeader({
+  icon: Icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ElementType
+  title: string
+  subtitle: string
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="size-8 rounded-lg bg-[#40E0FF]/10 flex items-center justify-center border border-[#40E0FF]/20">
+        <Icon className="size-4 text-[#40E0FF]" />
+      </div>
+      <div>
+        <h2
+          className="text-sm font-black text-white uppercase tracking-widest"
+          style={{ fontFamily: 'var(--font-syne)' }}
+        >
+          {title}
+        </h2>
+        <p className="text-[10px] text-white/30 font-bold uppercase tracking-tighter mt-0.5">
+          {subtitle}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function DeltaBadge({ delta }: { delta: number | null }) {
+  if (delta === null) return null
+  if (delta === 0)
+    return (
+      <span className="flex items-center gap-0.5 text-[10px] font-black text-white/20">
+        <Minus className="size-3" /> 0%
+      </span>
+    )
+  const positive = delta > 0
+  return (
+    <span
+      className={cn(
+        'flex items-center gap-0.5 text-[10px] font-black',
+        positive ? 'text-emerald-400' : 'text-red-400',
+      )}
+    >
+      {positive ? (
+        <ArrowUpRight className="size-3" />
+      ) : (
+        <ArrowDownRight className="size-3" />
+      )}
+      {Math.abs(delta)}%
+    </span>
+  )
+}
+
+function CellWithDelta({ value, delta }: { value: string; delta: number | null }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-xs font-bold text-white/70 tabular-nums">{value}</span>
+      <DeltaBadge delta={delta} />
+    </div>
+  )
+}
+
+function LegendDot({ color, label }: { color: string; label: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="size-2 rounded-full shrink-0" style={{ background: color }} />
+      <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{label}</span>
+    </div>
+  )
+}
+
+function EmptyChart() {
+  return (
+    <div className="h-[240px] flex items-center justify-center text-xs font-mono text-white/20 uppercase tracking-widest">
+      Awaiting Data
     </div>
   )
 }

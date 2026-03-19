@@ -64,13 +64,17 @@ export default function CookiePolicyPage() {
           cookies also enable us to track and target the interests of our users to enhance the experience on our Online
           Properties. Third parties serve cookies through our Website for advertising, analytics, and other purposes.
         </p>
+        <p>
+          We use cookies to maintain your session state during interactions with our AI interface to ensure a seamless
+          conversational experience.
+        </p>
 
         <h2>How can I control cookies?</h2>
         <p>
-          You have the right to decide whether to accept or reject cookies. You can exercise your cookie rights by setting
-          your preferences in the Cookie Preference Center. The Cookie Preference Center allows you to select which
-          categories of cookies you accept or reject. Essential cookies cannot be rejected as they are strictly necessary
-          to provide you with services.
+          You have the right to provide, refuse, or withdraw your consent for non-essential cookies at any time via our
+          Cookie Preference Center. The Cookie Preference Center allows you to select which categories of cookies you
+          accept or reject. Essential cookies cannot be rejected as they are strictly necessary to provide you with
+          services.
         </p>
         <p>
           If you choose to reject cookies, you may still use our Website though your access to some functionality and
@@ -114,14 +118,6 @@ export default function CookiePolicyPage() {
               <td>http_cookie</td>
               <td>~400 days</td>
             </tr>
-            <tr>
-              <td>s7</td>
-              <td>Gather data regarding site usage and user behavior on the website</td>
-              <td>callendar.vercel.app</td>
-              <td>Adobe Analytics</td>
-              <td>html_local_storage</td>
-              <td>Persistent</td>
-            </tr>
           </tbody>
         </table>
 
@@ -131,24 +127,7 @@ export default function CookiePolicyPage() {
           the help of their providers.
         </p>
 
-        <table className="cookie-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Provider</th>
-              <th>Type</th>
-              <th>Expires</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>bare-mux-path</td>
-              <td>callendar.vercel.app</td>
-              <td>html_local_storage</td>
-              <td>Persistent</td>
-            </tr>
-          </tbody>
-        </table>
+        <p>We do not currently use any unclassified cookies.</p>
 
         <h2>How can I control cookies on my browser?</h2>
         <p>

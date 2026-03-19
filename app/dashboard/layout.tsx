@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { MobileNav } from '@/components/dashboard/MobileNav'
+import { ClinicProvider } from '@/components/providers/ClinicProvider'
+import { timeAsync } from '@/lib/perf'
 
 export default async function DashboardLayout({
   children,
@@ -11,30 +13,34 @@ export default async function DashboardLayout({
   const supabase = await createClient()
 
   // 1. Get the authenticated user
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user } } = await timeAsync('layout:get_user', () => supabase.auth.getUser())
 
   if (!user) {
     redirect('/?auth=required')
   }
 
-  // 2. Get the clinic link for this user
-  const { data: clinicUser } = await supabase
-    .from('clinic_users')
-    .select('clinic_config_id')
-    .eq('user_id', user.id)
-    .single()
+  // 2. Get the clinic link + role + name in one round-trip
+  const { data: clinicUser } = await timeAsync('layout:clinic_user', () =>
+    supabase
+      .from('clinic_users')
+      .select(`
+        clinic_config_id,
+        role,
+        clinic_configs (
+          clinic_name
+        )
+      `)
+      .eq('user_id', user.id)
+      .single()
+  )
 
   // If they don't have a clinic yet, send them to onboarding
   if (!clinicUser?.clinic_config_id) {
     redirect('/onboarding')
   }
 
-  // 3. Get the actual clinic name for the Sidebar
-  const { data: clinicConfig } = await supabase
-    .from('clinic_configs')
-    .select('clinic_name')
-    .eq('id', clinicUser.clinic_config_id)
-    .single()
+  // @ts-expect-error - handling nested supabase join
+  const clinicName = clinicUser?.clinic_configs?.clinic_name ?? 'Your Clinic'
 
   // 4. Return the UI (Single Return Statement)
   return (
@@ -60,7 +66,6 @@ export default async function DashboardLayout({
           background:
             'linear-gradient(90deg, rgba(64,224,255,0.25), rgba(14,165,233,0.12), rgba(64,224,255,0.25))',
           backgroundSize: '200% 200%',
-          animation: 'gradient-shift 20s ease infinite',
         }}
       />
       {/* Subtle vignette to frame content */}
@@ -73,19 +78,24 @@ export default async function DashboardLayout({
       />
 
       <div className="relative z-10">
-        <Sidebar
-          clinicName={clinicConfig?.clinic_name ?? 'Your Clinic'}
-          userEmail={user.email ?? ''}
-        />
+        <ClinicProvider
+          initialClinicConfigId={clinicUser?.clinic_config_id ?? null}
+          initialRole={(clinicUser?.role as 'owner' | 'staff' | null) ?? null}
+        >
+          <Sidebar
+            clinicName={clinicName}
+            userEmail={user.email ?? ''}
+          />
 
-        {/* Content area */}
-        <div className="lg:pl-[260px] pt-16 lg:pt-0 min-h-screen">
-          <main className="p-4 md:p-8 lg:p-10 max-w-[1600px] mx-auto">
-            {children}
-          </main>
-        </div>
+          {/* Content area */}
+          <div className="lg:pl-[260px] pt-16 lg:pt-0 min-h-screen">
+            <main className="p-4 md:p-8 lg:p-10 max-w-[1600px] mx-auto">
+              {children}
+            </main>
+          </div>
 
-        <MobileNav />
+          <MobileNav />
+        </ClinicProvider>
       </div>
     </div>
   )

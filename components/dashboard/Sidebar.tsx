@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import {
   LayoutDashboard,
-  PhoneCall,
   CalendarCheck,
   Zap,
   BarChart3,
@@ -23,9 +22,7 @@ import { createClient } from '@/lib/supabase/client'
 
 const navItems = [
   { label: 'Intelligence Overview', href: '/dashboard/overview',     icon: LayoutDashboard },
-  { label: 'Voice Logs',          href: '/dashboard/calls',        icon: PhoneCall },
-  { label: 'Clinical Calendar',   href: '/dashboard/appointments', icon: CalendarCheck },
-  { label: 'Engine Credits',      href: '/dashboard/credits',      icon: Zap },
+  { label: 'Operations Hub',      href: '/dashboard/operations',   icon: CalendarCheck },
   { label: 'ROI Reports',         href: '/dashboard/reports',      icon: BarChart3 },
   { label: 'System Settings',     href: '/dashboard/settings',     icon: Settings },
 ]

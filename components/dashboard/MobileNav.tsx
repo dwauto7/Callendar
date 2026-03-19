@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
-  PhoneCall,
   CalendarCheck,
   Zap,
   BarChart3,
@@ -13,8 +12,7 @@ import { cn } from '@/lib/utils'
 
 const mobileNavItems = [
   { label: 'Overview',     href: '/dashboard/overview',     icon: LayoutDashboard },
-  { label: 'Calls',        href: '/dashboard/calls',        icon: PhoneCall },
-  { label: 'Appointments', href: '/dashboard/appointments', icon: CalendarCheck },
+  { label: 'Operations',   href: '/dashboard/operations',   icon: CalendarCheck },
   { label: 'Credits',      href: '/dashboard/credits',      icon: Zap },
   { label: 'Reports',      href: '/dashboard/reports',      icon: BarChart3 },
 ]

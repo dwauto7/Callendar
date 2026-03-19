@@ -1,5 +1,3 @@
-'use client'
-
 import {
   CalendarCheck, Moon, ShieldCheck, BarChart3, MessageSquare, Search, Zap
 } from 'lucide-react'

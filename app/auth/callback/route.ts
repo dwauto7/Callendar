@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -8,6 +7,7 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/dashboard/overview'
 
   if (!code) {
+    console.error('[auth/callback] No code in URL params')
     return NextResponse.redirect(`${origin}/?auth=error`)
   }
 
@@ -25,7 +25,6 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/?auth=error`)
   }
 
-  // Check for existing clinic_users record
   const { data: clinicUser } = await supabase
     .from('clinic_users')
     .select('clinic_config_id')
@@ -33,45 +32,8 @@ export async function GET(request: Request) {
     .single()
 
   if (clinicUser?.clinic_config_id) {
-    // Returning user — go straight to dashboard
     return NextResponse.redirect(`${origin}${next}`)
   }
 
-  // No clinic_users record — find the existing clinic_config and auto-link
-  const admin = createAdminClient()
-
-  const { data: existingClinic, error: clinicErr } = await admin
-    .from('clinic_configs')
-    .select('id')
-    .limit(1)
-    .single()
-
-  if (clinicErr || !existingClinic?.id) {
-    console.error('[auth/callback] No clinic_configs found:', clinicErr?.message)
-    // No clinic exists yet — send to onboarding
-    return NextResponse.redirect(`${origin}/onboarding`)
-  }
-
-  // Auto-create the clinic_users link
-  const { error: insertErr } = await admin
-    .from('clinic_users')
-    .insert({
-      user_id: user.id,
-      clinic_config_id: existingClinic.id,
-      role: 'owner',
-    })
-
-  if (insertErr) {
-    console.error('[auth/callback] clinic_users insert error:', insertErr.message)
-    return NextResponse.redirect(`${origin}/?auth=error`)
-  }
-
-  // Ensure clinic_configs has an owner for RLS policies
-  await admin
-    .from('clinic_configs')
-    .update({ user_id: user.id })
-    .eq('id', existingClinic.id)
-    .is('user_id', null)
-
-  return NextResponse.redirect(`${origin}/dashboard/overview`)
+  return NextResponse.redirect(`${origin}/onboarding`)
 }

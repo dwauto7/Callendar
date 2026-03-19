@@ -27,8 +27,13 @@ type ChartPoint = {
 }
 
 export function CallsTrendChart({ data }: { data: ChartPoint[] }) {
-  if (data.length === 0) return <div className="h-[200px] flex items-center justify-center text-xs font-mono text-white/20 uppercase tracking-widest">Awaiting Data</div>
-  
+  if (data.length === 0)
+    return (
+      <div className="h-[240px] flex items-center justify-center text-xs font-mono text-white/20 uppercase tracking-widest">
+        Awaiting Data
+      </div>
+    )
+
   return (
     <ResponsiveContainer width="100%" height={240}>
       <LineChart data={data}>
@@ -44,15 +49,23 @@ export function CallsTrendChart({ data }: { data: ChartPoint[] }) {
 }
 
 export function BookingsRevenueChart({ data }: { data: ChartPoint[] }) {
-  if (data.length === 0) return null
-  
+  if (data.length === 0)
+    return (
+      <div className="h-[240px] flex items-center justify-center text-xs font-mono text-white/20 uppercase tracking-widest">
+        Awaiting Data
+      </div>
+    )
+
   return (
     <ResponsiveContainer width="100%" height={240}>
       <BarChart data={data} barGap={12}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
         <XAxis dataKey="period" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-        <Tooltip {...blizzardTooltip} formatter={(v, name) => [typeof v === 'number' ? `RM ${v.toLocaleString()}` : v, name]} />
+        <Tooltip
+          {...blizzardTooltip}
+          formatter={(v, name) => [typeof v === 'number' ? `RM ${v.toLocaleString()}` : v, name]}
+        />
         <Bar dataKey="investment" name="Cost" fill="rgba(255,255,255,0.05)" radius={[6, 6, 0, 0]} maxBarSize={20} />
         <Bar dataKey="revenue" name="Revenue" fill="#40E0FF" radius={[6, 6, 0, 0]} maxBarSize={20} className="cyan-glow-bar" />
       </BarChart>

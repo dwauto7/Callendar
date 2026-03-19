@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { Zap } from 'lucide-react'
 
@@ -87,7 +85,7 @@ export function Footer() {
               {[
                 { label: 'Privacy & PDPA', href: '/privacy-policy' },
                 { label: 'Terms of Service', href: '/terms-of-service' },
-                { label: 'Data Security', href: '/security' }
+                { label: 'Data Security', href: '/cookie-policy' }
               ].map((l) => (
                 <li key={l.label}>
                   <Link

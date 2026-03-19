@@ -1,5 +1,3 @@
-'use client'
-
 import { cn } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 // Import all icons here so they are bundled with the client component

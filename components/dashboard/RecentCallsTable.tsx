@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { PhoneCall, Clock, ArrowRight, ShieldCheck } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -36,7 +34,7 @@ export function RecentCallsTable({ calls }: RecentCallsTableProps) {
           </h2>
         </div>
         <Link
-          href="/dashboard/calls"
+          href="/dashboard/operations"
           className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-[#40E0FF] transition-all"
         >
           Detailed Records

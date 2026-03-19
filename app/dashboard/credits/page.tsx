@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation'
-import { Zap, DollarSign, Activity } from 'lucide-react'
+import { Zap } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { DailyUsageChart, UsageCostChart } from '@/components/dashboard/credits/DailyUsageChart'
-import { formatRM, formatDateTime, cn } from '@/lib/utils'
+import { CreditsChartsClient } from '@/components/dashboard/credits/CreditsChartsClient'
+import { CreditsLogsClient } from '@/components/dashboard/credits/CreditsLogsClient'
+import { cn } from '@/lib/utils'
+import { timeAsync } from '@/lib/perf'
 
-export const metadata = { title: 'Credits — AI Blizzard' }
+export const metadata = { title: 'Credits — Callendar' }
 
 // Keep your CircularProgress exactly as is, but update the default colors
 function CircularProgress({ pct, color, size = 160 }: { pct: number, color: string, size?: number }) {
@@ -31,11 +32,12 @@ function CircularProgress({ pct, color, size = 160 }: { pct: number, color: stri
 
 export default async function CreditsPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user } } = await timeAsync('credits:get_user', async () => supabase.auth.getUser())
   if (!user) redirect('/')
 
-  const { data: clinicUser } = await supabase
-    .from('clinic_users').select('clinic_config_id').eq('user_id', user.id).single()
+  const { data: clinicUser } = await timeAsync('credits:clinic_user', async () =>
+    supabase.from('clinic_users').select('clinic_config_id').eq('user_id', user.id).single()
+  )
   if (!clinicUser?.clinic_config_id) redirect('/onboarding')
 
   const id = clinicUser.clinic_config_id
@@ -43,14 +45,14 @@ export default async function CreditsPage() {
   const [creditsRes, callsRes] = await Promise.all([
     supabase.from('credits').select('*').eq('clinic_config_id', id).single(),
     supabase.from('call_logs')
-      .select('id, client_name, duration_min, aya_usage_cost_rm, created_at')
+      .select('id, client_name, patient_phone, duration_min, minutes_saved, is_after_hours, appointment_id, aya_usage_cost_rm, created_at, clinic_config_id, summary, recording_url')
       .eq('clinic_config_id', id)
       .order('created_at', { ascending: false })
-      .limit(200),
+      .limit(300),
   ])
 
-  const credits = creditsRes.data
-  const calls = callsRes.data ?? []
+  const credits = creditsRes?.data
+  const calls = callsRes?.data ?? []
 
   const balance = credits?.balance ?? 0
   const used = credits?.minutes_used ?? 0
@@ -106,60 +108,24 @@ export default async function CreditsPage() {
             </div>
 
             <div className="max-w-md">
-                <Progress value={remainPct} className="h-1.5 bg-white/5" indicatorClassName={isLow ? 'bg-amber-500' : 'bg-[#40E0FF]'} />
-                <div className="flex justify-between mt-2 text-[10px] font-mono text-white/20 uppercase tracking-widest">
-                    <span>{used.toLocaleString()} Used</span>
-                    <span>{total.toLocaleString()} Total</span>
-                </div>
+              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className={cn('h-full', isLow ? 'bg-amber-500' : 'bg-[#40E0FF]')}
+                  style={{ width: `${remainPct}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-2 text-[10px] font-mono text-white/20 uppercase tracking-widest">
+                  <span>{used.toLocaleString()} Used</span>
+                  <span>{total.toLocaleString()} Total</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-panel p-6 rounded-3xl border border-white/5">
-          <div className="flex items-center gap-2 mb-6">
-            <Activity className="size-4 text-[#40E0FF]" />
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Throughput (min)</p>
-          </div>
-          <DailyUsageChart calls={calls} />
-        </div>
+      <CreditsLogsClient calls={calls} />
 
-        <div className="glass-panel p-6 rounded-3xl border border-white/5">
-          <div className="flex items-center gap-2 mb-6">
-            <DollarSign className="size-4 text-amber-500" />
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Compute Cost (RM)</p>
-          </div>
-          <UsageCostChart calls={calls} />
-        </div>
-      </div>
-
-      {/* History table simplified for the Blizzard look */}
-      <div className="glass-panel rounded-3xl border border-white/5 overflow-hidden">
-        <div className="px-8 py-6 border-b border-white/5 bg-white/[0.01]">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Node Activity Log</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-[10px] font-black uppercase tracking-widest text-white/20 border-b border-white/5">
-                <th className="px-8 py-4">Timestamp</th>
-                <th className="px-8 py-4 text-right">Duration</th>
-                <th className="px-8 py-4 text-right">Cost</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {calls.map((c) => (
-                <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="px-8 py-4 text-xs font-mono text-white/40">{formatDateTime(c.created_at)}</td>
-                  <td className="px-8 py-4 text-right text-xs font-bold text-white">{c.duration_min?.toFixed(1)}m</td>
-                  <td className="px-8 py-4 text-right text-xs font-black text-[#40E0FF]">{formatRM(c.aya_usage_cost_rm)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <CreditsChartsClient calls={calls} />
     </div>
   )
 }

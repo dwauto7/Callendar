@@ -273,8 +273,8 @@ export default function TermsOfServicePage() {
           <h2>12. PRIVACY POLICY</h2>
           <p>
             We care about data privacy and security. Please review our Privacy Policy:{" "}
-            <a href={privacyPolicyUrl} target="_blank" rel="noopener noreferrer">{privacyPolicyUrl}</a>. By using the Services,
-            you agree to be bound by our Privacy Policy, which is incorporated into these Legal Terms.
+            <a href={privacyPolicyUrl} target="_blank" rel="noopener noreferrer">{privacyPolicyUrl}</a>. By using the Services, the User acknowledges that voice recordings are classified as sensitive personal data under Malaysian law and provides explicit consent for its processing via AI and
+            agrees to be bound by our Privacy Policy, which is incorporated into these Legal Terms.
           </p>
         </section>
 
@@ -346,7 +346,8 @@ export default function TermsOfServicePage() {
             SOLE RISK. TO THE FULLEST EXTENT PERMITTED BY LAW, WE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING THE IMPLIED
             WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE MAKE NO WARRANTIES OR
             REPRESENTATIONS ABOUT THE ACCURACY OR COMPLETENESS OF THE SERVICES&apos; CONTENT AND WE WILL ASSUME NO LIABILITY OR
-            RESPONSIBILITY FOR ANY ERRORS, MISTAKES, OR INACCURACIES OF CONTENT AND MATERIALS.
+            RESPONSIBILITY FOR ANY ERRORS, MISTAKES, OR INACCURACIES OF CONTENT AND MATERIALS.THE SERVICES UTILIZE GENERATIVE AI WHICH MAY OCCASIONALLY PRODUCE 'hallucinations' OR INACCURACIES. 
+            USERS ARE RESPONSIBLE FOR FINAL VERIFICATION OF ALL AI-GENERATED BOOKINGS.
           </p>
         </section>
 
@@ -373,12 +374,17 @@ export default function TermsOfServicePage() {
         </section>
 
         <section id="userdata">
-          <h2>21. USER DATA</h2>
+          <h2>21. USER DATA & DATA PROTECTION</h2>
           <p>
-            We will maintain certain data that you transmit to the Services for the purpose of managing the performance of the
-            Services. Although we perform regular routine backups of data, you are solely responsible for all data that you transmit
-            or that relates to any activity you have undertaken using the Services. We shall have no liability to you for any loss
-            or corruption of any such data.
+            21.1 Data Roles: For the purposes of the Malaysian Personal Data Protection Act (PDPA), the User (Clinic) acts as the Data Controller,
+            and the Company acts as the Data Processor. The User warrants it has a lawful basis (including explicit consent for Sensitive Personal Data
+            such as voice biometrics) to process and transfer data to the Company.
+
+            21.2 Data Responsibility: While we perform routine backups, the User is solely responsible for the accuracy and legality of the data transmitted. 
+            The Company shall not be liable for any loss, corruption, or unauthorized access of data caused by the User’s failure to secure their account or obtain proper patient consent.
+
+            21.3 Voice Biometrics: The User acknowledges that the AI assistant ("Aya") processes voice data. Under the PDPA 2024/2026 guidelines, voice patterns are classified as Sensitive Personal Data. 
+            The User must ensure patients are notified of this processing at the start of every call.
           </p>
         </section>
 
