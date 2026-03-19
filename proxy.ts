@@ -22,8 +22,18 @@ export async function proxy(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+  const { pathname } = request.nextUrl
 
-  if (!user) {
+  // Protect dashboard routes
+  if (pathname.startsWith('/dashboard') && !user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    url.searchParams.set('auth', 'required')
+    return NextResponse.redirect(url)
+  }
+
+  // Protect onboarding — must be logged in
+  if (pathname === '/onboarding' && !user) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
@@ -31,5 +41,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/onboarding'],
 }
