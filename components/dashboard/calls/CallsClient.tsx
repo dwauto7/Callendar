@@ -46,6 +46,17 @@ async function logTranscriptError(message: string, payload?: unknown) {
 }
 
 function normalizeTranscript(raw: unknown): TranscriptMessage[] {
+  if (typeof raw === 'string' && raw.trim()) {
+    const lines = raw.split('\n').filter(Boolean)
+    return lines.map((line) => {
+      const agentMatch = line.match(/^(agent|aya):\s*(.+)/i)
+      const userMatch = line.match(/^(user|patient|caller):\s*(.+)/i)
+      if (agentMatch) return { role: 'agent', content: agentMatch[2] }
+      if (userMatch) return { role: 'user', content: userMatch[2] }
+      return { role: 'agent', content: line }
+    })
+  }
+
   let parsed: unknown = raw
   if (typeof raw === 'string') {
     try {
@@ -67,8 +78,7 @@ function normalizeTranscript(raw: unknown): TranscriptMessage[] {
       if (item && typeof item === 'object') {
         const record = item as Record<string, unknown>
         const role = (record.role ?? record.speaker ?? 'patient')
-        const content =
-          (record.content ?? record.text ?? record.message ?? '').toString()
+        const content = (record.content ?? record.text ?? record.message ?? '').toString()
         return { role: String(role), content }
       }
       return null
@@ -98,7 +108,7 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
   const exportToCSV = () => {
     const headers = ["Date", "Name", "Phone", "Duration", "After Hours", "Impact"]
     const rows = filtered.map(c => [
-      new Date(c.created_at).toLocaleDateString('en-MY'),
+      new Date(c.created_at).toLocaleDateString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
       c.client_name || "Unknown",
       c.patient_phone || "N/A",
       `${c.duration_min?.toFixed(1)}m`,
@@ -126,7 +136,7 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
         summary: call.summary ?? null,
       })
     }
-    
+
     const supabase = createClient()
     const { data } = await supabase
       .from('call_logs')
@@ -155,15 +165,15 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        
+
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="flex items-center gap-3 px-4 h-11 rounded-xl bg-black/20 border border-white/5 flex-1 md:flex-none">
             <Switch checked={filterAfterHours} onCheckedChange={setFilterAfterHours} />
             <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 cursor-pointer">After-Hours</Label>
           </div>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             onClick={exportToCSV}
             disabled={filtered.length === 0}
             className="h-11 px-4 bg-white/5 border-white/5 hover:bg-[#40E0FF]/10 hover:text-[#40E0FF] transition-all rounded-xl gap-2 text-[10px] font-black uppercase tracking-widest"
@@ -219,7 +229,7 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
                           {call.client_name || 'Anonymous Signal'}
                         </span>
                         <span className="text-[10px] font-mono text-white/30">
-                          {new Date(call.created_at).toLocaleString('en-MY')}
+                          {new Date(call.created_at).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })}
                         </span>
                       </div>
                     </TableCell>
@@ -251,25 +261,13 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
               <Badge variant="outline" className="border-white/10 text-white/40">{selected?.patient_phone}</Badge>
             </div>
           </SheetHeader>
-          
+
           <div className="flex-1 overflow-y-auto p-6 space-y-8">
             {loading ? (
               <div className="h-40 animate-pulse bg-white/5 rounded-xl" />
             ) : (
               <>
-                <Card className="glass-panel border border-white/10 bg-white/[0.03]">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-[10px] font-black uppercase text-[#40E0FF] tracking-widest">
-                      Aya Summary
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-white/80 leading-relaxed italic">
-                      {detail?.summary || 'Analyzing interaction...'}
-                    </p>
-                  </CardContent>
-                </Card>
-
+                {/* Transcript FIRST */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="text-[10px] font-black uppercase text-white/20 tracking-widest">Live Stream Transcript</h4>
@@ -314,6 +312,20 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
                     )}
                   </div>
                 </div>
+
+                {/* Summary SECOND */}
+                <Card className="glass-panel border border-white/10 bg-white/[0.03]">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-[10px] font-black uppercase text-[#40E0FF] tracking-widest">
+                      Aya Summary
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-sm text-white/80 leading-relaxed italic">
+                      {detail?.summary || 'Analyzing interaction...'}
+                    </p>
+                  </CardContent>
+                </Card>
               </>
             )}
           </div>
