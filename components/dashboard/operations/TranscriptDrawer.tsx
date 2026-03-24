@@ -40,34 +40,78 @@ async function logTranscriptError(message: string, payload?: unknown) {
 }
 
 function normalizeTranscript(raw: unknown): TranscriptMessage[] {
-  let parsed: unknown = raw
+  // If raw is null or undefined, return empty array
+  if (!raw) return []
+  
+  // Handle string input
   if (typeof raw === 'string') {
+    // Try to parse as JSON first
     try {
-      parsed = JSON.parse(raw)
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((item) => {
+            if (typeof item === 'string') {
+              return { role: 'patient', content: item }
+            }
+            if (item && typeof item === 'object') {
+              const record = item as Record<string, unknown>
+              const role = (record.role ?? record.speaker ?? 'patient')
+              const content = (record.content ?? record.text ?? record.message ?? '').toString()
+              return { role: String(role), content }
+            }
+            return null
+          })
+          .filter((msg): msg is TranscriptMessage => Boolean(msg && msg.content))
+      }
     } catch (e) {
-      console.error('Failed to parse transcript string', e)
-      void logTranscriptError('Failed to parse transcript JSON', { raw })
-      return []
+      // Not valid JSON, treat as plain text transcript
+      console.log('Transcript is plain text, parsing as conversation format')
+      
+      // Handle plain text format like "Agent: Hi there\nPatient: Hello"
+      const lines = raw.split('\n')
+      const messages: TranscriptMessage[] = []
+      
+      for (const line of lines) {
+        if (!line.trim()) continue
+        
+        // Check for common formats: "Agent: ..." or "Patient: ..."
+        const agentMatch = line.match(/^Agent:\s*(.+)$/i)
+        const patientMatch = line.match(/^Patient:\s*(.+)$/i)
+        
+        if (agentMatch) {
+          messages.push({ role: 'agent', content: agentMatch[1].trim() })
+        } else if (patientMatch) {
+          messages.push({ role: 'patient', content: patientMatch[1].trim() })
+        } else {
+          // If no prefix found, treat as patient message
+          messages.push({ role: 'patient', content: line.trim() })
+        }
+      }
+      
+      return messages.length > 0 ? messages : [{ role: 'patient', content: raw }]
     }
   }
 
-  if (!Array.isArray(parsed)) return []
+  // Handle array input
+  if (Array.isArray(raw)) {
+    return raw
+      .map((item) => {
+        if (typeof item === 'string') {
+          return { role: 'patient', content: item }
+        }
+        if (item && typeof item === 'object') {
+          const record = item as Record<string, unknown>
+          const role = (record.role ?? record.speaker ?? 'patient')
+          const content = (record.content ?? record.text ?? record.message ?? '').toString()
+          return { role: String(role), content }
+        }
+        return null
+      })
+      .filter((msg): msg is TranscriptMessage => Boolean(msg && msg.content))
+  }
 
-  return parsed
-    .map((item) => {
-      if (typeof item === 'string') {
-        return { role: 'patient', content: item }
-      }
-      if (item && typeof item === 'object') {
-        const record = item as Record<string, unknown>
-        const role = (record.role ?? record.speaker ?? 'patient')
-        const content =
-          (record.content ?? record.text ?? record.message ?? '').toString()
-        return { role: String(role), content }
-      }
-      return null
-    })
-    .filter((msg): msg is TranscriptMessage => Boolean(msg && msg.content))
+  return []
 }
 
 export function TranscriptDrawer({
@@ -91,21 +135,33 @@ export function TranscriptDrawer({
 
     async function load() {
       setLoading(true)
+      
+      // If call already has summary, use it
       if (call?.summary) {
         setDetail({ transcript: [], summary: call.summary ?? null })
       }
+      
       const supabase = createClient()
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('call_logs')
         .select('transcript, summary')
         .eq('id', call?.id)
         .single()
 
       if (!active) return
-      setDetail({
-        transcript: normalizeTranscript(data?.transcript),
-        summary: data?.summary || null,
-      })
+      
+      if (error) {
+        console.error('Error loading transcript:', error)
+        setDetail({
+          transcript: [],
+          summary: call?.summary || 'Failed to load transcript data',
+        })
+      } else {
+        setDetail({
+          transcript: normalizeTranscript(data?.transcript),
+          summary: data?.summary || call?.summary || null,
+        })
+      }
       setLoading(false)
     }
 

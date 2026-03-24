@@ -10,7 +10,7 @@ import { timeAsync } from '@/lib/perf'
 import { cn } from '@/lib/utils'
 
 export const metadata = {
-  title: 'Intelligence Overview — Callendar',
+  title: 'Overview — Callendar',
 }
 
 export default async function OverviewPage() {
@@ -161,7 +161,7 @@ export default async function OverviewPage() {
             className="text-base md:text-lg font-semibold text-white/20 tracking-tight mt-1"
             style={{ fontFamily: 'var(--font-syne)' }}
           >
-            Intelligence Overview
+           Overview
           </p>
         </div>
 

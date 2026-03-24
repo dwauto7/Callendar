@@ -258,6 +258,7 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
           <SheetHeader className="p-6 border-b border-white/5 bg-white/[0.02]">
             <SheetTitle className="text-2xl font-bold tracking-tighter text-white">Interaction Data</SheetTitle>
             <div className="flex gap-2 mt-2">
+              <span className="text-sm font-semibold text-white/70">{selected?.client_name || 'Unknown Caller'}</span>
               <Badge variant="outline" className="border-white/10 text-white/40">{selected?.patient_phone}</Badge>
             </div>
           </SheetHeader>

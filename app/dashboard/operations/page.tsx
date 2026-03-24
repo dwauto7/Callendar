@@ -33,7 +33,7 @@ export default async function OperationsPage() {
     timeAsync('ops:appointments', async () =>
       supabase
         .from('appointments')
-        .select('id, patient_name, phone, email, appointment_date, appointment_time, patient_status, status, projected_revenue, reminder_sent, created_at')
+        .select('id, patient_name, phone, email, appointment_date, appointment_time, appointment_type, patient_status, status, projected_revenue, reminder_sent, created_at')
         .eq('clinic_id', clinicId) // MATCHES SCHEMA
         .order('appointment_date', { ascending: false })
         .limit(400)
