@@ -14,9 +14,10 @@ interface MonthlyReport {
 
 interface MonthSummaryProps {
   report: MonthlyReport | null
+  liveRevenue?: number
 }
 
-export function MonthSummary({ report }: MonthSummaryProps) {
+export function MonthSummary({ report, liveRevenue }: MonthSummaryProps) {
   const conversionRate =
     report && report.total_calls > 0
       ? Math.round((report.total_bookings / report.total_calls) * 100)
@@ -37,7 +38,7 @@ export function MonthSummary({ report }: MonthSummaryProps) {
     },
     {
       label: 'Gross Revenue Capture',
-      value: formatRM(report?.gross_revenue_generated),
+      value: formatRM(report?.gross_revenue_generated ?? liveRevenue ?? 0),
       icon: TrendingUp,
       color: '#40E0FF',
     },

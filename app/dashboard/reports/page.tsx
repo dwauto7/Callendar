@@ -36,16 +36,28 @@ export default async function ReportsPage() {
   const id = clinicUser.clinic_config_id
 
   // Fetch last 6 months of reports
-  const { data: reports } = await supabase
+  const [reportsRes, appointmentsRes] = await Promise.all([
+  supabase
     .from('monthly_reports')
     .select('*')
     .eq('clinic_config_id', id)
     .order('report_month', { ascending: false })
-    .limit(6)
+    .limit(6),
+  supabase
+    .from('appointments')
+    .select('projected_revenue, created_at, status')
+    .eq('clinic_id', id)
+    .eq('status', 'Booked')
+    .not('projected_revenue', 'is', null),
+  ])
 
-  const allReports = reports ?? []
+  const allReports = reportsRes.data ?? []
   const currentReport = allReports[0] ?? null
   const previousReport = allReports[1] ?? null
+
+  const liveRevenue = (appointmentsRes.data ?? []).reduce(
+  (sum, a) => sum + (Number(a.projected_revenue) || 0), 0
+  )
 
   // ── Month-on-month delta helpers ─────────────────────────────
   function delta(current: number | null, previous: number | null) {
@@ -88,7 +100,7 @@ export default async function ReportsPage() {
     },
     {
       label: 'Gross Revenue Capture',
-      value: formatRM(currentReport?.gross_revenue_generated),
+      value: formatRM(currentReport?.gross_revenue_generated ?? liveRevenue),
       icon: TrendingUp,
       delta: revenueDelta,
     },

@@ -260,7 +260,7 @@ export default async function OverviewPage() {
       {/* ── Two-column layout ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RecentCallsTable calls={recentCalls} />
-        <MonthSummary report={report} />
+        <MonthSummary report={report} liveRevenue={totalRevenue} />
       </div>
     </div>
   )
