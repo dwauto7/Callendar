@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { Zap } from 'lucide-react'
 
@@ -59,21 +61,15 @@ export function Footer() {
             <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-6">
               Consultancy
             </p>
-            <ul className="space-y-4">
-              {['AI Automation Audit', 'Custom Workflows', 'Staff Training'].map((l) => (
-                <li key={l}>
-                  <span className="text-sm text-white/40">{l}</span>
-                </li>
-              ))}
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-sm text-[#40E0FF] font-bold hover:underline"
-                >
-                  Book Consultation
-                </Link>
-              </li>
-            </ul>
+            <p className="text-sm text-white/40 mb-5">
+              AI automation audit and custom workflow design. Tell us what you want to automate.
+            </p>
+            <Link
+              href="/consultancy"
+              className="w-full inline-block rounded-md bg-[#40E0FF] text-[#0B0D10] text-xs font-black uppercase tracking-[0.2em] py-3 text-center transition hover:brightness-110"
+            >
+              Book Consultancy
+            </Link>
           </div>
 
           {/* Legal Intelligence */}

@@ -171,8 +171,8 @@ export function SettingsForm({ config }: SettingsFormProps) {
   }
 
   async function handleSave() {
-    if (role !== 'owner') {
-      toast.error('Owner access required to update settings.')
+    if (role !== 'admin' && role !== 'owner') {
+      toast.error('Admin access required to update settings.')
       return
     }
     const workingHoursResult = normalizeWorkingHoursJson()
@@ -244,7 +244,7 @@ export function SettingsForm({ config }: SettingsFormProps) {
       <div className="flex justify-end">
         <Button
           onClick={handleSave}
-          disabled={saving || role !== 'owner'}
+          disabled={saving || role !== 'admin' && role !== 'owner'}
           className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold px-6"
         >
           {saving ? (

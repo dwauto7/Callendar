@@ -6,6 +6,7 @@ import { CreditsChartsClient } from '@/components/dashboard/credits/CreditsChart
 import { CreditsLogsClient } from '@/components/dashboard/credits/CreditsLogsClient'
 import { cn } from '@/lib/utils'
 import { timeAsync } from '@/lib/perf'
+import { getClinicContext } from '@/lib/clinic/getClinicContext'
 
 export const metadata = { title: 'Credits — Callendar' }
 
@@ -35,12 +36,12 @@ export default async function CreditsPage() {
   const { data: { user } } = await timeAsync('credits:get_user', async () => supabase.auth.getUser())
   if (!user) redirect('/')
 
-  const { data: clinicUser } = await timeAsync('credits:clinic_user', async () =>
-    supabase.from('clinic_users').select('clinic_config_id').eq('user_id', user.id).single()
+  const clinicContext = await timeAsync('credits:clinic_user', async () =>
+    getClinicContext(supabase, user.id)
   )
-  if (!clinicUser?.clinic_config_id) redirect('/onboarding')
+  if (!clinicContext?.clinicConfigId) redirect('/onboarding')
 
-  const id = clinicUser.clinic_config_id
+  const id = clinicContext.clinicConfigId
 
   const [creditsRes, callsRes] = await Promise.all([
     supabase.from('credits').select('*').eq('clinic_config_id', id).single(),

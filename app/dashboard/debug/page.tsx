@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getClinicContext } from '@/lib/clinic/getClinicContext'
 
 export const metadata = { title: 'Debug - Callendar' }
 
@@ -13,18 +14,14 @@ export default async function DebugPage() {
     return <div className="p-8 text-red-500">No user logged in</div>
   }
 
-  // Get clinic_users
-  const { data: clinicUser } = await supabase
-    .from('clinic_users')
-    .select('clinic_config_id, role')
-    .eq('user_id', user.id)
-    .single()
+  // Get clinic context
+  const clinicContext = await getClinicContext(supabase, user.id)
 
-  if (!clinicUser) {
-    return <div className="p-8 text-red-500">No clinic_users record found</div>
+  if (!clinicContext) {
+    return <div className="p-8 text-red-500">No clinic record found</div>
   }
 
-  const clinicId = clinicUser.clinic_config_id
+  const clinicId = clinicContext.clinicConfigId
 
   // Get clinic_config
   const { data: clinicConfig } = await supabase
@@ -69,7 +66,7 @@ export default async function DebugPage() {
         <h2 className="text-xl font-semibold text-emerald-400">Clinic Info</h2>
         <div className="space-y-2 text-sm">
           <p><span className="text-gray-400">Clinic Config ID:</span> <code className="text-white">{clinicId}</code></p>
-          <p><span className="text-gray-400">Role:</span> <code className="text-white">{clinicUser.role}</code></p>
+          <p><span className="text-gray-400">Role:</span> <code className="text-white">{clinicContext.role}</code></p>
           <p><span className="text-gray-400">Clinic Name:</span> <code className="text-white">{clinicConfig?.clinic_name || 'N/A'}</code></p>
           <p><span className="text-gray-400">Is Active:</span> <code className={`${clinicConfig?.is_active ? 'text-emerald-400' : 'text-red-400'}`}>{String(clinicConfig?.is_active)}</code></p>
         </div>

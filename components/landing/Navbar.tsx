@@ -9,10 +9,10 @@ import { Menu, X, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
-  { label: 'Systems', href: '/#how-it-works' },
-  { label: 'Intelligence', href: '/#features' },
-  { label: 'Investment', href: '/#pricing' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Features', href: '/#features' },
+  { label: 'Pricing', href: '/#pricing' },
+  { label: 'Demo', href: '/contact' },
+  { label: 'Consultancy', href: '/consultancy' },
 ]
 
 export function Navbar() {
@@ -54,27 +54,21 @@ export function Navbar() {
           href="/"
           className="flex items-center gap-2 group"
         >
-          <div className="size-8 bg-[#40E0FF] rounded-lg flex items-center justify-center cyan-glow transition-transform group-hover:rotate-12">
+          <div className="size-8 bg-amber-500 rounded-lg flex items-center justify-center transition-transform group-hover:rotate-12">
             <Zap className="size-5 text-[#0B0D10] fill-current" />
           </div>
-          <span 
-            className="text-xl font-black text-white tracking-tighter uppercase"
-            style={{ fontFamily: 'var(--font-syne)' }}
-          >
-            AI Blizzard
-          </span>
         </Link>
 
-        {/* Desktop Nav - High-end wording */}
+        {/* Desktop Nav - Simplified */}
         <nav className="hidden md:flex items-center gap-8">
           {links.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
-              className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 hover:text-[#40E0FF] transition-colors duration-300"
+              className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 hover:text-amber-500 transition-colors duration-300"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -88,16 +82,16 @@ export function Navbar() {
             Portal
           </Button>
           <Button
-            onClick={() => window.open('https://calendly.com/dwautomate7/30min', '_blank')}
-            className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black text-xs uppercase tracking-widest px-6 h-10 rounded-lg cyan-glow transition-all"
+            onClick={() => router.push('/contact')}
+            className="bg-amber-500 hover:bg-amber-600 text-[#0B0D10] font-black text-xs uppercase tracking-widest px-6 h-10 rounded-lg transition-all hover:scale-105"
           >
-            Book Demo
+            Try Demo
           </Button>
         </div>
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden text-white/60 hover:text-[#40E0FF] transition-colors"
+          className="md:hidden text-white/60 hover:text-amber-500 transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {mobileOpen ? <X className="size-6" /> : <Menu className="size-6" />}
@@ -108,21 +102,27 @@ export function Navbar() {
       {mobileOpen && (
         <div className="md:hidden glass-panel border-b border-white/10 px-6 py-8 space-y-6 animate-fade-in-up">
           {links.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               onClick={() => setMobileOpen(false)}
-              className="block text-sm font-bold uppercase tracking-widest text-white/60 hover:text-[#40E0FF]"
+              className="block text-sm font-bold uppercase tracking-widest text-white/60 hover:text-amber-500"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
           <div className="pt-4 flex flex-col gap-3">
             <Button variant="outline" onClick={handleAuth} className="border-white/10 text-white bg-white/5 h-12">
               Client Portal
             </Button>
-            <Button onClick={() => window.open('https://calendly.com/dwautomate7/30min', '_blank')} className="bg-[#40E0FF] text-[#0B0D10] font-black h-12 cyan-glow">
-              Book Demo
+            <Button 
+              onClick={() => {
+                router.push('/contact')
+                setMobileOpen(false)
+              }} 
+              className="bg-amber-500 hover:bg-amber-600 text-[#0B0D10] font-black h-12"
+            >
+              Try Demo
             </Button>
           </div>
         </div>

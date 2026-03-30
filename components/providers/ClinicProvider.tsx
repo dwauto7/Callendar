@@ -3,10 +3,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { getClinicContext } from '@/lib/clinic/getClinicContext'
 
 type ClinicContextValue = {
   clinicConfigId: string | null
-  role: 'owner' | 'staff' | null
+  role: 'admin' | 'doctor' | 'receptionist' | 'owner' | null
   loading: boolean
 }
 
@@ -22,19 +23,15 @@ export async function getUserClinicContext() {
   const { data: { user }, error: userError } = await supabase.auth.getUser()
   if (userError || !user) return { clinicConfigId: null, role: null }
 
-  const { data, error } = await supabase
-    .from('clinic_users')
-    .select('clinic_config_id, role')
-    .eq('user_id', user.id)
-    .single()
+  const context = await getClinicContext(supabase, user.id)
 
-  if (error || !data?.clinic_config_id) {
+  if (!context?.clinicConfigId) {
     return { clinicConfigId: null, role: null }
   }
 
   return {
-    clinicConfigId: data.clinic_config_id as string,
-    role: (data.role as 'owner' | 'staff') ?? null,
+    clinicConfigId: context.clinicConfigId as string,
+    role: (context.role as 'admin' | 'doctor' | 'receptionist' | 'owner') ?? null,
   }
 }
 
@@ -45,11 +42,11 @@ export function ClinicProvider({
 }: {
   children: React.ReactNode
   initialClinicConfigId?: string | null
-  initialRole?: 'owner' | 'staff' | null
+  initialRole?: 'admin' | 'doctor' | 'receptionist' | 'owner' | null
 }) {
   const hasInitial = initialClinicConfigId !== undefined || initialRole !== undefined
   const [clinicConfigId, setClinicConfigId] = useState<string | null>(initialClinicConfigId ?? null)
-  const [role, setRole] = useState<'owner' | 'staff' | null>(initialRole ?? null)
+  const [role, setRole] = useState<'admin' | 'doctor' | 'receptionist' | 'owner' | null>(initialRole ?? null)
   const [loading, setLoading] = useState(!hasInitial)
   const router = useRouter()
 
@@ -67,9 +64,6 @@ export function ClinicProvider({
       setClinicConfigId(ctx.clinicConfigId)
       setRole(ctx.role)
       setLoading(false)
-      if (!ctx.clinicConfigId) {
-        router.push('/onboarding')
-      }
     }
 
     load()

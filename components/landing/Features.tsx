@@ -5,45 +5,51 @@ import {
 const features = [
   {
     icon: Search,
-    title: 'High-Value Lead Priority',
+    title: 'Every Call Answered',
     description:
-      'The "Red Tag" system identifies high-ticket inquiries (like implants or surgery) for immediate staff follow-up.',
+      'No busy signals or missed calls. Aya handles every inbound patient instantly.',
   },
   {
     icon: CalendarCheck,
-    title: 'Autopilot Scheduling',
+    title: 'More Appointments, Less Admin',
     description:
-      'Seamlessly books appointments into your existing calendar - eliminating manual entry and double-bookings.',
+      'Aya books directly into your calendar, removing back-and-forth and freeing staff from constant phone duty.',
   },
   {
     icon: CalendarCheck,
-    title: 'Self-Service Rescheduling',
+    title: 'Fewer No-Shows',
     description:
-      'Patients can reschedule or confirm appointments without staff intervention, reducing no-shows.',
+      'Self-service confirmations and reschedules keep your schedule full without extra staff work.',
   },
   {
     icon: Moon,
-    title: '24/7 Revenue Capture',
+    title: 'Never Miss a Call',
     description:
-      'Captures patient leads during peak hours, lunch breaks, and late nights. Your clinic never truly closes.',
+      'Always-on coverage captures bookings during lunch, after hours, and peak surges.',
   },
   {
     icon: ShieldCheck,
-    title: 'PDPA 2010 Compliance',
+    title: 'PDPA-Safe by Design',
     description:
-      'Built with Malaysian data laws in mind. Automated data purging and secure local encryption for patient privacy.',
+      'Built for Malaysian compliance with secure handling, retention controls, and privacy-first workflows.',
   },
   {
     icon: BarChart3,
-    title: 'Intelligence Dashboards',
+    title: 'Clear ROI Visibility',
     description:
-      'Track ROI, peak call times, and conversion rates with high-fidelity performance reports delivered monthly.',
+      'See bookings, conversion rates, and revenue impact without manual reporting.',
   },
   {
     icon: MessageSquare,
-    title: 'Instant WhatsApp Alerts',
+    title: '24-Hour Patient Reminders',
     description:
-      'Your staff receives live notifications for every booking, including a summary of the patient’s specific needs.',
+      'Automatic reminders go out 24 hours before appointments to reduce no-shows.',
+  },
+  {
+    icon: Zap,
+    title: 'Handles Concurrent Calls',
+    description:
+      'Multiple patients can call at the same time? Aya answers all of them without queues or busy signals.',
   },
 ]
 
@@ -54,17 +60,17 @@ export function Features() {
         <div className="text-center mb-20">
           <div className="inline-flex items-center gap-2 bg-[#40E0FF]/10 border border-[#40E0FF]/20 rounded-full px-4 py-1.5 mb-6">
             <Zap className="size-3 text-[#40E0FF]" />
-            <span className="text-[10px] font-bold text-[#40E0FF] uppercase tracking-widest">Capabilities</span>
+            <span className="text-[10px] font-bold text-[#40E0FF] uppercase tracking-widest">Outcomes</span>
           </div>
           <h2
             className="text-4xl md:text-5xl font-bold text-white mb-6"
             style={{ fontFamily: 'var(--font-syne)' }}
           >
-            Convert more calls.{' '}
-            <span className="text-[#40E0FF]">Delight every patient.</span>
+            Secure more patients.{' '}
+            <span className="text-[#40E0FF]">Stress less.</span>
           </h2>
           <p className="text-white/40 max-w-2xl mx-auto text-lg leading-relaxed">
-            Aya captures intent, qualifies high-value leads, and books directly into your workflow - without new software for your team to learn.
+            Aya turns every inbound call into a booked appointment or a clear next step, without extra headcount.
           </p>
         </div>
 

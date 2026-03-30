@@ -87,7 +87,7 @@ export function useClinicSettings() {
   const updateSettings = useCallback(
     async (changes: Record<string, unknown>) => {
       if (!clinicConfigId) throw new Error('No clinic context')
-      if (role !== 'owner') throw new Error('Owner access required')
+      if (role !== 'admin' && role !== 'owner') throw new Error('Admin access required')
 
       const { error: updateError } = await supabase
         .from('clinic_settings')

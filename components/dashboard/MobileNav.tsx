@@ -5,16 +5,17 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   CalendarCheck,
-  Zap,
   BarChart3,
+  Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const mobileNavItems = [
-  { label: 'Overview',     href: '/dashboard/overview',     icon: LayoutDashboard },
-  { label: 'Operations',   href: '/dashboard/operations',   icon: CalendarCheck },
-  { label: 'Credits',      href: '/dashboard/credits',      icon: Zap },
-  { label: 'Reports',      href: '/dashboard/reports',      icon: BarChart3 },
+  { label: 'Overview',    href: '/dashboard/overview',  icon: LayoutDashboard },
+  { label: 'Operations',  href: '/dashboard/operations',icon: CalendarCheck },
+  { label: 'Profiles',    href: '/dashboard/doctors',   icon: CalendarCheck },
+  { label: 'Reports',     href: '/dashboard/reports',   icon: BarChart3 },
+  { label: 'Settings',    href: '/dashboard/settings',  icon: Settings },
 ]
 
 export function MobileNav() {

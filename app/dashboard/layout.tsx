@@ -3,7 +3,18 @@ import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { MobileNav } from '@/components/dashboard/MobileNav'
 import { ClinicProvider } from '@/components/providers/ClinicProvider'
-import { timeAsync } from '@/lib/perf'
+import { getClinicContext } from '@/lib/clinic/getClinicContext'
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+const VALID_ROLES = ['admin', 'doctor', 'receptionist', 'owner'] as const
+type Role = typeof VALID_ROLES[number]
+
+function resolveRole(raw: string): Role | null {
+  return VALID_ROLES.includes(raw as Role) ? (raw as Role) : null
+}
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
 
 export default async function DashboardLayout({
   children,
@@ -12,45 +23,38 @@ export default async function DashboardLayout({
 }) {
   const supabase = await createClient()
 
-  // 1. Get the authenticated user
-  const { data: { user } } = await timeAsync('layout:get_user', () => supabase.auth.getUser())
+  // 1. Verify authenticated user (server-side — does NOT trust cookie alone)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/?auth=required')
   }
 
-  // 2. Get the clinic link + role + name in one round-trip
-  const { data: clinicUser } = await timeAsync('layout:clinic_user', () =>
-    supabase
-      .from('clinic_users')
-      .select(`
-        clinic_config_id,
-        role,
-        clinic_configs (
-          clinic_name
-        )
-      `)
-      .eq('user_id', user.id)
-      .single()
-  )
+  // 2. Resolve clinic context (clinic_users first, fallback to clinic_configs)
+  const clinicContext = await getClinicContext(supabase, user.id)
 
-  // If they don't have a clinic yet, send them to onboarding
-  if (!clinicUser?.clinic_config_id) {
+  // 3. Guard: no clinic = send to onboarding
+  if (!clinicContext?.clinicConfigId) {
     redirect('/onboarding')
   }
 
-  // @ts-expect-error - handling nested supabase join
-  const clinicName = clinicUser?.clinic_configs?.clinic_name ?? 'Your Clinic'
+  const clinicName = clinicContext.clinicName ?? 'Your Clinic'
+  const role = resolveRole(clinicContext.role ?? 'owner')
+  const userEmail = user.email ?? ''
 
-  // 4. Return the UI (Single Return Statement)
+  // 5. Render layout
   return (
-    <div className="min-h-screen bg-[#0B0D10] aurora-bg grain text-slate-200 selection:bg-[#40E0FF]/30 relative overflow-hidden">
-      {/* Dynamic Background Glow - keeps the AI Blizzard aesthetic consistent */}
+    <div className="dashboard-amber min-h-screen bg-[#0B0D10] aurora-bg grain text-slate-200 selection:bg-[#40E0FF]/30 relative overflow-hidden">
+
+      {/* ── Background: Dynamic Glow ── */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#40E0FF]/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-[#40E0FF]/3 rounded-full blur-[100px]" />
       </div>
-      {/* Subtle grid overlay for structure */}
+
+      {/* ── Background: Subtle Grid ── */}
       <div
         className="fixed inset-0 pointer-events-none z-0 opacity-[0.06]"
         style={{
@@ -59,7 +63,8 @@ export default async function DashboardLayout({
           backgroundSize: '90px 90px',
         }}
       />
-      {/* Soft moving fog band */}
+
+      {/* ── Background: Fog Band ── */}
       <div
         className="fixed -bottom-32 left-1/2 h-[420px] w-[1200px] -translate-x-1/2 rounded-full opacity-[0.08] blur-[120px] pointer-events-none z-0"
         style={{
@@ -68,7 +73,8 @@ export default async function DashboardLayout({
           backgroundSize: '200% 200%',
         }}
       />
-      {/* Subtle vignette to frame content */}
+
+      {/* ── Background: Vignette ── */}
       <div
         className="fixed inset-0 pointer-events-none z-0 opacity-[0.35]"
         style={{
@@ -77,17 +83,17 @@ export default async function DashboardLayout({
         }}
       />
 
+      {/* ── Main Content ── */}
       <div className="relative z-10">
         <ClinicProvider
-          initialClinicConfigId={clinicUser?.clinic_config_id ?? null}
-          initialRole={(clinicUser?.role as 'owner' | 'staff' | null) ?? null}
+          initialClinicConfigId={clinicContext.clinicConfigId}
+          initialRole={role}
         >
           <Sidebar
             clinicName={clinicName}
-            userEmail={user.email ?? ''}
+            userEmail={userEmail}
           />
 
-          {/* Content area */}
           <div className="lg:pl-[260px] pt-16 lg:pt-0 min-h-screen">
             <main className="p-4 md:p-8 lg:p-10 max-w-[1600px] mx-auto">
               {children}
@@ -97,6 +103,7 @@ export default async function DashboardLayout({
           <MobileNav />
         </ClinicProvider>
       </div>
+
     </div>
   )
 }

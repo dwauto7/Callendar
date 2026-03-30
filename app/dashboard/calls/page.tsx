@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { timeAsync } from '@/lib/perf'
 import { CallsClient } from '@/components/dashboard/calls/CallsClient'
 import type { CallLogRow } from '@/components/dashboard/operations/TranscriptDrawer'
+import { getClinicContext } from '@/lib/clinic/getClinicContext'
 
 export const metadata = { title: 'Voice Logs — Callendar' }
 
@@ -12,15 +13,11 @@ export default async function CallsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
 
-  const { data: clinicUser } = await supabase
-    .from('clinic_users')
-    .select('clinic_config_id')
-    .eq('user_id', user.id)
-    .single()
+  const clinicContext = await getClinicContext(supabase, user.id)
 
-  if (!clinicUser?.clinic_config_id) redirect('/onboarding')
+  if (!clinicContext?.clinicConfigId) redirect('/onboarding')
 
-  const clinicId = clinicUser.clinic_config_id as string
+  const clinicId = clinicContext.clinicConfigId as string
 
   // Fetch call_logs directly to ensure data is retrieved
   const { data: callLogs, error: callLogsError } = await supabase

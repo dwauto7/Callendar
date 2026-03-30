@@ -1,67 +1,26 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { BarChart3, TrendingUp, Phone, CalendarCheck, Clock, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react'
 import { formatRM, formatMins } from '@/lib/utils'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { CallsTrendChart, BookingsRevenueChart } from '@/components/dashboard/reports/ReportCharts'
 import { cn } from '@/lib/utils'
+import { useReportsData } from '@/hooks/useReportsData'
+import { useClinicContext } from '@/components/providers/ClinicProvider'
 
-export const metadata = {
-  title: 'Performance & ROI — Callendar',
-}
+export default function ReportsPage() {
+  const { clinicConfigId } = useClinicContext()
 
-export default async function ReportsPage() { 
-  const supabase = await createClient()
+  const { allReports, liveRevenue, isLoading } = useReportsData(clinicConfigId ?? '')
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/')
-
-  const { data: clinicUser } = await supabase
-    .from('clinic_users')
-    .select(`
-      clinic_config_id,
-      clinic_configs (
-        clinic_name
-      )
-    `)
-    .eq('user_id', user.id)
-    .single()
-
-  if (!clinicUser?.clinic_config_id) redirect('/onboarding')
-
-  // @ts-expect-error - nested supabase join
-  const clinicName = clinicUser.clinic_configs?.clinic_name ?? 'Partner'
-  const id = clinicUser.clinic_config_id
-
-  // Fetch last 6 months of reports
-  const [reportsRes, appointmentsRes] = await Promise.all([
-  supabase
-    .from('monthly_reports')
-    .select('*')
-    .eq('clinic_config_id', id)
-    .order('report_month', { ascending: false })
-    .limit(6),
-  supabase
-    .from('appointments')
-    .select('projected_revenue, created_at, status')
-    .eq('clinic_id', id)
-    .eq('status', 'Booked')
-    .not('projected_revenue', 'is', null),
-  ])
-
-  const allReports = reportsRes.data ?? []
   const currentReport = allReports[0] ?? null
   const previousReport = allReports[1] ?? null
 
-  const liveRevenue = (appointmentsRes.data ?? []).reduce(
-  (sum, a) => sum + (Number(a.projected_revenue) || 0), 0
-  )
-
   // ── Month-on-month delta helpers ─────────────────────────────
-  function delta(current: number | null, previous: number | null) {
-    if (!current || !previous || previous === 0) return null
+  function delta(current: number | null | undefined, previous: number | null | undefined) {
+    if (current == null || previous == null || previous === 0) return null
     return Math.round(((current - previous) / previous) * 100)
   }
 
@@ -70,12 +29,12 @@ export default async function ReportsPage() {
   const revenueDelta  = delta(currentReport?.gross_revenue_generated, previousReport?.gross_revenue_generated)
   const minutesDelta  = delta(currentReport?.total_minutes_used, previousReport?.total_minutes_used)
 
-  const conversionRate =
-    currentReport && currentReport.total_calls > 0
-      ? Math.round((currentReport.total_bookings / currentReport.total_calls) * 100)
-      : 0
+  const totalCalls    = currentReport?.total_calls ?? 0
+  const totalBookings = currentReport?.total_bookings ?? 0
 
-  // ── Chart data (oldest → newest for left-to-right trend) ─────
+  const conversionRate =
+    totalCalls > 0 ? Math.round((totalBookings / totalCalls) * 100) : 0
+
   const chartData = [...allReports].reverse().map((r) => ({
     period: r.report_period ?? '—',
     calls: r.total_calls ?? 0,
@@ -84,22 +43,22 @@ export default async function ReportsPage() {
     investment: r.total_monthly_investment ?? 0,
   }))
 
-  // ── Snapshot metric rows ──────────────────────────────────────
   const snapshotRows = [
     {
       label: 'Voice Inquiries',
-      value: currentReport?.total_calls?.toLocaleString() ?? '—',
+      value: totalCalls > 0 ? totalCalls.toLocaleString() : '—',
       icon: Phone,
       delta: callsDelta,
     },
     {
       label: 'System Appointments',
-      value: currentReport?.total_bookings?.toLocaleString() ?? '—',
+      value: totalBookings > 0 ? totalBookings.toLocaleString() : '—',
       icon: CalendarCheck,
       delta: bookingsDelta,
     },
     {
       label: 'Gross Revenue Capture',
+      // Falls back to liveRevenue when monthly_reports not yet populated
       value: formatRM(currentReport?.gross_revenue_generated ?? liveRevenue),
       icon: TrendingUp,
       delta: revenueDelta,
@@ -112,6 +71,8 @@ export default async function ReportsPage() {
     },
   ]
 
+  if (!clinicConfigId) return null
+
   return (
     <div className="px-6 py-8 lg:px-10 lg:py-12 max-w-[1600px] mx-auto">
 
@@ -120,14 +81,14 @@ export default async function ReportsPage() {
         <div className="flex items-center gap-2 mb-1">
           <div className="size-2 rounded-full bg-[#40E0FF] animate-pulse" />
           <p className="text-[10px] text-[#40E0FF] font-black uppercase tracking-[0.2em]">
-            {clinicName}
+            {clinicName ?? 'Partner'}
           </p>
         </div>
         <h1
           className="text-4xl md:text-5xl font-bold text-white tracking-tighter leading-none"
           style={{ fontFamily: 'var(--font-syne)' }}
         >
-          Performance <span className="text-white/20">&amp; ROI</span>
+          Performance
         </h1>
         <p
           className="text-base md:text-lg font-semibold text-white/20 tracking-tight mt-1"
@@ -137,9 +98,7 @@ export default async function ReportsPage() {
         </p>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────
-          1. CURRENT MONTH SNAPSHOT
-      ───────────────────────────────────────────────────────── */}
+      {/* ── 1. CURRENT MONTH SNAPSHOT ── */}
       <div className="mb-6">
         <SectionLabel>Current Cycle Snapshot</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -187,26 +146,20 @@ export default async function ReportsPage() {
               />
             </div>
             <p className="text-[10px] text-white/20 font-mono mt-2">
-              {currentReport?.total_bookings ?? 0} bookings from {currentReport?.total_calls ?? 0} calls this cycle
+              {totalBookings} bookings from {totalCalls} calls this cycle
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────
-          2. MULTI-MONTH TREND CHARTS
-      ───────────────────────────────────────────────────────── */}
+      {/* ── 2. MULTI-MONTH TREND CHARTS ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="rounded-2xl border border-white/5 bg-white/[0.02] glass-panel">
           <CardHeader className="px-6 py-5 border-b border-white/5 bg-white/[0.01]">
             <ChartHeader icon={Phone} title="Calls & Bookings" subtitle="Trend over time" />
           </CardHeader>
           <CardContent className="p-6">
-            {chartData.length === 0 ? (
-              <EmptyChart />
-            ) : (
-              <CallsTrendChart data={chartData} />
-            )}
+            {chartData.length === 0 ? <EmptyChart /> : <CallsTrendChart data={chartData} />}
             <div className="flex items-center gap-4 mt-4">
               <LegendDot color="#40E0FF" label="Total Calls" />
               <LegendDot color="#10B981" label="Bookings" />
@@ -214,19 +167,12 @@ export default async function ReportsPage() {
           </CardContent>
         </Card>
 
-        {/* ─────────────────────────────────────────────────────
-            3. COST VS REVENUE ROI
-        ───────────────────────────────────────────────────── */}
         <Card className="rounded-2xl border border-white/5 bg-white/[0.02] glass-panel">
           <CardHeader className="px-6 py-5 border-b border-white/5 bg-white/[0.01]">
             <ChartHeader icon={TrendingUp} title="Revenue vs Investment" subtitle="ROI by cycle" />
           </CardHeader>
           <CardContent className="p-6">
-            {chartData.length === 0 ? (
-              <EmptyChart />
-            ) : (
-              <BookingsRevenueChart data={chartData} />
-            )}
+            {chartData.length === 0 ? <EmptyChart /> : <BookingsRevenueChart data={chartData} />}
             <div className="flex items-center gap-4 mt-4">
               <LegendDot color="#40E0FF" label="Revenue" />
               <LegendDot color="rgba(255,255,255,0.15)" label="Investment" />
@@ -235,9 +181,7 @@ export default async function ReportsPage() {
         </Card>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────
-          4. MONTH-ON-MONTH COMPARISON TABLE
-      ───────────────────────────────────────────────────────── */}
+      {/* ── 3. MONTH-ON-MONTH COMPARISON TABLE ── */}
       <div className="mb-6">
         <SectionLabel>Month-on-Month Comparison</SectionLabel>
         <Card className="rounded-2xl border border-white/5 bg-white/[0.02] glass-panel overflow-hidden">
@@ -263,10 +207,10 @@ export default async function ReportsPage() {
                 <tbody className="divide-y divide-white/5">
                   {allReports.map((r, i) => {
                     const prev = allReports[i + 1]
-                    const eff =
-                      r.total_calls > 0
-                        ? Math.round((r.total_bookings / r.total_calls) * 100)
-                        : 0
+                    const calls = r.total_calls ?? 0
+                    const bookings = r.total_bookings ?? 0
+                    const eff = calls > 0 ? Math.round((bookings / calls) * 100) : 0
+
                     return (
                       <tr
                         key={r.id}
@@ -289,13 +233,13 @@ export default async function ReportsPage() {
                         </td>
                         <td className="px-6 py-4">
                           <CellWithDelta
-                            value={r.total_calls?.toLocaleString() ?? '—'}
+                            value={calls > 0 ? calls.toLocaleString() : '—'}
                             delta={delta(r.total_calls, prev?.total_calls)}
                           />
                         </td>
                         <td className="px-6 py-4">
                           <CellWithDelta
-                            value={r.total_bookings?.toLocaleString() ?? '—'}
+                            value={bookings > 0 ? bookings.toLocaleString() : '—'}
                             delta={delta(r.total_bookings, prev?.total_bookings)}
                           />
                         </td>
@@ -391,11 +335,7 @@ function DeltaBadge({ delta }: { delta: number | null }) {
         positive ? 'text-emerald-400' : 'text-red-400',
       )}
     >
-      {positive ? (
-        <ArrowUpRight className="size-3" />
-      ) : (
-        <ArrowDownRight className="size-3" />
-      )}
+      {positive ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
       {Math.abs(delta)}%
     </span>
   )

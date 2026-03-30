@@ -1,58 +1,49 @@
 import { redirect } from 'next/navigation'
 import { Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { SettingsForm } from '@/components/dashboard/settings/SettingsForm'
 import { SpecialClosures } from '@/components/dashboard/settings/SpecialClosures'
 import { ClinicSettingsPanel } from '@/components/dashboard/settings/ClinicSettingsPanel'
-import { timeAsync } from '@/lib/perf'
+import { ServicesSettingsPanel } from '@/components/dashboard/settings/ServicesSettingsPanel'
+import { getClinicContext } from '@/lib/clinic/getClinicContext'
 
 export const metadata = { title: 'Settings - Callendar' }
+
+type HolidayClosure = {
+  id: string
+  holiday_date: string | null
+  description: string | null
+  is_recurring: boolean
+}
 
 export default async function SettingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
 
-  const { data: clinicUser } = await supabase
-    .from('clinic_users')
-    .select('clinic_config_id')
-    .eq('user_id', user.id)
-    .single()
+  const clinicContext = await getClinicContext(supabase, user.id)
 
-  if (!clinicUser?.clinic_config_id) redirect('/onboarding')
+  if (!clinicContext?.clinicConfigId) redirect('/onboarding')
 
-  const id = clinicUser.clinic_config_id
+  const id = clinicContext.clinicConfigId
 
-  const { data: clinicConfig, error: clinicConfigError } = await supabase
-    .from('clinic_configs')
-    .select('clinic_name, owner_phone, clinic_whatsapp, is_active, agent_id, google_calendar_id')
-    .eq('id', id)
-    .maybeSingle()
-
-  const [settingsRes, closuresRes] = await Promise.all([
-    timeAsync('settings:clinic_settings', async () =>
-      supabase
-        .from('clinic_settings')
-        .select('*')
-        .eq('clinic_config_id', id)
-        .maybeSingle()
-    ),
-    timeAsync('settings:special_closures', async () =>
-      supabase
-        .from('clinic_settings')
-        .select('id, date, reason, is_closed, setting_name')
-        .eq('clinic_config_id', id)
-        .order('date', { ascending: true })
-    ),
+  // All 3 queries fire in parallel — no waterfall, no duplicate table hits
+  const [clinicConfigRes, closuresRes] = await Promise.all([
+    supabase
+      .from('clinic_configs')
+      .select('clinic_name, owner_phone, clinic_whatsapp, is_active, agent_id, google_calendar_id')
+      .eq('id', id)
+      .maybeSingle(),
+    supabase
+      .from('clinic_holidays')
+      .select('id, holiday_date, description, is_recurring')
+      .eq('clinic_config_id', id)
+      .order('holiday_date', { ascending: true }),
   ])
 
-  const settingsConfig = settingsRes?.data ?? {
-    clinic_config_id: id,
-    working_hours: null,
-    working_days: null,
-    timezone: 'Asia/Kuala_Lumpur',
-    emergency_contact: null,
-  }
+  const clinicConfig = clinicConfigRes.data
+  const clinicConfigError = clinicConfigRes.error
+
+  const closures = (closuresRes.data ?? []) as HolidayClosure[]
 
   return (
     <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-3xl mx-auto space-y-8">
@@ -109,10 +100,10 @@ export default async function SettingsPage() {
         </div>
       )}
 
-      <SettingsForm config={settingsConfig} />
       <ClinicSettingsPanel />
+      <ServicesSettingsPanel />
       <SpecialClosures
-        closures={closuresRes?.data ?? []}
+        closures={closures}
         clinicConfigId={id}
       />
     </div>

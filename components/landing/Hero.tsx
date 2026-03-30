@@ -1,19 +1,19 @@
 import { Button } from '@/components/ui/button'
 import { ArrowRight, CalendarCheck, Clock, TrendingUp, Zap, CheckCircle2, ShieldCheck, Search } from 'lucide-react'
 
-// Updated Mockup with "Red Tag" Logic and Glassmorphism
+// Updated Mockup with Live Call Activity and Glassmorphism
 function DashboardMockup() {
   const stats = [
     { label: 'Revenue Recovered', value: 'RM 14,250', icon: TrendingUp, color: '#40E0FF' },
     { label: 'Appointments booked', value: '42', icon: CalendarCheck, color: '#40E0FF' },
-    { label: 'Staff Hours Saved', value: '18.5h', icon: Clock, color: '#40E0FF' },
-    { label: 'Active Red Tags', value: '12', icon: Search, color: '#EF7E71' },
+    { label: 'Front Desk Hours Saved', value: '18.5h', icon: Clock, color: '#40E0FF' },
+    { label: 'Live Call Alerts', value: '12', icon: Search, color: '#EF7E71' },
   ]
 
   const calls = [
-    { name: 'Dr. Sarah (Implant)', time: 'Just now', dur: '4.2m', status: 'Red Tag', priority: true },
-    { name: 'Tan Sri Chen', time: '14 mins ago', dur: '2.1m', status: 'Booked', priority: false },
-    { name: 'Zulhaidi Rahim', time: '1h ago', dur: '1.8m', status: 'Booked', priority: false },
+    { name: 'Dr. Sarah (Implant)', time: 'Just now', dur: '4.2m', status: 'Handled' },
+    { name: 'Tan Sri Chen', time: '14 mins ago', dur: '2.1m', status: 'Booked' },
+    { name: 'Zulhaidi Rahim', time: '1h ago', dur: '1.8m', status: 'Booked' },
   ]
 
   return (
@@ -101,7 +101,7 @@ function DashboardMockup() {
                     <p className="text-[10px] font-medium text-white">{c.name}</p>
                     <p className="text-[8px] text-white/40">{c.time} | {c.dur}</p>
                   </div>
-                  <span className={`text-[8px] font-bold px-2 py-0.5 rounded ${c.priority ? 'bg-[#EF7E71]/20 text-[#EF7E71] border border-[#EF7E71]/30' : 'bg-[#40E0FF]/10 text-[#40E0FF]'}`}>
+                  <span className="text-[8px] font-bold px-2 py-0.5 rounded bg-[#40E0FF]/10 text-[#40E0FF]">
                     {c.status}
                   </span>
                 </div>
@@ -132,18 +132,19 @@ export function Hero() {
           <div>
             <div className="inline-flex items-center gap-2 bg-[#40E0FF]/10 border border-[#40E0FF]/20 rounded-full px-4 py-1.5 mb-8">
               <Zap className="size-3.5 text-[#40E0FF]" />
-              <span className="text-xs font-bold text-[#40E0FF] tracking-wide uppercase">
-              AI Blizzard Intelligence
+            <span className="text-xs font-bold text-[#40E0FF] tracking-wide uppercase">
+              Intelligence
               </span>
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight mb-8" style={{ fontFamily: 'var(--font-syne)' }}>
-              Turn Missed Calls <br />
-              Into <span className="text-[#40E0FF]">Booked Patients.</span>
+              Never Miss <br />
+              <span className="text-[#40E0FF]">A Patient.</span>
             </h1>
 
             <p className="text-lg text-white/60 leading-relaxed mb-10 max-w-lg">
-              Aya answers instantly, qualifies high-value leads, and books appointments into your clinic workflow.
+              Aya answers every call instantly and books appointments while your team stays focused.
+              Handles concurrent calls with zero hold time.
               <span className="text-white font-medium"> Fully PDPA-safe.</span>
             </p>
 
@@ -162,7 +163,7 @@ export function Hero() {
                 variant="outline"
                 className="border-white/10 bg-white/5 text-white hover:bg-white/10 h-14 px-8 rounded-xl text-sm font-bold backdrop-blur-md"
               >
-                <a href="/#how-it-works">24/7 AVAILABILITY</a>
+                <a href="/#demo">SEE A LIVE CALL</a>
               </Button>
             </div>
 

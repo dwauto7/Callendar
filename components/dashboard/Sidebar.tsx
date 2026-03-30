@@ -21,10 +21,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 
 const navItems = [
-  { label: 'Intelligence Overview', href: '/dashboard/overview',     icon: LayoutDashboard },
-  { label: 'Operations Hub',      href: '/dashboard/operations',   icon: CalendarCheck },
-  { label: 'ROI Reports',         href: '/dashboard/reports',      icon: BarChart3 },
-  { label: 'System Settings',     href: '/dashboard/settings',     icon: Settings },
+  { label: 'Overview',    href: '/dashboard/overview',  icon: LayoutDashboard },
+  { label: 'Operations',  href: '/dashboard/operations',icon: CalendarCheck },
+  { label: 'Profiles',    href: '/dashboard/doctors',   icon: CalendarCheck },
+  { label: 'Reports',     href: '/dashboard/reports',   icon: BarChart3 },
+  { label: 'Settings',    href: '/dashboard/settings',  icon: Settings },
 ]
 
 interface SidebarProps {

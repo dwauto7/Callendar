@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { submitOnboarding } from './actions'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -57,6 +58,30 @@ export default function OnboardingPage() {
   const router                = useRouter()
   const supabase              = createClient()
 
+  // Check if user already completed onboarding
+  React.useEffect(() => {
+    async function checkOnboardingStatus() {
+
+      if (step === 5) return // Already completed, no need to check again
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: clinic, error } = await supabase
+        .from('clinic_configs')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      // If clinic exists, user already completed onboarding
+      if (clinic) {
+        router.push('/dashboard/overview')
+      }
+    }
+
+    checkOnboardingStatus()
+  }, [ step])
+
   function set<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm(f => ({ ...f, [key]: value }))
   }
@@ -82,45 +107,27 @@ export default function OnboardingPage() {
     setError(null)
 
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Session expired. Please log in again.')
+      const { error } = await submitOnboarding({
+        clinic_name:             form.clinic_name,
+        clinic_whatsapp:         form.clinic_whatsapp,
+        ai_name:                 form.ai_name,
+        ai_tone:                 form.ai_tone,
+        answering_mode:          form.answering_mode,
+        working_hours_start:     form.working_hours_start,
+        working_hours_end:       form.working_hours_end,
+        working_days:            form.working_days,
+        timezone:                form.timezone,
+        whatsapp_reminders_enabled: form.whatsapp_reminders_enabled,
+        emergency_contact:       form.emergency_contact,
+      })
 
-      // 1. Create clinic_configs + clinic_users via SECURITY DEFINER RPC
-      //    This bypasses RLS for the insert, running as the function owner
-      const { data: clinicId, error: rpcErr } = await supabase
-        .rpc('create_clinic_on_onboarding', {
-          p_clinic_name:     form.clinic_name.trim(),
-          p_clinic_whatsapp: form.clinic_whatsapp.trim() || null,
-          p_user_id:         user.id,
-        })
-
-      if (rpcErr) throw new Error(`Clinic setup failed: ${rpcErr.message}`)
-      if (!clinicId) throw new Error('Clinic creation returned no ID.')
-
-      // 2. Insert clinic_settings
-      //    clinic_users row now exists so check_clinic_access() will pass
-      const { error: settingsErr } = await supabase
-        .from('clinic_settings')
-        .insert({
-          clinic_config_id:           clinicId,
-          ai_name:                    form.ai_name.trim(),
-          ai_tone:                    form.ai_tone,
-          answering_mode:             form.answering_mode,
-          working_hours:              `${form.working_hours_start}-${form.working_hours_end}`,
-          working_days:               form.working_days.join(','),
-          timezone:                   form.timezone,
-          whatsapp_reminders_enabled: form.whatsapp_reminders_enabled,
-          emergency_contact:          form.emergency_contact.trim() || null,
-        })
-
-      if (settingsErr) throw new Error(`Settings failed: ${settingsErr.message}`)
-
-      // 3. Seed monthly report
-      await supabase.rpc('refresh_monthly_report', { p_clinic_config_id: clinicId })
-
-      setStep(5)
+      if (error) {
+        setError(error)
+      } else {
+        setStep(5)
+      }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Initialization failed. Please try again.')
+      setError(err instanceof Error ? err.message : 'Submission failed')
     } finally {
       setLoading(false)
     }
@@ -323,7 +330,7 @@ export default function OnboardingPage() {
                 Agent <span className="text-white/40">{form.ai_name}</span> is standing by.
               </p>
               <button
-                onClick={() => { router.push('/dashboard/overview'); router.refresh() }}
+                onClick={() => { router.push('/dashboard/overview')}}
                 className="w-full py-4 bg-[#40E0FF] text-[#0B0D10] font-black uppercase tracking-widest rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 Enter Dashboard

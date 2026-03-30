@@ -6,54 +6,57 @@ const tiers = [
     name: 'Launch',
     price: 'RM 1,800',
     period: '/ month',
-    setupFee: 'RM 3,000 Setup',
-    description: 'For clinics starting 24/7 call capture.',
-    credits: '500 Monthly Minutes',
+    setupFee: 'RM 2,500 Setup',
+    description: 'Best for steady inbound volume.',
+    credits: 'Covers ~200 appointments / month',
     highlight: false,
     cta: 'Book Demo',
     features: [
-      'Dashboard + Insights',
+      'Every call answered',
+      'Concurrent call handling',
       'WhatsApp Reminders + Booking Confirmation',
       'Full Call Transcripts & Summaries',
       '24/7 Availability',
-      'English Language (Bahasa soon)',
+      'English Language',
       'Overage RM 2.0/min',
     ],
   },
   {
     name: 'Growth',
-    price: 'RM 3,200',
+    price: 'RM 3,000',
     period: '/ month',
-    setupFee: 'RM 4,500 Setup',
-    description: 'Most popular for high-volume clinics.',
-    credits: '1,500 Monthly Minutes',
+    setupFee: 'RM 3,000 Setup',
+    description: 'Built for high-volume clinics.',
+    credits: 'Covers ~400 appointments / month',
     highlight: true,
     cta: 'Book Demo',
     features: [
-      'Dashboard + Insights',
+      'Every call answered',
+      'Concurrent call handling',
       'WhatsApp Reminders + Booking Confirmation',
       'Full Call Transcripts & Summaries',
       '24/7 Availability',
-      'English Language (Bahasa soon)',
-      'Overage RM 1.8/min',
+      'English Language',
+      'Overage RM 1.5/min',
     ],
   },
   {
     name: 'Network',
-    price: 'RM 5,500',
+    price: 'RM 5,000',
     period: '/ month',
-    setupFee: 'RM 6,000 Setup',
-    description: 'Best for multi-branch clinics.',
-    credits: '3,000 Monthly Minutes',
+    setupFee: 'RM 4,000 Setup',
+    description: 'Ideal for multi-branch operations.',
+    credits: 'Covers ~800 appointments / month',
     highlight: false,
     cta: 'Book Demo',
     features: [
-      'Dashboard + Insights',
+      'Every call answered',
+      'Concurrent call handling',
       'WhatsApp Reminders + Booking Confirmation',
       'Full Call Transcripts & Summaries',
       '24/7 Availability',
       'Multi-branch Synchronization',
-      'Overage RM 1.5/min',
+      'Overage RM 1.2/min',
     ],
   },
 ]
@@ -73,10 +76,10 @@ export function Pricing() {
             Invest in predictable <span className="text-[#40E0FF]">patient flow.</span>
           </h2>
           <p className="text-white/50 max-w-2xl mx-auto text-lg">
-            Transparent pricing for clinics that want more bookings, less admin time, and a premium patient experience.
+            Pricing aligned to outcomes: more bookings, less admin time, and a premium patient experience.
           </p>
           <p className="mt-4 text-white/40 text-xs uppercase tracking-widest">
-            Annual Prepay: 15-20% off first-year monthly
+            Estimated coverage assumes ~2.5 minutes per appointment call.
           </p>
         </div>
 
@@ -135,9 +138,12 @@ export function Pricing() {
               </ul>
 
               <div className="pt-6 border-t border-white/5">
-                <div className="flex items-center gap-2 opacity-50">
+                <div className="flex items-center gap-2">
                   <ShieldCheck className="size-3 text-[#40E0FF]" />
-                  <span className="text-[9px] font-bold text-white uppercase tracking-tighter">{tier.credits}</span>
+                  <span className="text-[10px] font-semibold text-white/60">Estimated coverage</span>
+                  <span className="text-[10px] font-bold text-[#0B0D10] bg-[#40E0FF] px-2.5 py-1 rounded-full">
+                    {tier.credits}
+                  </span>
                 </div>
               </div>
             </div>

@@ -6,21 +6,21 @@ const steps = [
     icon: Phone,
     title: 'Instant Acquisition',
     description:
-      'A high-ticket lead calls your clinic. Our AI Blizzard engine picks up in <1 second - no hold times, no missed revenue.',
+      'Patients call in? Aya answers instantly and handles concurrent calls.',
   },
   {
     number: '02',
     icon: Cpu,
     title: 'Clinical Intelligence',
     description:
-      'The AI identifies the patient intent, handles trilingual inquiries, and syncs directly with your clinic software in real-time.',
+      'Aya qualifies intent, confirms eligibility, and books directly into your calendar.',
   },
   {
     number: '03',
     icon: BellRing,
-    title: 'Priority Execution',
+    title: 'Instant Staff Updates',
     description:
-      'Your staff receives a "Red Tag" WhatsApp notification for high-value leads. Full transcripts are logged instantly.',
+      'Staff get instant summaries and transcripts so follow-ups are effortless.',
   },
 ]
 
@@ -34,16 +34,16 @@ export function HowItWorks() {
         <div className="text-center mb-24">
           <div className="inline-flex items-center gap-2 bg-[#40E0FF]/10 border border-[#40E0FF]/20 rounded-full px-4 py-1.5 mb-6">
             <Zap className="size-3 text-[#40E0FF]" />
-            <span className="text-[10px] font-bold text-[#40E0FF] uppercase tracking-widest">The Architecture</span>
+            <span className="text-[10px] font-bold text-[#40E0FF] uppercase tracking-widest">The Outcomes</span>
           </div>
           <h2
             className="text-4xl md:text-5xl font-bold text-white mb-6"
             style={{ fontFamily: 'var(--font-syne)' }}
           >
-            Three steps. <span className="text-[#40E0FF]">Immediate lift.</span>
+            Three steps. <span className="text-[#40E0FF]">Immediate bookings.</span>
           </h2>
           <p className="text-white/40 max-w-xl mx-auto text-lg leading-relaxed">
-            Keep your number, keep your tools. We plug in the intelligence layer and start booking within days.
+            Keep your number, keep your tools. We plug in and start capturing bookings in days.
           </p>
         </div>
 

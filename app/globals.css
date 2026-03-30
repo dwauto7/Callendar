@@ -46,30 +46,55 @@
 }
 
 :root {
+  /* UI Rounding - Keep your 1rem for that modern, friendly feel */
   --radius: 1rem;
-  --background: #0B0D10;
-  --foreground: #E9EEF5;
-  --card: rgba(16, 20, 26, 0.55);
-  --card-foreground: #E9EEF5;
-  --popover: #111419;
-  --popover-foreground: #E9EEF5;
-  --primary: #40E0FF;
-  --primary-foreground: #0B0D10;
-  --secondary: #161B22;
-  --secondary-foreground: #E9EEF5;
-  --muted: #161B22;
-  --muted-foreground: #8B949E;
-  --accent: #40E0FF;
-  --accent-foreground: #0B0D10;
-  --destructive: #EF7E71; 
-  --border: rgba(255, 255, 255, 0.1);
-  --input:  rgba(255, 255, 255, 0.05);
-  --ring: #40E0FF;
-  --sidebar: #090B0E;
-  --sidebar-foreground: #E9EEF5;
-  --sidebar-primary: #40E0FF;
-  --sidebar-primary-foreground: #0B0D10;
-  --sidebar-border: rgba(255, 255, 255, 0.05);
+
+  /* Main Surfaces - Shifted to soft, sterile slate */
+  --background: #F8FAFC;            /* Clean light slate */
+  --foreground: #0F172A;            /* Deep navy text for max legibility */
+  
+  /* Cards - Brilliant white to stand out against the background */
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  
+  /* Popovers - Now light & clean */
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  
+  /* Primary Identity - The "Doctor Teal" */
+  --primary: #0D9488;               /* Professional Teal */
+  --primary-foreground: #FFFFFF;
+  
+  /* Secondary/Muted - Light mode friendly */
+  --secondary: #F1F5F9;             /* Soft light gray/blue */
+  --secondary-foreground: #475569;
+  
+  /* Muted for subtle panel backgrounds */
+  --muted: #F1F5F9;                 /* Subtle panel backgrounds */
+  --muted-foreground: #64748B;
+  
+  /* Accent - Your "AI Spark" Cyan */
+  --accent: #40E0FF;                /* Electric Sky Blue */
+  --accent-foreground: #0F172A;
+  
+  /* Borders & Inputs - Softened for a "Glass" look */
+  --border: #E2E8F0;                /* Light Slate Border */
+  --input: #F8FAFC;
+  --ring: #0D9488;                  /* Focus ring matches primary */
+  
+  /* Sidebar - Light Mode Professional */
+  --sidebar: #FFFFFF;               /* Clean white sidebar */
+  --sidebar-foreground: #475569;
+  --sidebar-primary: #0D9488;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #40E0FF;        /* Accent for sidebar items */
+  --sidebar-accent-foreground: #0F172A;
+  --sidebar-border: #F1F5F9;
+  --sidebar-ring: #0D9488;          /* Focus ring in sidebar */
+  
+  /* Status Colors */
+  --success: #22C55E;               /* Green for "Active/Confirmed" */
+  --destructive: #EF4444;           /* Red for "Cancelled/Missed" */
   
   /* Unified Cyan Chart Colors */
   --chart-1: #40E0FF;
@@ -79,22 +104,123 @@
   --chart-5: #EF7E71;
 }
 
-@layer base {
-  * { @apply border-border outline-ring/50; }
-  html { scroll-behavior: smooth; }
+/* Light mode (default) */
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #F8FAFC;
+    --foreground: #0F172A;
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+    --popover: #FFFFFF;
+    --popover-foreground: #0F172A;
+    --primary: #0D9488;
+    --primary-foreground: #FFFFFF;
+    --secondary: #F1F5F9;
+    --secondary-foreground: #475569;
+    --muted: #F1F5F9;
+    --muted-foreground: #64748B;
+    --accent: #40E0FF;
+    --accent-foreground: #0F172A;
+    --border: #E2E8F0;
+    --input: #F8FAFC;
+    --ring: #0D9488;
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #475569;
+    --sidebar-primary: #0D9488;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #40E0FF;
+    --sidebar-accent-foreground: #0F172A;
+    --sidebar-border: #F1F5F9;
+    --sidebar-ring: #0D9488;
+    --success: #22C55E;
+    --destructive: #EF4444;
+    --chart-1: #40E0FF;
+    --chart-2: #2DD4BF;
+    --chart-3: #3B82F6;
+    --chart-4: #8B5CF6;
+    --chart-5: #EF7E71;
+  }
+}
+
+/* Dark mode (if you want to support it later) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0F172A;
+    --foreground: #F8FAFC;
+    --card: #1E293B;
+    --card-foreground: #F8FAFC;
+    --popover: #1E293B;
+    --popover-foreground: #F8FAFC;
+    --primary: #06B6D4;             /* Brighter cyan for dark mode */
+    --primary-foreground: #0F172A;
+    --secondary: #334155;
+    --secondary-foreground: #F1F5F9;
+    --muted: #334155;
+    --muted-foreground: #94A3B8;
+    --accent: #40E0FF;
+    --accent-foreground: #0F172A;
+    --border: #334155;
+    --input: #1E293B;
+    --ring: #06B6D4;
+    --sidebar: #1E293B;
+    --sidebar-foreground: #F1F5F9;
+    --sidebar-primary: #06B6D4;
+    --sidebar-primary-foreground: #0F172A;
+    --sidebar-accent: #40E0FF;
+    --sidebar-accent-foreground: #0F172A;
+    --sidebar-border: #334155;
+    --sidebar-ring: #06B6D4;
+    --success: #22C55E;
+    --destructive: #EF4444;
+    --chart-1: #40E0FF;
+    --chart-2: #2DD4BF;
+    --chart-3: #3B82F6;
+    --chart-4: #8B5CF6;
+    --chart-5: #EF7E71;
+  }
+}
+
+/* Base styles */
+* {
+  @apply border-border outline-ring/50;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-background text-foreground min-h-screen relative;
+  font-feature-settings: "rounding-params(1rem)";
+}
+
+/* Light mode body gradient (optional, remove if you prefer solid background) */
+@media (prefers-color-scheme: light) {
+  body {
+    background:
+      radial-gradient(1200px 600px at -10% -20%, rgba(13, 148, 136, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, rgba(64, 224, 255, 0.08), transparent 55%),
+      radial-gradient(800px 400px at 50% 120%, rgba(15, 23, 42, 0.03), transparent 60%),
+      var(--background);
+  }
+}
+
+/* Dark mode body gradient */
+@media (prefers-color-scheme: dark) {
   body {
     background:
       radial-gradient(1200px 600px at -10% -20%, rgba(64, 224, 255, 0.08), transparent 60%),
       radial-gradient(900px 500px at 110% 10%, rgba(56, 189, 248, 0.06), transparent 55%),
       radial-gradient(circle at top left, #121820, #0B0D10);
-    @apply text-foreground min-h-screen relative;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display), sans-serif;
-    @apply tracking-tight;
   }
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display), sans-serif;
+  @apply tracking-tight;
+}
+
+/* Reduce motion preference */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
@@ -104,7 +230,10 @@
   }
 }
 
-html.reduced-motion { scroll-behavior: auto; }
+html.reduced-motion {
+  scroll-behavior: auto;
+}
+
 html.reduced-motion * {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
@@ -113,13 +242,13 @@ html.reduced-motion * {
 
 /* ─── AI Blizzard Custom Keyframes ─── */
 @keyframes pulse-glow-cyan {
-  0%, 100% { box-shadow: 0 0 20px rgba(64, 224, 255, 0.25); }
-  50% { box-shadow: 0 0 40px rgba(64, 224, 255, 0.5); }
+  0%, 100% { box-shadow: 0 0 20px color-mix(in oklab, var(--accent) 30%, transparent); }
+  50% { box-shadow: 0 0 40px color-mix(in oklab, var(--accent) 55%, transparent); }
 }
 
 @keyframes border-pulse-cyan {
-  0%, 100% { border-color: rgba(64, 224, 255, 0.1); }
-  50% { border-color: rgba(64, 224, 255, 0.6); }
+  0%, 100% { border-color: color-mix(in oklab, var(--accent) 15%, transparent); }
+  50% { border-color: color-mix(in oklab, var(--accent) 60%, transparent); }
 }
 
 @keyframes aurora {
@@ -140,7 +269,9 @@ html.reduced-motion * {
 /* ─── Layout Utilities ─── */
 @layer utilities {
   .glass-panel {
-    @apply bg-white/[0.03] backdrop-blur-lg border border-white/[0.10] shadow-[0_12px_28px_rgba(0,0,0,0.28)] relative overflow-hidden;
+    @apply backdrop-blur-lg border shadow-[0_12px_28px_rgba(15,23,42,0.12)] relative overflow-hidden;
+    background: color-mix(in oklab, var(--card) 92%, var(--accent) 8%);
+    border-color: color-mix(in oklab, var(--border) 85%, var(--accent) 15%);
   }
 
   /* Soft inner sheen (lighter, single overlay) */
@@ -150,8 +281,8 @@ html.reduced-motion * {
     inset: 1px;
     background: radial-gradient(
       120% 140% at 0% 0%,
-      rgba(255, 255, 255, 0.06),
-      rgba(255, 255, 255, 0.015) 40%,
+      rgba(13, 148, 136, 0.06),
+      rgba(64, 224, 255, 0.03) 40%,
       rgba(255, 255, 255, 0) 70%
     );
     pointer-events: none;
@@ -164,7 +295,9 @@ html.reduced-motion * {
   }
 
   .cyan-glow {
-    box-shadow: 0 0 25px rgba(64, 224, 255, 0.2);
+    box-shadow:
+      0 0 24px color-mix(in oklab, var(--accent) 35%, transparent),
+      0 0 48px color-mix(in oklab, var(--primary) 25%, transparent);
   }
 
   .pulse-glow {
@@ -179,9 +312,9 @@ html.reduced-motion * {
   .aurora-bg {
     background: linear-gradient(
       45deg,
-      rgba(64, 224, 255, 0.05),
-      rgba(20, 184, 166, 0.03),
-      rgba(64, 224, 255, 0.04)
+      color-mix(in oklab, var(--accent) 10%, transparent),
+      color-mix(in oklab, var(--primary) 8%, transparent),
+      color-mix(in oklab, var(--accent) 6%, transparent)
     );
     background-size: 200% 200%;
   }
@@ -200,4 +333,31 @@ html.reduced-motion * {
   .fade-in-up-delay-1 { animation: fade-in-up 0.6s ease-out 0.1s both; }
   .fade-in-up-delay-2 { animation: fade-in-up 0.6s ease-out 0.2s both; }
   .fade-in-up-delay-3 { animation: fade-in-up 0.6s ease-out 0.3s both; }
+}
+
+/* Dashboard amber test */
+.dashboard-amber .text-white { color: #F59E0B !important; }
+.dashboard-amber .text-white\/90 { color: rgba(245, 158, 11, 0.9) !important; }
+.dashboard-amber .text-white\/80 { color: rgba(245, 158, 11, 0.8) !important; }
+.dashboard-amber .text-white\/70 { color: rgba(245, 158, 11, 0.7) !important; }
+.dashboard-amber .text-white\/60 { color: rgba(245, 158, 11, 0.6) !important; }
+.dashboard-amber .text-white\/50 { color: rgba(245, 158, 11, 0.5) !important; }
+.dashboard-amber .text-white\/40 { color: rgba(245, 158, 11, 0.4) !important; }
+.dashboard-amber .text-white\/30 { color: rgba(245, 158, 11, 0.3) !important; }
+.dashboard-amber .text-white\/20 { color: rgba(245, 158, 11, 0.2) !important; }
+
+/* Landing amber test */
+.landing-amber .text-white { color: #F59E0B !important; }
+.landing-amber .text-white\/90 { color: rgba(245, 158, 11, 0.9) !important; }
+.landing-amber .text-white\/80 { color: rgba(245, 158, 11, 0.8) !important; }
+.landing-amber .text-white\/70 { color: rgba(245, 158, 11, 0.7) !important; }
+.landing-amber .text-white\/60 { color: rgba(245, 158, 11, 0.6) !important; }
+.landing-amber .text-white\/50 { color: rgba(245, 158, 11, 0.5) !important; }
+.landing-amber .text-white\/40 { color: rgba(245, 158, 11, 0.4) !important; }
+.landing-amber .text-white\/30 { color: rgba(245, 158, 11, 0.3) !important; }
+.landing-amber .text-white\/20 { color: rgba(245, 158, 11, 0.2) !important; }
+
+/* Landing animated fog */
+.landing-fog-animate {
+  animation: gradient-shift 18s ease-in-out infinite;
 }

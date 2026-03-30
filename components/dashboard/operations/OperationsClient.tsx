@@ -2,17 +2,12 @@
 
 import dynamic from 'next/dynamic'
 import { useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Search, X, PhoneCall } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { ChevronLeft, ChevronRight, Search, X, PhoneCall, Clock, Mic, CalendarDays } from 'lucide-react'
+import { useOperationsData } from '@/lib/hooks/useOperationsData'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import type { CallLogRow } from '@/components/dashboard/operations/TranscriptDrawer'
-
-const CreditsLogsClient = dynamic(
-  () => import('@/components/dashboard/credits/CreditsLogsClient').then(m => m.CreditsLogsClient),
-  { ssr: false }
-)
 
 const TranscriptDrawer = dynamic(
   () => import('@/components/dashboard/operations/TranscriptDrawer').then(m => m.TranscriptDrawer),
@@ -34,7 +29,6 @@ export type AppointmentRow = {
   created_at: string | null
 }
 
-// ✅ TIMEZONE-SAFE UTILITIES
 function toDateKey(date: Date) {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')
@@ -45,9 +39,7 @@ function toDateKey(date: Date) {
 function fmtDateLabel(dateStr: string | null) {
   if (!dateStr) return '—'
   return new Date(dateStr + 'T00:00').toLocaleDateString('en-MY', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
+    day: '2-digit', month: 'short', year: 'numeric',
     timeZone: 'Asia/Kuala_Lumpur',
   })
 }
@@ -65,319 +57,306 @@ function buildCalendar(month: Date) {
   const end = new Date(month.getFullYear(), month.getMonth() + 1, 0)
   const startDay = start.getDay()
   const totalDays = end.getDate()
-
   const cells: Date[] = []
-
-  for (let i = startDay - 1; i >= 0; i--) {
-    cells.push(new Date(month.getFullYear(), month.getMonth(), -i))
-  }
-
-  for (let day = 1; day <= totalDays; day++) {
-    cells.push(new Date(month.getFullYear(), month.getMonth(), day))
-  }
-
+  for (let i = startDay - 1; i >= 0; i--) cells.push(new Date(month.getFullYear(), month.getMonth(), -i))
+  for (let day = 1; day <= totalDays; day++) cells.push(new Date(month.getFullYear(), month.getMonth(), day))
   while (cells.length % 7 !== 0) {
     const last = cells[cells.length - 1]
     cells.push(new Date(last.getFullYear(), last.getMonth(), last.getDate() + 1))
   }
-
   return cells
 }
 
-export function OperationsClient({
-  clinicId,
-  initialAppointments,
-  initialCalls,
-  stats,
-}: {
-  clinicId: string
-  initialAppointments: AppointmentRow[]
-  initialCalls: CallLogRow[]
-  stats: { total_credits_mins: number | null; minutes_used: number | null; balance: number | null } | null
-}) {
-  const [appointments, setAppointments] = useState<AppointmentRow[]>(initialAppointments)
-  const [calls] = useState<CallLogRow[]>(initialCalls || [])
-  const [month, setMonth] = useState(() => {
-    const now = new Date()
-    return new Date(now.getFullYear(), now.getMonth(), 1)
-  })
+const STATUS_CONFIG = {
+  Booked:      { dot: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  Cancelled:   { dot: 'bg-red-400',     badge: 'bg-red-500/10 text-red-400 border-red-500/20' },
+  Rescheduled: { dot: 'bg-amber-400',   badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+} as const
+
+function statusConfig(status: string | null) {
+  return STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ?? { dot: 'bg-white/20', badge: 'bg-white/5 text-white/40 border-white/10' }
+}
+
+export function OperationsClient({ clinicId }: { clinicId: string }) {
+  const { appointments: hookAppointments, callLogs, credits, isLoading, error } = useOperationsData(clinicId)
+  const [appointments, setAppointments] = useState<AppointmentRow[]>(hookAppointments)
+  const [month, setMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1) })
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [visibleAppointments, setVisibleAppointments] = useState(80)
   const [detailAppt, setDetailAppt] = useState<AppointmentRow | null>(null)
-  const deferredSearch = useDeferredValue(search)
-
   const [transcriptOpen, setTranscriptOpen] = useState(false)
   const [selectedCall, setSelectedCall] = useState<CallLogRow | null>(null)
+  const deferredSearch = useDeferredValue(search)
 
-  useEffect(() => {
-    const supabase = createClient()
-    const appointmentsChannel = supabase
-      .channel('appointments-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'appointments',
-          filter: `clinic_id=eq.${clinicId}`
-        },
-        (payload) => {
-          setAppointments((prev) => {
-            const next = [...prev]
-            const incoming = payload.new as AppointmentRow
-            if (payload.eventType === 'DELETE') {
-              return next.filter((item) => item.id !== (payload.old as { id: string }).id)
-            }
-            const idx = next.findIndex((item) => item.id === incoming.id)
-            if (idx >= 0) {
-              next[idx] = { ...next[idx], ...incoming }
-            } else {
-              next.unshift(incoming)
-            }
-            return next
-          })
-        }
-      )
-      .subscribe()
-
-    return () => { supabase.removeChannel(appointmentsChannel) }
-  }, [clinicId])
+  useEffect(() => { setAppointments(hookAppointments) }, [hookAppointments])
 
   const appointmentsByDate = useMemo(() => {
     const map = new Map<string, AppointmentRow[]>()
     for (const appt of appointments) {
       if (!appt.appointment_date) continue
-      const key = appt.appointment_date
-      const list = map.get(key) ?? []
+      const list = map.get(appt.appointment_date) ?? []
       list.push(appt)
-      map.set(key, list)
+      map.set(appt.appointment_date, list)
     }
     return map
   }, [appointments])
 
   const calendarCells = useMemo(() => buildCalendar(month), [month])
-  const monthLabel = useMemo(
-    () => month.toLocaleDateString('en-MY', { month: 'long', year: 'numeric' }),
-    [month]
-  )
+  const monthLabel = useMemo(() => month.toLocaleDateString('en-MY', { month: 'long', year: 'numeric' }), [month])
 
   const filteredAppointments = useMemo(() => {
-    const list = selectedDate
-      ? appointments.filter((a) => a.appointment_date === selectedDate)
-      : appointments
+    const list = selectedDate ? appointments.filter(a => a.appointment_date === selectedDate) : appointments
     if (!deferredSearch) return list
-    const query = deferredSearch.toLowerCase()
-    return list.filter(
-      (a) =>
-        (a.patient_name || '').toLowerCase().includes(query) ||
-        (a.phone || '').includes(query)
-    )
+    const q = deferredSearch.toLowerCase()
+    return list.filter(a => (a.patient_name || '').toLowerCase().includes(q) || (a.phone || '').includes(q))
   }, [appointments, selectedDate, deferredSearch])
 
-  // Safe stats object with fallback values
-  const safeStats = useMemo(() => {
-    return {
-      total_credits_mins: stats?.total_credits_mins ?? 0,
-      minutes_used: stats?.minutes_used ?? 0,
-      balance: stats?.balance ?? 0,
-    }
-  }, [stats])
+  const safeStats = useMemo(() => ({
+    total_credits_mins: credits?.total_credits_mins ?? 0,
+    minutes_used: credits?.minutes_used ?? 0,
+    balance: credits?.balance ?? 0,
+  }), [credits])
+
+  const today = toDateKey(new Date())
+
+  if (error) return (
+    <div className="border border-red-500/20 rounded-xl p-6 text-red-400 text-sm">
+      <p className="font-bold mb-1">Error loading operations data</p>
+      <p className="text-red-400/60">{error.message}</p>
+    </div>
+  )
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-500" />
-        <Input
-          placeholder="Search by patient name or phone..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 bg-[#111318] border-[#1E2128] text-white placeholder:text-gray-600"
-        />
+    <div className="flex flex-col gap-5">
+
+      {/* ── CREDITS STRIP ── */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: 'Total Credits', value: safeStats.total_credits_mins, icon: Clock },
+          { label: 'Minutes Used',  value: safeStats.minutes_used,       icon: Mic },
+          { label: 'Balance',       value: safeStats.balance,            icon: CalendarDays },
+        ].map(({ label, value, icon: Icon }) => (
+          <div key={label} className="bg-[#0D0F12] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-3">
+            <div className="size-8 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
+              <Icon className="size-3.5 text-white/30" />
+            </div>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/25 mb-0.5">{label}</p>
+              <p className="text-lg font-bold text-white tabular-nums leading-none">
+                {value}<span className="text-xs font-medium text-white/25 ml-1">min</span>
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1.4fr] gap-6">
-        {/* LEFT */}
-        <div className="flex flex-col gap-4">
-          <div className="text-sm text-gray-400">
-            {selectedDate
-              ? `${filteredAppointments.length} appointment${filteredAppointments.length !== 1 ? 's' : ''} on ${fmtDateLabel(selectedDate)}`
-              : `${filteredAppointments.length} total appointment${filteredAppointments.length !== 1 ? 's' : ''}`}
+      {/* ── SEARCH ── */}
+      <div className="relative">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-3.5 text-white/20" />
+        <Input
+          placeholder="Search patient or phone..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="pl-9 h-9 bg-[#0D0F12] border-white/[0.06] text-white/80 placeholder:text-white/20 text-sm focus:border-white/20 transition-colors"
+        />
+        {search && (
+          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+            <X className="size-3.5 text-white/30 hover:text-white/60 transition-colors" />
+          </button>
+        )}
+      </div>
+
+      {/* ── MAIN GRID ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-5">
+
+        {/* LEFT — APPOINTMENT LIST */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/25">
+              {selectedDate ? fmtDateLabel(selectedDate) : 'All Appointments'}
+            </p>
+            <p className="text-[10px] font-mono text-white/20">
+              {filteredAppointments.length} records
+            </p>
           </div>
 
-          <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2">
-            {filteredAppointments.slice(0, visibleAppointments).map((appt) => {
-              const linkedCall = calls?.find((c) => c.appointment_id === appt.id)
-              const statusColor =
-                appt.status === 'Booked'
-                  ? 'bg-emerald-600/20 text-emerald-300'
-                  : appt.status === 'Cancelled'
-                  ? 'bg-red-600/20 text-red-300'
-                  : 'bg-amber-600/20 text-amber-300'
-
-              return (
-                <button
-                  key={appt.id}
-                  onClick={() => setDetailAppt(appt)}
-                  className="p-4 bg-[#111318] border border-[#1E2128] rounded-lg hover:bg-[#161B22] transition-colors text-left"
-                >
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div>
-                      <p className="font-medium text-white">{appt.patient_name || '—'}</p>
-                      <p className="text-sm text-gray-400">{appt.phone || '—'}</p>
+          <div className="flex flex-col gap-2 max-h-[560px] overflow-y-auto pr-1 scrollbar-thin">
+            {filteredAppointments.length === 0 ? (
+              <div className="py-16 text-center text-xs text-white/20 uppercase tracking-widest">
+                No appointments
+              </div>
+            ) : (
+              filteredAppointments.slice(0, visibleAppointments).map(appt => {
+                const cfg = statusConfig(appt.status)
+                const linkedCall = callLogs?.find(c => c.appointment_id === appt.id)
+                return (
+                  <button
+                    key={appt.id}
+                    onClick={() => setDetailAppt(appt)}
+                    className="group w-full text-left bg-[#0D0F12] border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.12] hover:bg-[#111318] transition-all duration-150"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-white/90 truncate">{appt.patient_name || '—'}</p>
+                        <p className="text-xs text-white/30 mt-0.5">{appt.phone || '—'}</p>
+                      </div>
+                      <span className={cn('shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border', cfg.badge)}>
+                        {appt.status || '—'}
+                      </span>
                     </div>
-                    <Badge className={statusColor}>{appt.status || '—'}</Badge>
-                  </div>
 
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-                    <span>
-                      {fmtDateLabel(appt.appointment_date)} · {fmtTime(appt.appointment_time)}
-                    </span>
-                    <span className="text-emerald-400 font-medium">
-                      RM {appt.projected_revenue?.toFixed(2) || '0.00'}
-                    </span>
-                  </div>
-
-                  {linkedCall && (
-                    <div className="text-xs text-gray-500 pt-2 border-t border-[#1E2128]">
-                      Call recorded • {linkedCall.duration_min?.toFixed(1) || '0'} min
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/30">
+                        {fmtDateLabel(appt.appointment_date)} · {fmtTime(appt.appointment_time)}
+                      </span>
+                      <span className="text-xs font-bold text-emerald-400 tabular-nums">
+                        RM {appt.projected_revenue?.toFixed(2) || '0.00'}
+                      </span>
                     </div>
-                  )}
-                </button>
-              )
-            })}
+
+                    {linkedCall && (
+                      <div className="mt-3 pt-2.5 border-t border-white/[0.05] flex items-center gap-1.5">
+                        <Mic className="size-3 text-white/20" />
+                        <span className="text-[10px] text-white/25">
+                          {linkedCall.duration_min?.toFixed(1) || '0'} min recorded
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                )
+              })
+            )}
             {visibleAppointments < filteredAppointments.length && (
               <button
-                onClick={() => setVisibleAppointments((v) => v + 40)}
-                className="py-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                onClick={() => setVisibleAppointments(v => v + 40)}
+                className="py-2 text-xs text-white/30 hover:text-white/60 transition-colors uppercase tracking-widest font-bold"
               >
-                Load more...
+                Load more
               </button>
             )}
           </div>
         </div>
 
-        {/* RIGHT CALENDAR */}
-        <div className="p-4 bg-[#111318] border border-[#1E2128] rounded-lg">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold text-white">{monthLabel}</h3>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setMonth((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-                className="p-1 hover:bg-[#161B22] rounded"
-              >
-                <ChevronLeft className="size-4 text-gray-400" />
-              </button>
-              <button
-                onClick={() => setMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-                className="p-1 hover:bg-[#161B22] rounded"
-              >
-                <ChevronRight className="size-4 text-gray-400" />
-              </button>
+        {/* RIGHT — CALENDAR */}
+        <div className="bg-[#0D0F12] border border-white/[0.06] rounded-xl p-5">
+          {/* Month Nav */}
+          <div className="flex items-center justify-between mb-5">
+            <p className="text-sm font-bold text-white/80">{monthLabel}</p>
+            <div className="flex gap-1">
+              {[
+                { icon: ChevronLeft, onClick: () => setMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1)) },
+                { icon: ChevronRight, onClick: () => setMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1)) },
+              ].map(({ icon: Icon, onClick }, i) => (
+                <button key={i} onClick={onClick} className="size-7 flex items-center justify-center rounded-lg hover:bg-white/[0.06] transition-colors">
+                  <Icon className="size-3.5 text-white/40" />
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
-            {calendarCells.map((date) => {
-              const dateStr = toDateKey(date)
-              const isSelected = selectedDate === dateStr
-              const dayAppointments = appointmentsByDate.get(dateStr) ?? []
+          {/* Day headers */}
+          <div className="grid grid-cols-7 mb-2">
+            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
+              <div key={d} className="text-center text-[9px] font-black uppercase tracking-widest text-white/20 py-1">
+                {d}
+              </div>
+            ))}
+          </div>
 
-              const hasBooked = dayAppointments.some(a => a.status === 'Booked')
-              const hasCancelled = dayAppointments.some(a => a.status === 'Cancelled')
-              const hasRescheduled = dayAppointments.some(a => a.status === 'Rescheduled')
-              const count = dayAppointments.length
+          {/* Cells */}
+          <div className="grid grid-cols-7 gap-1">
+            {calendarCells.map(date => {
+              const dateStr = toDateKey(date)
+              const isCurrentMonth = date.getMonth() === month.getMonth()
+              const isSelected = selectedDate === dateStr
+              const isToday = dateStr === today
+              const dayAppts = appointmentsByDate.get(dateStr) ?? []
+              const hasBooked = dayAppts.some(a => a.status === 'Booked')
+              const hasCancelled = dayAppts.some(a => a.status === 'Cancelled')
+              const hasRescheduled = dayAppts.some(a => a.status === 'Rescheduled')
+
               return (
                 <button
                   key={dateStr}
                   onClick={() => setSelectedDate(isSelected ? null : dateStr)}
                   className={cn(
-                    'aspect-square p-2 rounded text-sm flex flex-col items-center justify-center',
-                    isSelected ? 'bg-emerald-600/30 border border-emerald-500/50' : 'hover:bg-[#161B22]'
+                    'relative aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all duration-150',
+                    !isCurrentMonth && 'opacity-20',
+                    isSelected && 'bg-white/10 ring-1 ring-white/20',
+                    !isSelected && isCurrentMonth && 'hover:bg-white/[0.04]',
+                    isToday && !isSelected && 'ring-1 ring-white/15',
                   )}
                 >
-                  <span>{date.getDate()}</span>
-                  {dayAppointments.length > 0 && (
-                    <div className="flex gap-1 mt-1">
-                      {hasBooked && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      )}
-                      {hasRescheduled && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      )}
-                      {hasCancelled && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                      )}
+                  <span className={cn(
+                    'text-xs tabular-nums leading-none',
+                    isToday ? 'font-black text-white' : 'font-medium text-white/50',
+                    isSelected && 'text-white',
+                  )}>
+                    {date.getDate()}
+                  </span>
+                  {dayAppts.length > 0 && (
+                    <div className="flex gap-0.5 items-center">
+                      {hasBooked      && <span className="size-1 rounded-full bg-emerald-400" />}
+                      {hasRescheduled && <span className="size-1 rounded-full bg-amber-400" />}
+                      {hasCancelled   && <span className="size-1 rounded-full bg-red-400" />}
                     </div>
-                  )}
-                  {count > 0 && (
-                    <span className="text-xs mt-1 bg-emerald-600/50 px-1 rounded-full text-emerald-200">
-                      {count}
-                    </span>
                   )}
                 </button>
               )
             })}
           </div>
+
+          {/* Legend */}
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/[0.05]">
+            {[
+              { color: 'bg-emerald-400', label: 'Booked' },
+              { color: 'bg-amber-400',   label: 'Rescheduled' },
+              { color: 'bg-red-400',     label: 'Cancelled' },
+            ].map(({ color, label }) => (
+              <div key={label} className="flex items-center gap-1.5">
+                <span className={cn('size-1.5 rounded-full', color)} />
+                <span className="text-[9px] uppercase tracking-widest font-bold text-white/25">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* ── CREDITS STATS CARDS ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-        <div className="bg-[#111318] border border-[#1E2128] rounded-lg p-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Total Credits</p>
-          <p className="text-2xl font-bold text-white">{safeStats.total_credits_mins} min</p>
+      {/* ── VOICE LOGS ── */}
+      <div className="bg-[#0D0F12] border border-white/[0.06] rounded-xl overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-white/[0.05] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Mic className="size-3.5 text-white/25" />
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">Voice Logs</p>
+          </div>
+          <p className="text-[10px] font-mono text-white/20">{callLogs?.length ?? 0} records</p>
         </div>
-        <div className="bg-[#111318] border border-[#1E2128] rounded-lg p-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Minutes Used</p>
-          <p className="text-2xl font-bold text-white">{safeStats.minutes_used} min</p>
-        </div>
-        <div className="bg-[#111318] border border-[#1E2128] rounded-lg p-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Balance</p>
-          <p className="text-2xl font-bold text-emerald-400">{safeStats.balance} min</p>
-        </div>
-      </div>
 
-      {/* ── VOICE LOGS SECTION ── */}
-      <div className="bg-[#111318] border border-[#1E2128] rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-400 mb-4 uppercase">
-          Voice Logs
-        </h3>
-
-        <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto">
-          {!calls || calls.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-8">No voice logs available</p>
+        <div className="flex flex-col divide-y divide-white/[0.04] max-h-[360px] overflow-y-auto">
+          {!callLogs || callLogs.length === 0 ? (
+            <p className="text-xs text-white/20 text-center py-10 uppercase tracking-widest">No voice logs</p>
           ) : (
-            calls.map((call) => (
+            callLogs.map(call => (
               <button
                 key={call.id}
-                onClick={() => {
-                  setSelectedCall(call)
-                  setTranscriptOpen(true)
-                }}
-                className="p-3 bg-[#0A0A0A] border border-[#1E2128] rounded-lg hover:bg-[#161B22] transition-colors text-left"
+                onClick={() => { setSelectedCall(call); setTranscriptOpen(true) }}
+                className="px-5 py-3.5 hover:bg-white/[0.02] transition-colors text-left flex items-center justify-between gap-4"
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-white font-medium">
-                    {call.client_name || 'Unknown Caller'}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {call.duration_min?.toFixed(1) || '0'} min
-                  </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-white/80 truncate">{call.client_name || 'Unknown Caller'}</p>
+                  <p className="text-xs text-white/30 mt-0.5">{call.patient_phone || '—'}</p>
                 </div>
-
-                <div className="text-xs text-gray-500 mb-2">
-                  {call.patient_phone || '—'}
-                </div>
-
-                {call.is_after_hours && (
-                  <div className="mt-2">
-                    <Badge className="bg-amber-600/20 text-amber-300 text-xs">
+                <div className="flex items-center gap-3 shrink-0">
+                  {call.is_after_hours && (
+                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                       After Hours
-                    </Badge>
-                  </div>
-                )}
+                    </span>
+                  )}
+                  <span className="text-xs font-mono text-white/25">
+                    {call.duration_min?.toFixed(1) || '0'}m
+                  </span>
+                </div>
               </button>
             ))
           )}
@@ -386,114 +365,104 @@ export function OperationsClient({
 
       {/* ── TRANSCRIPT DRAWER ── */}
       {transcriptOpen && selectedCall && (
-        <TranscriptDrawer
-          open={transcriptOpen}
-          onOpenChange={setTranscriptOpen}
-          call={selectedCall}
-        />
+        <TranscriptDrawer open={transcriptOpen} onOpenChange={setTranscriptOpen} call={selectedCall} />
       )}
 
-      {/* ── APPOINTMENT DETAIL DRAWER ── */}
+      {/* ── APPOINTMENT DETAIL PANEL ── */}
       {detailAppt && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end lg:items-center lg:justify-end">
-          <div className="w-full lg:w-[500px] bg-[#0A0A0A] border-l border-[#1E2128] h-full lg:h-auto lg:rounded-lg lg:mr-6 flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-[#1E2128]">
-              <h2 className="text-lg font-semibold text-white">
-                {detailAppt.patient_name || 'Appointment'}
-              </h2>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end lg:items-center lg:justify-end">
+          <div className="w-full lg:w-[440px] bg-[#0A0B0E] border border-white/[0.08] h-full lg:h-auto lg:max-h-[90vh] lg:rounded-2xl lg:mr-6 flex flex-col overflow-hidden">
+
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/25 mb-0.5">Appointment</p>
+                <h2 className="text-base font-bold text-white">{detailAppt.patient_name || '—'}</h2>
+              </div>
               <button
                 onClick={() => setDetailAppt(null)}
-                className="p-1 hover:bg-[#111318] rounded transition-colors"
+                className="size-8 flex items-center justify-center rounded-lg hover:bg-white/[0.06] transition-colors"
               >
-                <X className="size-5 text-gray-400" />
+                <X className="size-4 text-white/40" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-gray-400 uppercase">Appointment Details</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Date</span>
-                    <span className="text-white">{fmtDateLabel(detailAppt.appointment_date)}</span>
+              {/* Status badge */}
+              <div>
+                <span className={cn(
+                  'text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border',
+                  statusConfig(detailAppt.status).badge
+                )}>
+                  {detailAppt.status || '—'}
+                </span>
+              </div>
+
+              {/* Details grid */}
+              <div className="space-y-1">
+                {[
+                  { label: 'Date',  value: fmtDateLabel(detailAppt.appointment_date) },
+                  { label: 'Time',  value: fmtTime(detailAppt.appointment_time) },
+                  { label: 'Type',  value: detailAppt.appointment_type || '—' },
+                  { label: 'Phone', value: detailAppt.phone || '—' },
+                  { label: 'Email', value: detailAppt.email || '—' },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between py-2.5 border-b border-white/[0.04]">
+                    <span className="text-xs text-white/30">{label}</span>
+                    <span className="text-xs font-medium text-white/70">{value}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Time</span>
-                    <span className="text-white">{fmtTime(detailAppt.appointment_time)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Type</span>
-                    <span className="text-white capitalize">{detailAppt.appointment_type || '—'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Phone</span>
-                    <span className="text-white">{detailAppt.phone || '—'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Email</span>
-                    <span className="text-white text-xs">{detailAppt.email || '—'}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-[#1E2128]">
-                    <span className="text-gray-500">Status</span>
-                    <Badge
-                      className={
-                        detailAppt.status === 'Booked'
-                          ? 'bg-emerald-600/20 text-emerald-300'
-                          : detailAppt.status === 'Cancelled'
-                          ? 'bg-red-600/20 text-red-300'
-                          : 'bg-amber-600/20 text-amber-300'
-                      }
-                    >
-                      {detailAppt.status}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Revenue</span>
-                    <span className="text-emerald-400 font-medium">
-                      RM {detailAppt.projected_revenue?.toFixed(2) || '0.00'}
-                    </span>
-                  </div>
+                ))}
+                <div className="flex items-center justify-between py-2.5">
+                  <span className="text-xs text-white/30">Revenue</span>
+                  <span className="text-sm font-bold text-emerald-400 tabular-nums">
+                    RM {detailAppt.projected_revenue?.toFixed(2) || '0.00'}
+                  </span>
                 </div>
               </div>
 
+              {/* Linked call */}
               {(() => {
-                const linkedCall = calls?.find((c) => c.appointment_id === detailAppt.id)
+                const linkedCall = callLogs?.find(c => c.appointment_id === detailAppt.id)
                 return linkedCall ? (
                   <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-gray-400 uppercase">Call Record</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Duration</span>
-                        <span className="text-white">{linkedCall.duration_min?.toFixed(1) || '0'} min</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Minutes Saved</span>
-                        <span className="text-white">{linkedCall.minutes_saved?.toFixed(1) || '0'} min</span>
-                      </div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/25">Call Record</p>
+                    <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 space-y-2">
+                      {[
+                        { label: 'Duration',       value: `${linkedCall.duration_min?.toFixed(1) || '0'} min` },
+                        { label: 'Minutes Saved',  value: `${linkedCall.minutes_saved?.toFixed(1) || '0'} min` },
+                      ].map(({ label, value }) => (
+                        <div key={label} className="flex items-center justify-between">
+                          <span className="text-xs text-white/30">{label}</span>
+                          <span className="text-xs font-medium text-white/60">{value}</span>
+                        </div>
+                      ))}
                       {linkedCall.is_after_hours && (
-                        <div className="pt-2 border-t border-[#1E2128]">
-                          <Badge className="bg-amber-600/20 text-amber-300">After Hours</Badge>
+                        <div className="pt-2 border-t border-white/[0.06]">
+                          <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            After Hours
+                          </span>
                         </div>
                       )}
                     </div>
                     <button
-                      onClick={() => {
-                        setDetailAppt(null)
-                        setSelectedCall(linkedCall)
-                        setTranscriptOpen(true)
-                      }}
-                      className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[#40E0FF]/20 bg-[#40E0FF]/5 text-[#40E0FF] text-sm font-semibold hover:bg-[#40E0FF]/10 transition-colors"
+                      onClick={() => { setDetailAppt(null); setSelectedCall(linkedCall); setTranscriptOpen(true) }}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-white/50 text-xs font-bold hover:bg-white/[0.06] hover:text-white/70 hover:border-white/20 transition-all"
                     >
-                      <PhoneCall className="size-4" />
-                      View Transcript & Summary
+                      <PhoneCall className="size-3.5" />
+                      View Transcript
                     </button>
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-600 italic">No call record linked to this appointment.</p>
+                  <p className="text-xs text-white/20 italic">No call record linked.</p>
                 )
               })()}
             </div>
           </div>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="fixed bottom-6 right-6 text-[10px] text-white/20 font-mono uppercase tracking-widest">
+          Syncing
         </div>
       )}
     </div>

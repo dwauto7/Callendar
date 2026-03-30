@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -12,10 +12,10 @@ import { Plus, Trash2, CalendarOff, Loader2 } from 'lucide-react'
 
 interface Closure {
   id: string
-  date: string | null
-  reason: string | null
-  is_closed: boolean
-  setting_name: string | null
+  holiday_date: string | null
+  description: string | null
+  is_recurring  : boolean
+  recurrence_weekday?: string | null
 }
 
 interface SpecialClosuresProps {
@@ -38,51 +38,102 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
   const [dialogOpen, setDialogOpen] = useState(false)
   const [newDate, setNewDate] = useState('')
   const [newReason, setNewReason] = useState('')
-  const [newIsClosed, setNewIsClosed] = useState(true)
+  const [newIsRecurring, setNewIsRecurring] = useState(false)
+  const [weeklyDay, setWeeklyDay] = useState('sun')
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const supabase = createClient()
+
+  async function refreshClosures() {
+    const { data, error } = await supabase
+      .from('clinic_holidays')
+      .select('id, holiday_date, description, is_recurring, recurrence_weekday')
+      .eq('clinic_config_id', clinicConfigId)
+      .order('holiday_date', { ascending: true })
+
+    if (!error) {
+      setClosures(data ?? [])
+    }
+  }
+
+  useEffect(() => {
+    refreshClosures()
+  }, [clinicConfigId])
+
+  const daysOfWeek = [
+    { value: 'mon', label: 'Mon' },
+    { value: 'tue', label: 'Tue' },
+    { value: 'wed', label: 'Wed' },
+    { value: 'thu', label: 'Thu' },
+    { value: 'fri', label: 'Fri' },
+    { value: 'sat', label: 'Sat' },
+    { value: 'sun', label: 'Sun' },
+  ]
+
+  function nextDateForWeekday(day: string) {
+    const map: Record<string, number> = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 }
+    const target = map[day] ?? 0
+    const today = new Date()
+    const todayIdx = today.getDay()
+    let diff = target - todayIdx
+    if (diff <= 0) diff += 7
+    const next = new Date(today)
+    next.setDate(today.getDate() + diff)
+    return next.toISOString().slice(0, 10)
+  }
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const visibleClosures = closures.filter((closure) => {
+    if (closure.is_recurring) return true
+    if (!closure.holiday_date) return false
+    const date = new Date(closure.holiday_date + 'T00:00:00')
+    return date >= today
+  })
 
   async function handleAdd() {
-    if (!newDate) {
+    const dateToUse = newIsRecurring ? nextDateForWeekday(weeklyDay) : newDate
+    if (!dateToUse) {
       toast.error('Please select a date')
       return
     }
     setSaving(true)
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('clinic_settings')
+    const { error } = await supabase
+      .from('clinic_holidays')
       .insert({
         clinic_config_id: clinicConfigId,
-        setting_name: 'special_closure',
-        date: newDate,
-        reason: newReason || null,
-        is_closed: newIsClosed,
+        holiday_date: dateToUse,
+        description: newReason || null,
+        is_recurring: newIsRecurring,
+        recurrence_weekday: newIsRecurring ? weeklyDay : null,
       })
-      .select()
-      .single()
     setSaving(false)
 
     if (error) {
-      toast.error('Failed to add closure — ' + error.message)
+      toast.error('Failed to add closure')
     } else {
-      setClosures((prev) => [...prev, data])
+      await refreshClosures()
       setDialogOpen(false)
       setNewDate('')
       setNewReason('')
-      setNewIsClosed(true)
-      toast.success('Closure date added')
+      setNewIsRecurring(false)
+      setWeeklyDay('sun')
+      toast.success('Closure inserted successfully')
     }
   }
 
   async function handleDelete(id: string) {
     setDeleting(id)
-    const supabase = createClient()
-    const { error } = await supabase.from('clinic_settings').delete().eq('id', id)
+    const { error } = await supabase
+      .from('clinic_holidays')
+      .delete()
+      .eq('id', id)
+      .eq('clinic_config_id', clinicConfigId)
     setDeleting(null)
     if (error) {
-      toast.error('Failed to delete — ' + error.message)
+      toast.error('Failed to delete')
     } else {
-      setClosures((prev) => prev.filter((c) => c.id !== id))
+      await refreshClosures()
       toast.success('Closure removed')
     }
   }
@@ -116,8 +167,8 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
           </div>
         ) : (
           <div className="divide-y divide-[#1E2128]">
-            {closures
-              .sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
+            {visibleClosures
+              .sort((a, b) => (a.holiday_date ?? '').localeCompare(b.holiday_date ?? ''))
               .map((closure) => (
                 <div
                   key={closure.id}
@@ -126,11 +177,11 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                   <div className="flex items-center gap-3 min-w-0">
                     <div>
                       <p className="text-sm font-medium text-[#F1F5F9]">
-                        {fmtDate(closure.date)}
+                        {fmtDate(closure.holiday_date)}
                       </p>
-                      {closure.reason && (
+                      {closure.description && (
                         <p className="text-xs text-[#64748B] mt-0.5 truncate max-w-[260px]">
-                          {closure.reason}
+                          {closure.description}
                         </p>
                       )}
                     </div>
@@ -138,12 +189,14 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                   <div className="flex items-center gap-2 shrink-0">
                     <Badge
                       className={
-                        closure.is_closed
-                          ? 'bg-[#EF4444]/15 text-[#EF4444] border-0 text-[10px] font-bold uppercase'
+                        closure.is_recurring
+                          ? 'bg-[#10B981]/15 text-[#F59E0B] border-0 text-[10px] font-bold uppercase'
                           : 'bg-[#64748B]/15 text-[#64748B] border-0 text-[10px] font-bold uppercase'
                       }
                     >
-                      {closure.is_closed ? 'Closed' : 'Modified'}
+                      {closure.is_recurring
+                        ? `Weekly: ${(closure.recurrence_weekday ?? 'sun').toUpperCase()}`
+                        : 'One-off'}
                     </Badge>
                     <Button
                       variant="ghost"
@@ -202,13 +255,53 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
               />
             </div>
             <div className="flex items-center justify-between">
-              <Label className="text-sm text-[#F1F5F9]">Mark as Closed</Label>
+              <Label className="text-sm text-[#F1F5F9]">Weekly recurrence</Label>
               <Switch
-                checked={newIsClosed}
-                onCheckedChange={setNewIsClosed}
+                checked={newIsRecurring}
+                onCheckedChange={setNewIsRecurring}
                 className="data-[state=checked]:bg-[#10B981]"
               />
             </div>
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] text-white/40 uppercase tracking-widest">Quick shortcut</p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setNewIsRecurring(true)
+                  setWeeklyDay('sun')
+                }}
+                className="h-8 border-white/10 bg-white/5 text-white text-xs"
+              >
+                Close Every Sunday
+              </Button>
+            </div>
+            {newIsRecurring ? (
+              <div>
+                <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-2 block">
+                  Repeat every
+                </Label>
+                <div className="grid grid-cols-7 gap-2">
+                  {daysOfWeek.map((day) => (
+                    <button
+                      key={day.value}
+                      type="button"
+                      onClick={() => setWeeklyDay(day.value)}
+                      className={
+                        weeklyDay === day.value
+                          ? 'h-9 rounded-lg bg-[#40E0FF]/10 border border-[#40E0FF]/40 text-[#40E0FF] text-[11px] font-bold uppercase'
+                          : 'h-9 rounded-lg bg-white/5 border border-white/10 text-white/30 text-[11px] font-bold uppercase hover:border-white/30'
+                      }
+                    >
+                      {day.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-white/40 mt-2">
+                  We will close every {weeklyDay.toUpperCase()}.
+                </p>
+              </div>
+            ) : null}
           </div>
 
           <DialogFooter className="gap-2">
