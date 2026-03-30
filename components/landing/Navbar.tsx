@@ -11,8 +11,7 @@ import { cn } from '@/lib/utils'
 const links = [
   { label: 'Features', href: '/#features' },
   { label: 'Pricing', href: '/#pricing' },
-  { label: 'Demo', href: '/contact' },
-  { label: 'Consultancy', href: '/consultancy' },
+  { label: 'Contact Us', href: '/contact' },
 ]
 
 export function Navbar() {
@@ -54,7 +53,7 @@ export function Navbar() {
           href="/"
           className="flex items-center gap-2 group"
         >
-          <div className="size-8 bg-amber-500 rounded-lg flex items-center justify-center transition-transform group-hover:rotate-12">
+          <div className="size-8 bg-[#40E0FF] rounded-lg flex items-center justify-center transition-transform group-hover:rotate-12">
             <Zap className="size-5 text-[#0B0D10] fill-current" />
           </div>
         </Link>
@@ -65,7 +64,7 @@ export function Navbar() {
             <Link
               key={l.href}
               href={l.href}
-              className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 hover:text-amber-500 transition-colors duration-300"
+              className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 hover:text-[#40E0FF] transition-colors duration-300"
             >
               {l.label}
             </Link>
@@ -83,7 +82,7 @@ export function Navbar() {
           </Button>
           <Button
             onClick={() => router.push('/contact')}
-            className="bg-amber-500 hover:bg-amber-600 text-[#0B0D10] font-black text-xs uppercase tracking-widest px-6 h-10 rounded-lg transition-all hover:scale-105"
+            className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black text-xs uppercase tracking-widest px-6 h-10 rounded-lg transition-all hover:scale-105"
           >
             Try Demo
           </Button>
@@ -91,7 +90,7 @@ export function Navbar() {
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden text-white/60 hover:text-amber-500 transition-colors"
+          className="md:hidden text-white/60 hover:text-[#40E0FF] transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
           {mobileOpen ? <X className="size-6" /> : <Menu className="size-6" />}
@@ -106,7 +105,7 @@ export function Navbar() {
               key={l.href}
               href={l.href}
               onClick={() => setMobileOpen(false)}
-              className="block text-sm font-bold uppercase tracking-widest text-white/60 hover:text-amber-500"
+              className="block text-sm font-bold uppercase tracking-widest text-white/60 hover:text-[#40E0FF]"
             >
               {l.label}
             </Link>
@@ -120,7 +119,7 @@ export function Navbar() {
                 router.push('/contact')
                 setMobileOpen(false)
               }} 
-              className="bg-amber-500 hover:bg-amber-600 text-[#0B0D10] font-black h-12"
+              className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black h-12"
             >
               Try Demo
             </Button>

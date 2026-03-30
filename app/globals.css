@@ -335,28 +335,6 @@ html.reduced-motion * {
   .fade-in-up-delay-3 { animation: fade-in-up 0.6s ease-out 0.3s both; }
 }
 
-/* Dashboard amber test */
-.dashboard-amber .text-white { color: #F59E0B !important; }
-.dashboard-amber .text-white\/90 { color: rgba(245, 158, 11, 0.9) !important; }
-.dashboard-amber .text-white\/80 { color: rgba(245, 158, 11, 0.8) !important; }
-.dashboard-amber .text-white\/70 { color: rgba(245, 158, 11, 0.7) !important; }
-.dashboard-amber .text-white\/60 { color: rgba(245, 158, 11, 0.6) !important; }
-.dashboard-amber .text-white\/50 { color: rgba(245, 158, 11, 0.5) !important; }
-.dashboard-amber .text-white\/40 { color: rgba(245, 158, 11, 0.4) !important; }
-.dashboard-amber .text-white\/30 { color: rgba(245, 158, 11, 0.3) !important; }
-.dashboard-amber .text-white\/20 { color: rgba(245, 158, 11, 0.2) !important; }
-
-/* Landing amber test */
-.landing-amber .text-white { color: #F59E0B !important; }
-.landing-amber .text-white\/90 { color: rgba(245, 158, 11, 0.9) !important; }
-.landing-amber .text-white\/80 { color: rgba(245, 158, 11, 0.8) !important; }
-.landing-amber .text-white\/70 { color: rgba(245, 158, 11, 0.7) !important; }
-.landing-amber .text-white\/60 { color: rgba(245, 158, 11, 0.6) !important; }
-.landing-amber .text-white\/50 { color: rgba(245, 158, 11, 0.5) !important; }
-.landing-amber .text-white\/40 { color: rgba(245, 158, 11, 0.4) !important; }
-.landing-amber .text-white\/30 { color: rgba(245, 158, 11, 0.3) !important; }
-.landing-amber .text-white\/20 { color: rgba(245, 158, 11, 0.2) !important; }
-
 /* Landing animated fog */
 .landing-fog-animate {
   animation: gradient-shift 18s ease-in-out infinite;

@@ -56,19 +56,19 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Consultancy & Partnership */}
+          {/* Contact & Support */}
           <div>
             <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-6">
-              Consultancy
+              Get Started
             </p>
             <p className="text-sm text-white/40 mb-5">
-              AI automation audit and custom workflow design. Tell us what you want to automate.
+              Ready to transform your clinic? Book a demo or contact us for custom automation solutions.
             </p>
             <Link
-              href="/consultancy"
+              href="/contact"
               className="w-full inline-block rounded-md bg-[#40E0FF] text-[#0B0D10] text-xs font-black uppercase tracking-[0.2em] py-3 text-center transition hover:brightness-110"
             >
-              Book Consultancy
+              Contact Us
             </Link>
           </div>
 

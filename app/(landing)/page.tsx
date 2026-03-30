@@ -3,14 +3,13 @@ import { Hero } from '@/components/landing/Hero'
 import { ResultsBand } from '@/components/landing/ResultsBand'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { DemoClip } from '@/components/landing/DemoClip'
-import { AutomationServices } from '@/components/landing/AutomationServices'
 import { Features } from '@/components/landing/Features'
 import { Pricing } from '@/components/landing/Pricing'
 import { Footer } from '@/components/landing/Footer'
 
 export default function LandingPage() {
   return (
-    <div className="landing-amber bg-background min-h-screen flex flex-col aurora-bg relative overflow-hidden">
+    <div className="bg-background min-h-screen flex flex-col aurora-bg relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] grain" />
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-soft-light"
@@ -44,7 +43,6 @@ export default function LandingPage() {
         <ResultsBand />
         <HowItWorks />
         <DemoClip />
-        <AutomationServices />
         <Features />
         <Pricing />
       </main>

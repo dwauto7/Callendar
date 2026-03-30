@@ -108,7 +108,7 @@ export default function ContactPage() {
                   WhatsApp Concierge
                 </h3>
                 <p className="text-white/60 mb-6 leading-relaxed">
-                  Fastest way to reach us. Ask about pricing, integration, or live call examples.
+                  Fastest way to reach us. Ask about pricing, custom automations, integration guidance, or live call examples.
                 </p>
                 <Button
                   onClick={() => window.open('https://wa.me/601114399466', '_blank')}

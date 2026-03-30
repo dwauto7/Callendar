@@ -30,11 +30,14 @@ export async function getClinicContext(
     .maybeSingle()
 
   if (clinicUser?.clinic_config_id) {
+    const clinicConfig = Array.isArray(clinicUser.clinic_configs)
+      ? clinicUser.clinic_configs[0]
+      : clinicUser.clinic_configs
     return {
       clinicConfigId: clinicUser.clinic_config_id as string,
       role: (clinicUser.role as ClinicRole) ?? null,
-      clinicName: clinicUser.clinic_configs?.clinic_name ?? null,
-      isActive: clinicUser.clinic_configs?.is_active ?? null,
+      clinicName: clinicConfig?.clinic_name ?? null,
+      isActive: clinicConfig?.is_active ?? null,
       source: 'clinic_users',
     }
   }
