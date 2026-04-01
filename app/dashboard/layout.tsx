@@ -4,6 +4,7 @@ import { Sidebar } from '@/components/dashboard/Sidebar'
 import { MobileNav } from '@/components/dashboard/MobileNav'
 import { ClinicProvider } from '@/components/providers/ClinicProvider'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
+import { TermsGate } from '@/components/dashboard/TermsGate'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -32,19 +33,43 @@ export default async function DashboardLayout({
     redirect('/?auth=required')
   }
 
-  // 2. Resolve clinic context (clinic_users first, fallback to clinic_configs)
-  const clinicContext = await getClinicContext(supabase, user.id)
+  // 2. Resolve clinic context with error handling
+  let clinicContext
+
+  try {
+    clinicContext = await getClinicContext(supabase, user.id)
+  } catch (error) {
+    console.error('Critical: Failed to fetch clinic context for user:', user.id, error)
+    redirect('/auth/login?error=clinic_context_failed&message=Could not load clinic data. Please try logging in again.')
+  }
 
   // 3. Guard: no clinic = send to onboarding
   if (!clinicContext?.clinicConfigId) {
+    console.info('User has no clinic memberships, redirecting to onboarding:', user.id)
     redirect('/onboarding')
   }
 
+  // 4. Extract safe values with defaults
   const clinicName = clinicContext.clinicName ?? 'Your Clinic'
   const role = resolveRole(clinicContext.role ?? 'owner')
   const userEmail = user.email ?? ''
 
-  // 5. Render layout
+  const { data: clinicConfig } = await supabase
+  .from('clinic_configs')
+  .select('accepted_terms_version')
+  .eq('id', clinicContext.clinicConfigId)
+  .single()
+
+  const acceptedVersion = clinicConfig?.accepted_terms_version ?? null
+
+  // 5. Log successful dashboard access (optional - for analytics)
+  console.info('Dashboard access granted:', {
+    userId: user.id,
+    clinicId: clinicContext.clinicConfigId,
+    role: clinicContext.role,
+  })
+
+  // 6. Render layout
   return (
     <div className="dashboard-amber min-h-screen bg-[#0B0D10] aurora-bg grain text-slate-200 selection:bg-[#40E0FF]/30 relative overflow-hidden">
 
@@ -96,7 +121,12 @@ export default async function DashboardLayout({
 
           <div className="lg:pl-[260px] pt-16 lg:pt-0 min-h-screen">
             <main className="p-4 md:p-8 lg:p-10 max-w-[1600px] mx-auto">
+              <TermsGate
+                clinicConfigId={clinicContext.clinicConfigId}
+                acceptedVersion={acceptedVersion}
+                >
               {children}
+              </TermsGate>
             </main>
           </div>
 

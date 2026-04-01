@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+  let response = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,36 +16,34 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
-          supabaseResponse = NextResponse.next({ request })
+          response = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            response.cookies.set(name, value, options)
           )
         },
       },
     }
   )
 
-  // Refresh session — IMPORTANT: do not add logic between createServerClient and getUser
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
 
-  // Protect all /dashboard/* routes
-  if (pathname.startsWith('/dashboard') && !user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
-    url.searchParams.set('auth', 'required')
-    return NextResponse.redirect(url)
+  const isAuthRoute = pathname.startsWith('/auth')
+  const isOnboarding = pathname.startsWith('/onboarding')
+  const isDashboard = pathname.startsWith('/dashboard')
+
+  // 🔒 NOT LOGGED IN → block protected routes
+  if (!user && (isDashboard || isOnboarding)) {
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Redirect authenticated users away from root login attempts
-  if (pathname === '/onboarding' && !user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
-    return NextResponse.redirect(url)
+  // 🔁 LOGGED IN → prevent going back to auth pages
+  if (user && isAuthRoute && pathname !== '/auth/accept-invite') {
+    return NextResponse.redirect(new URL('/auth/post-auth', request.url))
   }
 
-  return supabaseResponse
+  return response
 }

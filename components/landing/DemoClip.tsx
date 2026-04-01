@@ -25,9 +25,10 @@ export function DemoClip() {
             muted 
             loop 
             playsInline
+            controls
             className="w-full aspect-video object-cover relative z-10"
           >
-            <source src="/videos/demo-clip.mp4" type="video/mp4" />
+            <source src="https://website.aiblizzard.work/demo%20website.mp4" />
             {/* Fallback for unsupported browsers */}
             <p className="text-white text-center p-8">
               Your browser does not support the video tag. 

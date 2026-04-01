@@ -2,11 +2,11 @@
 export default function TermsOfServicePage() {
   const brandName = "Beacon Horizons Solutions";
   const doingBusinessAs = "Beacon Horizons";
-  const supportEmail = "dwautomate7@gmail.com";
+  const supportEmail = "hello@aiblizzard.work";
   const phone = "(+60)1114399466";
   const lastUpdated = "March 11, 2026";
-  const privacyPolicyUrl = "https://callendar-zeta.vercel.app/privacy-policy";
-  const siteUrl = "https://callendar-zeta.vercel.app/";
+  const privacyPolicyUrl = "https://clinic.aiblizzard.work/privacy-policy";
+  const siteUrl = "https://clinic.aiblizzard.work/";
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12 font-sans bg-white text-[#595959]">

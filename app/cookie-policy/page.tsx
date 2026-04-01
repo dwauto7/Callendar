@@ -1,10 +1,9 @@
-/* eslint-disable react/no-unescaped-entities */
 export default function CookiePolicyPage() {
   const brandName = "Beacon Horizons Solutions";
-  const supportEmail = "dwautomate7@gmail.com";
+  const supportEmail = "hello@aiblizzard.work";
   const phone = "(+60)1114399466";
   const lastUpdated = "March 11, 2026";
-  const websiteUrl = "https://callendar-zeta.vercel.app";
+  const websiteUrl = "https://clinic.aiblizzard.work/";
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12 font-sans bg-white text-[#595959]">

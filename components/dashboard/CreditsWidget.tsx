@@ -76,81 +76,83 @@ export function CreditsWidget({
           )}
         />
 
-        {/* ── Engine capacity row ── */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        {/* ── Metrics row (Balance | Minutes Used | Total Minutes) ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 
-          {/* Left: icon + balance */}
-          <div className="flex items-center gap-4">
-            <div
-              className={cn(
-                'rounded-xl p-3 border transition-all duration-500 group-hover:scale-110',
-                isLow
-                  ? 'bg-amber-500/10 border-amber-500/20'
-                  : 'bg-[#40E0FF]/10 border-[#40E0FF]/20',
-              )}
-            >
-              <Zap
-                className="size-5"
-                style={{ color: isLow ? '#F59E0B' : '#40E0FF' }}
-              />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
-                Engine Capacity
-              </p>
-              <p
-                className="text-3xl font-bold text-white tracking-tighter"
-                style={{ fontFamily: 'var(--font-syne)' }}
-              >
-                {balance.toLocaleString()}
-                <span className="text-sm font-medium text-white/30 ml-2 tracking-normal">
-                  mins available
-                </span>
-              </p>
-            </div>
+          {/* Balance (Remaining) - Cyan */}
+          <div className="rounded-xl p-4 bg-[#40E0FF]/5 border border-[#40E0FF]/20">
+            <p className="text-[10px] font-semibold text-[#40E0FF]/70 uppercase tracking-[0.15em] mb-2">
+              Balance Available
+            </p>
+            <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+              {balance.toLocaleString()}
+            </p>
+            <p className="text-xs text-white/40 mt-1">minutes</p>
           </div>
 
-          {/* Right: Status + System Live side by side + low warning */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {status && (
-              <Badge className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest border rounded-full bg-white/5 text-white/40 border-white/10">
-                Status: {status}
-              </Badge>
-            )}
+          {/* Minutes Used - Amber */}
+          <div className="rounded-xl p-4 bg-amber-500/5 border border-amber-500/20">
+            <p className="text-[10px] font-semibold text-amber-500/70 uppercase tracking-[0.15em] mb-2">
+              Minutes Used
+            </p>
+            <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+              {minutesUsed.toLocaleString()}
+            </p>
+            <p className="text-xs text-white/40 mt-1">{usedPct}% consumed</p>
+          </div>
 
-            <Badge
-              className={cn(
-                'px-3 py-1.5 text-[10px] font-black uppercase tracking-widest border rounded-full transition-colors duration-300 flex items-center gap-1.5',
-                currentMode.bg,
-                currentMode.color,
-                currentMode.border,
-              )}
-            >
-              <span
-                className={cn(
-                  'size-1.5 rounded-full shrink-0',
-                  currentMode.dot,
-                  answeringMode !== 'disabled' && 'animate-pulse',
-                )}
-              />
-              <ModeIcon className="size-3" />
-              {currentMode.label}
-            </Badge>
-
-            {isLow && (
-              <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-black uppercase tracking-widest rounded-full animate-bounce">
-                Refill Required
-              </Badge>
-            )}
+          {/* Total Minutes - Emerald */}
+          <div className="rounded-xl p-4 bg-emerald-500/5 border border-emerald-500/20">
+            <p className="text-[10px] font-semibold text-emerald-500/70 uppercase tracking-[0.15em] mb-2">
+              Total Minutes
+            </p>
+            <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+              {totalCredits.toLocaleString()}
+            </p>
+            <p className="text-xs text-white/40 mt-1">allocated</p>
           </div>
         </div>
 
-        {/* ── Utilization bar ── */}
+        {/* ── Status & Mode badges ── */}
+        <div className="flex items-center gap-2 flex-wrap mb-6">
+          {status && (
+            <Badge className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest border rounded-full bg-white/5 text-white/40 border-white/10">
+              Status: {status}
+            </Badge>
+          )}
+
+          <Badge
+            className={cn(
+              'px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest border rounded-full transition-colors duration-300 flex items-center gap-1.5',
+              currentMode.bg,
+              currentMode.color,
+              currentMode.border,
+            )}
+          >
+            <span
+              className={cn(
+                'size-1.5 rounded-full shrink-0',
+                currentMode.dot,
+                answeringMode !== 'disabled' && 'animate-pulse',
+              )}
+            />
+            <ModeIcon className="size-3" />
+            {currentMode.label}
+          </Badge>
+
+          {isLow && (
+            <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-semibold uppercase tracking-widest rounded-full animate-bounce">
+              Refill Required
+            </Badge>
+          )}
+        </div>
+
+        {/* ── Usage progress bar ── */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-white/30">
-            <span>Utilization Matrix</span>
-            <span className={isLow ? 'text-amber-500' : 'text-[#40E0FF]'}>
-              {remainingPct}% Power Remaining
+          <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-widest text-white/40">
+            <span>Usage Progress</span>
+            <span className={isLow ? 'text-amber-500 font-bold' : 'text-[#40E0FF]'}>
+              {remainingPct}% remaining
             </span>
           </div>
           <div className="h-2 bg-black/40 border border-white/5 rounded-full overflow-hidden">
@@ -163,9 +165,6 @@ export function CreditsWidget({
               )}
               style={{ width: `${usedPct}%` }}
             />
-          </div>
-          <div className="text-[10px] text-white/20 font-medium italic">
-            Total Bandwidth: {totalCredits.toLocaleString()} minutes allocated for current cycle.
           </div>
         </div>
 

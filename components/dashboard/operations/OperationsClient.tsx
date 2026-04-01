@@ -130,25 +130,40 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
   return (
     <div className="flex flex-col gap-5">
 
-      {/* ── CREDITS STRIP ── */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: 'Total Credits', value: safeStats.total_credits_mins, icon: Clock },
-          { label: 'Minutes Used',  value: safeStats.minutes_used,       icon: Mic },
-          { label: 'Balance',       value: safeStats.balance,            icon: CalendarDays },
-        ].map(({ label, value, icon: Icon }) => (
-          <div key={label} className="bg-[#0D0F12] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-3">
-            <div className="size-8 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
-              <Icon className="size-3.5 text-white/30" />
-            </div>
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/25 mb-0.5">{label}</p>
-              <p className="text-lg font-bold text-white tabular-nums leading-none">
-                {value}<span className="text-xs font-medium text-white/25 ml-1">min</span>
-              </p>
-            </div>
-          </div>
-        ))}
+      {/* ── CREDITS STRIP (Color-Coordinated) ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* Balance Available - Cyan */}
+        <div className="rounded-xl p-4 bg-[#40E0FF]/5 border border-[#40E0FF]/20 flex flex-col md:block">
+          <p className="text-[10px] font-semibold text-[#40E0FF]/70 uppercase tracking-[0.15em] mb-2">
+            Balance Available
+          </p>
+          <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            {safeStats.balance.toLocaleString()}
+          </p>
+          <p className="text-xs text-white/40 mt-1">minutes</p>
+        </div>
+
+        {/* Minutes Used - Amber */}
+        <div className="rounded-xl p-4 bg-amber-500/5 border border-amber-500/20 flex flex-col md:block">
+          <p className="text-[10px] font-semibold text-amber-500/70 uppercase tracking-[0.15em] mb-2">
+            Minutes Used
+          </p>
+          <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            {safeStats.minutes_used.toLocaleString()}
+          </p>
+          <p className="text-xs text-white/40 mt-1">consumed</p>
+        </div>
+
+        {/* Total Minutes - Emerald */}
+        <div className="rounded-xl p-4 bg-emerald-500/5 border border-emerald-500/20 flex flex-col md:block">
+          <p className="text-[10px] font-semibold text-emerald-500/70 uppercase tracking-[0.15em] mb-2">
+            Total Minutes
+          </p>
+          <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            {safeStats.total_credits_mins.toLocaleString()}
+          </p>
+          <p className="text-xs text-white/40 mt-1">allocated</p>
+        </div>
       </div>
 
       {/* ── SEARCH ── */}

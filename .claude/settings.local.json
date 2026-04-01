@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
+      "Bash(/tmp/auth_flow_summary.md:*)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

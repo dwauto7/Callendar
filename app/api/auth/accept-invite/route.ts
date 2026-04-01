@@ -11,14 +11,11 @@ export async function POST(request: Request) {
 
     if (!invite_token || !password || !full_name) {
       return Response.json(
-        {
-          error: "Missing required fields: invite_token, password, full_name",
-        },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // Validate password strength (minimum 8 characters)
     if (password.length < 8) {
       return Response.json(
         { error: "Password must be at least 8 characters long" },
@@ -26,7 +23,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Look up the invite token
+    // 🔍 Find invite
     const { data: staffWithInvite, error: lookupError } = await supabase
       .from("clinic_users")
       .select("id, clinic_config_id, user_email, role, invite_expires_at")
@@ -40,7 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if invite is expired
+    // ⏳ Expiry check
     const expiresAt = new Date(staffWithInvite.invite_expires_at);
     if (expiresAt < new Date()) {
       return Response.json(
@@ -49,32 +46,45 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create Supabase auth user
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser(
-      {
-        email: staffWithInvite.user_email,
+    const email = staffWithInvite.user_email.toLowerCase();
+
+    // 🚫 Prevent duplicate users
+    const { data: usersList } = await supabase.auth.admin.listUsers();
+    const existingUser = usersList.users.find((u) => u.email === email);
+
+    if (existingUser) {
+      return Response.json(
+        { error: "User already exists. Please login instead." },
+        { status: 400 }
+      );
+    }
+
+    // 👤 Create user
+    const { data: authData, error: authError } =
+      await supabase.auth.admin.createUser({
+        email,
         password,
-        email_confirm: true, // Auto-confirm email
+        email_confirm: true,
         user_metadata: {
           full_name,
-          clinic_config_id: staffWithInvite.clinic_config_id,
         },
-      }
-    );
+      });
 
     if (authError || !authData.user) {
-      console.error("Auth creation error:", authError);
+      console.error("Auth error:", authError);
       return Response.json(
         { error: "Failed to create account" },
         { status: 500 }
       );
     }
 
-    // Update clinic_users record with user_id and clear invite token
+    const userId = authData.user.id;
+
+    // 🔗 Link to clinic_users
     const { error: updateError } = await supabase
       .from("clinic_users")
       .update({
-        user_id: authData.user.id,
+        user_id: userId,
         invite_token: null,
         invite_expires_at: null,
         last_login_at: new Date().toISOString(),
@@ -83,38 +93,32 @@ export async function POST(request: Request) {
 
     if (updateError) {
       console.error("Update error:", updateError);
-      // Auth user was created but clinic_users wasn't updated—this is a problem
-      // In production, you'd want to clean up the auth user here
       return Response.json(
-        { error: "Account created but failed to complete setup" },
+        { error: "Account created but failed to link clinic" },
         { status: 500 }
       );
     }
 
-    // Link doctor profile by email (if exists)
+    // 🔗 Link profile (optional but good)
     await supabase
       .from("clinic_profiles")
-      .update({
-        user_id: authData.user.id,
-      })
+      .update({ user_id: userId })
       .eq("clinic_config_id", staffWithInvite.clinic_config_id)
-      .eq("user_email", staffWithInvite.user_email);
+      .eq("user_email", email);
 
-    // Mark invite as accepted in clinic_user_invites table
+    // ✅ Mark invite accepted
     await supabase
       .from("clinic_user_invites")
       .update({
         accepted_at: new Date().toISOString(),
-        accepted_by_user_id: authData.user.id,
+        accepted_by_user_id: userId,
       })
       .eq("invite_token", invite_token);
 
     return Response.json(
       {
         success: true,
-        message: "Account created successfully",
-        user_id: authData.user.id,
-        clinic_config_id: staffWithInvite.clinic_config_id,
+        email, // 🔥 used for auto-login
       },
       { status: 201 }
     );

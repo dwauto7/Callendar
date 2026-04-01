@@ -1,14 +1,13 @@
-/* eslint-disable react/no-unescaped-entities */
 'use client'
 
 import { useState } from 'react'
 export default function PrivacyPolicyPage() {
   const brandName = "Beacon Horizons Solutions";
   const doingBusinessAs = "Beacon Horizons";
-  const supportEmail = "dwautomate7@gmail.com";
-  const adminEmail = "admin@beaconhorizons.com";
+  const supportEmail = "hello@aiblizzard.work";
+  const adminEmail = "admin@aiblizzard.work";
   const lastUpdated = "March 11, 2026";
-  const siteUrl = "https://callendar-zeta.vercel.app/";
+  const siteUrl = "https://clinic.aiblizzard.work/";
   const dsarUrl = "https://app.termly.io/dsar/6284c694-5dc1-457f-923b-4533ad8f0a3f";
   const [language, setLanguage] = useState<'EN' | 'BM'>('EN')
 
@@ -148,7 +147,7 @@ export default function PrivacyPolicyPage() {
             <li>Contact preferences</li>
             <li>Contact or authentication data</li>
           </ul>
-          <p><strong>Sensitive Information.</strong> We process voice recordings and biometric identifiers (voice patterns) when you interact with our AI Voice Products. Under the Malaysian PDPA, this is classified as Sensitive Personal Data. We process this only with your express consent for the purpose of appointment booking and service quality monitoring.</p>
+          <p><strong>Sensitive Information.</strong> We process voice recordings and biometric identifiers (voice patterns) when you interact with our AI Voice Products. Under the Malaysian PDPA, this is classified as Sensitive Personal Data. **Clinics must obtain explicit patient consent before voice processing begins.** We process this only with express consent for the purpose of appointment booking and service quality monitoring.</p>
           <p>
             <strong>Social Media Login Data.</strong> We may provide you with the option to register with us using your
             existing social media account details, like your Facebook, X, or other social media account. If you choose to

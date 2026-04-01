@@ -1,6 +1,5 @@
 import { Navbar } from '@/components/landing/Navbar'
 import { Hero } from '@/components/landing/Hero'
-import { ResultsBand } from '@/components/landing/ResultsBand'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { DemoClip } from '@/components/landing/DemoClip'
 import { Features } from '@/components/landing/Features'
@@ -40,7 +39,6 @@ export default function LandingPage() {
       <Navbar />
       <main className="flex-1 relative z-10">
         <Hero />
-        <ResultsBand />
         <HowItWorks />
         <DemoClip />
         <Features />
