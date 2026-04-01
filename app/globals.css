@@ -335,7 +335,8 @@ html.reduced-motion * {
   .fade-in-up-delay-3 { animation: fade-in-up 0.6s ease-out 0.3s both; }
 }
 
-/* Landing animated fog */
+/* Landing animated fog - paused to prevent scroll jank */
 .landing-fog-animate {
-  animation: gradient-shift 18s ease-in-out infinite;
+  animation: none;
+  /* Previously: animation: gradient-shift 18s ease-in-out infinite; */
 }

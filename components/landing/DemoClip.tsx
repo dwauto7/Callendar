@@ -40,7 +40,7 @@ export function DemoClip() {
         {/* CTA Section */}
         <div className="text-center space-y-4">
           <p className="text-white/40 text-sm">
-            Experience the Callendar AI agent handling patient inquiries, booking appointments, and more.
+            Experience the AI agent handling patient inquiries, booking appointments, and more.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
