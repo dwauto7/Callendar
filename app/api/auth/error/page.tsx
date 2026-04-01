@@ -1,29 +1,27 @@
-// app/auth/error/page.tsx
-
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, Home, HelpCircle } from 'lucide-react'
 
-export default function AuthErrorPage() {
+function AuthErrorContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
   const error = searchParams.get('error')
   const message = searchParams.get('message')
 
-  // Error message mappings
   const errorMessages: Record<string, { title: string; description: string; suggestion: string }> = {
     clinic_context_failed: {
       title: 'Failed to Load Clinic',
-      description: 'We couldn\'t retrieve your clinic information from our servers.',
+      description: "We couldn't retrieve your clinic information from our servers.",
       suggestion: 'Please try logging in again. If the problem persists, contact your clinic administrator.',
     },
     clinic_fetch_failed: {
       title: 'Access Error',
-      description: 'We couldn\'t verify your clinic access permissions.',
+      description: "We couldn't verify your clinic access permissions.",
       suggestion: 'This might be a temporary server issue. Try logging in again or contact support.',
     },
     session_invalid: {
@@ -71,7 +69,6 @@ export default function AuthErrorPage() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Error Description */}
           <div className="space-y-2">
             <p className="text-sm text-slate-300">{displayMessage}</p>
             <p className="text-xs text-slate-400 flex items-start gap-2">
@@ -80,7 +77,6 @@ export default function AuthErrorPage() {
             </p>
           </div>
 
-          {/* Error Code (for support) */}
           {error && (
             <div className="bg-slate-900 border border-slate-700 rounded-lg p-3">
               <p className="text-xs text-slate-500 mb-1">Error code:</p>
@@ -88,7 +84,6 @@ export default function AuthErrorPage() {
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="flex flex-col gap-2">
             <Button
               onClick={() => router.push('/auth/login')}
@@ -106,7 +101,6 @@ export default function AuthErrorPage() {
             </Button>
           </div>
 
-          {/* Support Contact */}
           <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-3">
             <p className="text-xs text-slate-400">
               Still having trouble?{' '}
@@ -119,5 +113,19 @@ export default function AuthErrorPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+          <p className="text-sm text-slate-400">Loading...</p>
+        </div>
+      }
+    >
+      <AuthErrorContent />
+    </Suspense>
   )
 }
