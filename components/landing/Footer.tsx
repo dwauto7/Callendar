@@ -112,7 +112,7 @@ export function Footer() {
             </p>
             <span className="text-white/10 text-xs">|</span>
             <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
-              aiblizzard.work
+              beaconhorizons.io
             </p>
           </div>
 

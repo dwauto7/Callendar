@@ -1,9 +1,9 @@
 export default function CookiePolicyPage() {
   const brandName = "Beacon Horizons Solutions";
-  const supportEmail = "hello@aiblizzard.work";
+  const supportEmail = "hello@beaconhorizons.io";
   const phone = "(+60)1114399466";
   const lastUpdated = "March 11, 2026";
-  const websiteUrl = "https://clinic.aiblizzard.work/";
+  const websiteUrl = "https://clinic.beaconhorizons.io/";
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-12 font-sans bg-white text-[#595959]">

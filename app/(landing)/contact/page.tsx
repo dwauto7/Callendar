@@ -248,7 +248,7 @@ export default function ContactPage() {
                     </ul>
                     <p className="text-xs text-white/70 mb-4">
                       I understand that I can opt-out or request data deletion at any time by emailing{' '}
-                      <a href="mailto:demo@aiblizzard.work" className="text-[#40E0FF]">demo@aiblizzard.work</a>.
+                      <a href="mailto:demo@beaconhorizons.io" className="text-[#40E0FF]">demo@beaconhorizons.io</a>.
                     </p>
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
@@ -283,10 +283,10 @@ export default function ContactPage() {
           <div className="text-center mt-12 fade-in-up-delay-3">
             <p className="text-white/40 mb-2">Or email us at</p>
             <a
-              href="mailto:demo@aiblizzard.work"
+              href="mailto:demo@beaconhorizons.io"
               className="text-[#40E0FF] hover:text-[#40E0FF]/80 font-semibold text-lg transition-colors duration-200"
             >
-              demo@aiblizzard.work
+              demo@beaconhorizons.io
             </a>
           </div>
         </div>

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid phone' }, { status: 400 })
   }
 
-  const res = await fetch('https://n8n.aiblizzard.work/webhook/callendar-demo-request', {
+  const res = await fetch('https://n8n.beaconhorizons.io/webhook/callendar-demo-request', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, phone, clinic_name, role }),

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Email to admin
-    const adminEmail = 'admin@aiblizzard.work'
+    const adminEmail = 'admin@beaconhorizons.io'
 
     const serviceTypeLabel = {
       custom_integration: 'Custom Integration with Existing Systems',
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Send email to admin
     await transporter.sendMail({
-      from: process.env.EMAIL_FROM || 'noreply@aiblizzard.work',
+      from: process.env.EMAIL_FROM || 'noreply@beaconhorizons.io',
       to: adminEmail,
       subject: `New Consultancy Request: ${body.clinic_name} - ${body.contact_name}`,
       html: emailHtml,
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     `
 
     await transporter.sendMail({
-      from: process.env.EMAIL_FROM || 'noreply@aiblizzard.work',
+      from: process.env.EMAIL_FROM || 'noreply@beaconhorizons.io',
       to: body.email,
       subject: 'Consultancy Request Received - Callendar',
       html: confirmationHtml,

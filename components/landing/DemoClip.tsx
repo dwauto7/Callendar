@@ -28,7 +28,7 @@ export function DemoClip() {
             controls
             className="w-full aspect-video object-cover relative z-10"
           >
-            <source src="https://website.aiblizzard.work/demo%20website.mp4" />
+            <source src="https://website.beaconhorizons.io/demo%20website.mp4" />
             {/* Fallback for unsupported browsers */}
             <p className="text-white text-center p-8">
               Your browser does not support the video tag. 

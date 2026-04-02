@@ -31,7 +31,7 @@ function DashboardMockup() {
           <div className="size-2.5 rounded-full bg-white/20" />
           <div className="size-2.5 rounded-full bg-[#40E0FF]/70" />
           <div className="flex-1 mx-4 h-5 rounded-md bg-white/5 flex items-center px-2">
-            <span className="text-[9px] text-white/40 tracking-tight">aiblizzard.work/portal</span>
+            <span className="text-[9px] text-white/40 tracking-tight">beaconhorizons.io/portal</span>
           </div>
         </div>
 

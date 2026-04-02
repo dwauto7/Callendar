@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
   }
 
-  const webhookUrl = process.env.N8N_CLOSURES_WEBHOOK_URL ?? 'https://n8n.aiblizzard.work/webhook/Holiday_Closure'
+  const webhookUrl = process.env.N8N_CLOSURES_WEBHOOK_URL ?? 'https://n8n.beaconhorizons.io/webhook/Holiday_Closure'
 
   const res = await fetch(webhookUrl, {
     method: 'POST',
@@ -58,7 +58,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
   }
 
-  const webhookUrl = process.env.N8N_CLOSURES_WEBHOOK_URL ?? 'https://n8n.aiblizzard.work/webhook/Holiday_Closure'
+  const webhookUrl = process.env.N8N_CLOSURES_WEBHOOK_URL ?? 'https://n8n.beaconhorizons.io/webhook/Holiday_Closure'
 
   const res = await fetch(webhookUrl, {
     method: 'POST',

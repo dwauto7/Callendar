@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
   }
 
-  const webhookUrl = process.env.N8N_SERVICES_WEBHOOK_URL ?? 'https://n8n.aiblizzard.work/webhook/services-and-offers'
+  const webhookUrl = process.env.N8N_SERVICES_WEBHOOK_URL ?? 'https://n8n.beaconhorizons.io/webhook/services-and-offers'
   if (!webhookUrl) {
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
   }

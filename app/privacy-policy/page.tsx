@@ -4,10 +4,10 @@ import { useState } from 'react'
 export default function PrivacyPolicyPage() {
   const brandName = "Beacon Horizons Solutions";
   const doingBusinessAs = "Beacon Horizons";
-  const supportEmail = "hello@aiblizzard.work";
-  const adminEmail = "admin@aiblizzard.work";
+  const supportEmail = "hello@beaconhorizons.io";
+  const adminEmail = "admin@beaconhorizons.io";
   const lastUpdated = "March 11, 2026";
-  const siteUrl = "https://clinic.aiblizzard.work/";
+  const siteUrl = "https://clinic.beaconhorizons.io/";
   const dsarUrl = "https://app.termly.io/dsar/6284c694-5dc1-457f-923b-4533ad8f0a3f";
   const [language, setLanguage] = useState<'EN' | 'BM'>('EN')
 

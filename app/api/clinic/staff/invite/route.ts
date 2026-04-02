@@ -138,7 +138,7 @@ export async function POST(request: Request) {
 
     try {
       await resend.emails.send({
-        from: "Callendar <noreply@aiblizzard.work>",
+        from: "Callendar <noreply@beaconhorizons.io>",
         to: invitee_email,
         subject: "You're invited to join Callendar",
         html: `
