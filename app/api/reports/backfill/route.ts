@@ -54,7 +54,7 @@ export async function POST() {
     const errors: string[] = []
 
     for (const monthStr of uniqueMonths) {
-      const { error } = await supabase.rpc('upsert_monthly_report', {
+      const { error } = await supabase.rpc('upsert_monthly_report' as any, {
         p_clinic_config_id: clinicConfigId,
         p_month: monthStr,
       })

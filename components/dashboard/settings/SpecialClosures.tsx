@@ -8,14 +8,14 @@ import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Trash2, CalendarOff, Loader2 } from 'lucide-react'
+import { Plus, Trash2, CalendarOff, Loader2, Edit2 } from 'lucide-react'
 
 interface Closure {
   id: string
   holiday_date: string | null
   description: string | null
   is_recurring: boolean
-  recurrence_weekday?: number | null // ✅ number, not string
+  recurrence_weekday?: number | null
 }
 
 interface SpecialClosuresProps {
@@ -26,12 +26,10 @@ interface SpecialClosuresProps {
 const inputCls =
   'w-full h-9 rounded-md border border-[#1E2128] bg-[#0D0F12] px-3 text-sm text-[#F1F5F9] placeholder:text-[#64748B]/50 focus:border-[#10B981] focus:outline-none transition-colors'
 
-// ✅ Map string day keys → int (0=Sun, 1=Mon … 6=Sat)
 const DAY_TO_INT: Record<string, number> = {
   sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6,
 }
 
-// ✅ Map int → display label
 const INT_TO_DAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function fmtDate(d: string | null) {
@@ -44,10 +42,14 @@ function fmtDate(d: string | null) {
 export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialClosuresProps) {
   const [closures, setClosures] = useState<Closure[]>(initial)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  
+  // Form state
   const [newDate, setNewDate] = useState('')
   const [newReason, setNewReason] = useState('')
   const [newIsRecurring, setNewIsRecurring] = useState(false)
   const [weeklyDay, setWeeklyDay] = useState('sun')
+  
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
   const supabase = createClient()
@@ -89,6 +91,13 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
     return next.toISOString().slice(0, 10)
   }
 
+  // Convert int (0-6) back to string key for display
+  function intToDayString(weekdayInt: number | null | undefined): string {
+    if (weekdayInt === null || weekdayInt === undefined) return 'sun'
+    const reverse = Object.entries(DAY_TO_INT).find(([_, v]) => v === weekdayInt)
+    return reverse ? reverse[0] : 'sun'
+  }
+
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const visibleClosures = closures.filter((closure) => {
@@ -98,34 +107,90 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
     return date >= today
   })
 
-  async function handleAdd() {
+  // ✅ Handle opening dialog for new closure
+  function handleOpenAdd() {
+    setEditingId(null)
+    setNewDate('')
+    setNewReason('')
+    setNewIsRecurring(false)
+    setWeeklyDay('sun')
+    setDialogOpen(true)
+  }
+
+  // ✅ Handle opening dialog for editing existing closure
+  function handleOpenEdit(closure: Closure) {
+    setEditingId(closure.id)
+    setNewReason(closure.description || '')
+    setNewIsRecurring(closure.is_recurring)
+    
+    if (closure.is_recurring) {
+      const dayStr = intToDayString(closure.recurrence_weekday)
+      setWeeklyDay(dayStr)
+      setNewDate('')
+    } else {
+      setNewDate(closure.holiday_date || '')
+      setWeeklyDay('sun')
+    }
+    
+    setDialogOpen(true)
+  }
+
+  // ✅ Unified save handler for both add and edit
+  async function handleSave() {
     const dateToUse = newIsRecurring ? nextDateForWeekday(weeklyDay) : newDate
     if (!dateToUse) {
-      toast.error('Please select a date')
+      toast.error('Please select a date or recurrence day')
       return
     }
-    setSaving(true)
-    const { error } = await supabase
-      .from('clinic_holidays')
-      .insert({
-        clinic_config_id: clinicConfigId,
-        holiday_date: dateToUse,
-        description: newReason || null,
-        is_recurring: newIsRecurring,
-        recurrence_weekday: newIsRecurring ? DAY_TO_INT[weeklyDay] : null, // ✅ insert int
-      })
-    setSaving(false)
 
-    if (error) {
-      toast.error('Failed to add closure')
-    } else {
-      await refreshClosures()
-      setDialogOpen(false)
-      setNewDate('')
-      setNewReason('')
-      setNewIsRecurring(false)
-      setWeeklyDay('sun')
-      toast.success('Closure inserted successfully')
+    setSaving(true)
+
+    try {
+      if (editingId) {
+        // UPDATE existing closure
+        const { error } = await supabase
+          .from('clinic_holidays')
+          .update({
+            holiday_date: dateToUse,
+            description: newReason || null,
+            is_recurring: newIsRecurring,
+            recurrence_weekday: newIsRecurring ? DAY_TO_INT[weeklyDay] : null,
+          })
+          .eq('id', editingId)
+          .eq('clinic_config_id', clinicConfigId)
+
+        if (error) {
+          toast.error('Failed to update closure')
+          console.error(error)
+        } else {
+          await refreshClosures()
+          setDialogOpen(false)
+          setEditingId(null)
+          toast.success('Closure updated')
+        }
+      } else {
+        // INSERT new closure
+        const { error } = await supabase
+          .from('clinic_holidays')
+          .insert({
+            clinic_config_id: clinicConfigId,
+            holiday_date: dateToUse,
+            description: newReason || null,
+            is_recurring: newIsRecurring,
+            recurrence_weekday: newIsRecurring ? DAY_TO_INT[weeklyDay] : null,
+          })
+
+        if (error) {
+          toast.error('Failed to add closure')
+          console.error(error)
+        } else {
+          await refreshClosures()
+          setDialogOpen(false)
+          toast.success('Closure added')
+        }
+      }
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -159,7 +224,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
             </p>
           </div>
           <Button
-            onClick={() => setDialogOpen(true)}
+            onClick={handleOpenAdd}
             size="sm"
             className="h-8 bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold text-xs"
           >
@@ -179,9 +244,13 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
               .map((closure) => (
                 <div
                   key={closure.id}
-                  className="flex items-center justify-between px-5 py-3.5 hover:bg-[#161B22] transition-colors"
+                  className="flex items-center justify-between px-5 py-3.5 hover:bg-[#161B22] transition-colors group"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  {/* ✅ Clickable closure content */}
+                  <div
+                    onClick={() => handleOpenEdit(closure)}
+                    className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
+                  >
                     <div>
                       <p className="text-sm font-medium text-[#F1F5F9]">
                         {fmtDate(closure.holiday_date)}
@@ -193,6 +262,8 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                       )}
                     </div>
                   </div>
+
+                  {/* Badge + Action buttons */}
                   <div className="flex items-center gap-2 shrink-0">
                     <Badge
                       className={
@@ -202,9 +273,24 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                       }
                     >
                       {closure.is_recurring
-                        ? `Weekly: ${INT_TO_DAY[closure.recurrence_weekday ?? 0]}` // ✅ int → label
+                        ? `Weekly: ${INT_TO_DAY[closure.recurrence_weekday ?? 0]}`
                         : 'One-off'}
                     </Badge>
+
+                    {/* ✅ Edit button (visible on hover) */}
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleOpenEdit(closure)
+                      }}
+                      className="text-[#64748B] hover:text-[#40E0FF] hover:bg-[#40E0FF]/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Edit2 className="size-3.5" />
+                    </Button>
+
+                    {/* Delete button */}
                     <Button
                       variant="ghost"
                       size="icon-sm"
@@ -225,7 +311,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
         )}
       </div>
 
-      {/* Add closure dialog */}
+      {/* ✅ Unified Dialog for Add/Edit */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-[#111318] border-[#1E2128] text-[#F1F5F9] max-w-sm">
           <DialogHeader>
@@ -233,22 +319,27 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
               className="text-base font-bold"
               style={{ fontFamily: 'var(--font-syne)' }}
             >
-              Add Special Closure
+              {editingId ? 'Edit Closure' : 'Add Special Closure'}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            <div>
-              <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
-                Date
-              </Label>
-              <input
-                type="date"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-                className={inputCls + ' [color-scheme:dark]'}
-              />
-            </div>
+            {/* Date input - only shown for one-off closures */}
+            {!newIsRecurring && (
+              <div>
+                <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+                  Date
+                </Label>
+                <input
+                  type="date"
+                  value={newDate}
+                  onChange={(e) => setNewDate(e.target.value)}
+                  className={inputCls + ' [color-scheme:dark]'}
+                />
+              </div>
+            )}
+
+            {/* Reason input */}
             <div>
               <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
                 Reason
@@ -261,6 +352,8 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                 className={inputCls}
               />
             </div>
+
+            {/* Recurring toggle */}
             <div className="flex items-center justify-between">
               <Label className="text-sm text-[#F1F5F9]">Weekly recurrence</Label>
               <Switch
@@ -269,6 +362,8 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                 className="data-[state=checked]:bg-[#10B981]"
               />
             </div>
+
+            {/* Quick shortcut for every Sunday */}
             <div className="flex items-center justify-between">
               <p className="text-[11px] text-white/40 uppercase tracking-widest">Quick shortcut</p>
               <Button
@@ -283,6 +378,8 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                 Close Every Sunday
               </Button>
             </div>
+
+            {/* Weekly recurrence picker */}
             {newIsRecurring ? (
               <div>
                 <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-2 block">
@@ -320,12 +417,12 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
               Cancel
             </Button>
             <Button
-              onClick={handleAdd}
+              onClick={handleSave}
               disabled={saving}
               className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold"
             >
               {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
-              {saving ? 'Adding…' : 'Add Closure'}
+              {saving ? (editingId ? 'Updating…' : 'Adding…') : (editingId ? 'Update Closure' : 'Add Closure')}
             </Button>
           </DialogFooter>
         </DialogContent>

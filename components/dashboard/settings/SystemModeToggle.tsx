@@ -23,7 +23,7 @@ export function SystemModeToggle({ initialMode, onModeChange, aiName = 'Your AI'
 
     // If they are turning the system off, double check
     if (newMode === 'disabled') {
-        const confirmOff = confirm("Are you sure? This will stop AI Blizzard from answering all incoming calls.")
+        const confirmOff = confirm("Are you sure? This will stop Beacon Horizons from answering all incoming calls.")
     if (!confirmOff) return // Exit if they click cancel
     }
     

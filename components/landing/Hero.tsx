@@ -42,7 +42,7 @@ function DashboardMockup() {
               <div className="size-7 rounded-lg bg-[#40E0FF] flex items-center justify-center">
                 <Zap className="size-4 text-[#0B0D10]" />
               </div>
-              <span className="text-[10px] font-black text-white uppercase tracking-widest">AI Blizzard</span>
+              <span className="text-[10px] font-black text-white uppercase tracking-widest">Beacon Horizons</span>
             </div>
             {['Overview', 'Calls', 'Settings'].map((label, idx) => (
               <div

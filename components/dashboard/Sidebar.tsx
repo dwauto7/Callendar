@@ -59,7 +59,7 @@ export function Sidebar({ clinicName, userEmail }: SidebarProps) {
             className="text-lg font-black text-white tracking-tighter uppercase"
             style={{ fontFamily: 'var(--font-syne)' }}
           >
-            AI Blizzard
+            Beacon Horizons
           </span>
         </div>
         <Button
@@ -98,7 +98,7 @@ export function Sidebar({ clinicName, userEmail }: SidebarProps) {
               className="text-xl font-black text-white tracking-tighter uppercase"
               style={{ fontFamily: 'var(--font-syne)' }}
             >
-              AI Blizzard
+              Beacon Horizons
             </span>
           </Link>
           <Button

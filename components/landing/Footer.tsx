@@ -40,7 +40,7 @@ export function Footer() {
                 className="text-lg font-black text-white tracking-tighter uppercase"
                 style={{ fontFamily: 'var(--font-syne)' }}
               >
-                AI Blizzard
+                Beacon Horizons
               </span>
             </div>
             <p className="text-sm text-white/40 leading-relaxed max-w-[240px]">
@@ -108,7 +108,7 @@ export function Footer() {
         <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
-              © {YEAR} AI Blizzard
+              © {YEAR} Beacon Horizons
             </p>
             <span className="text-white/10 text-xs">|</span>
             <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
