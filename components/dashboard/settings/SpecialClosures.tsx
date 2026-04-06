@@ -14,8 +14,8 @@ interface Closure {
   id: string
   holiday_date: string | null
   description: string | null
-  is_recurring  : boolean
-  recurrence_weekday?: string | null
+  is_recurring: boolean
+  recurrence_weekday?: number | null // ✅ number, not string
 }
 
 interface SpecialClosuresProps {
@@ -25,6 +25,14 @@ interface SpecialClosuresProps {
 
 const inputCls =
   'w-full h-9 rounded-md border border-[#1E2128] bg-[#0D0F12] px-3 text-sm text-[#F1F5F9] placeholder:text-[#64748B]/50 focus:border-[#10B981] focus:outline-none transition-colors'
+
+// ✅ Map string day keys → int (0=Sun, 1=Mon … 6=Sat)
+const DAY_TO_INT: Record<string, number> = {
+  sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6,
+}
+
+// ✅ Map int → display label
+const INT_TO_DAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function fmtDate(d: string | null) {
   if (!d) return '—'
@@ -71,8 +79,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
   ]
 
   function nextDateForWeekday(day: string) {
-    const map: Record<string, number> = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 }
-    const target = map[day] ?? 0
+    const target = DAY_TO_INT[day] ?? 0
     const today = new Date()
     const todayIdx = today.getDay()
     let diff = target - todayIdx
@@ -105,7 +112,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
         holiday_date: dateToUse,
         description: newReason || null,
         is_recurring: newIsRecurring,
-        recurrence_weekday: newIsRecurring ? weeklyDay : null,
+        recurrence_weekday: newIsRecurring ? DAY_TO_INT[weeklyDay] : null, // ✅ insert int
       })
     setSaving(false)
 
@@ -195,7 +202,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                       }
                     >
                       {closure.is_recurring
-                        ? `Weekly: ${(closure.recurrence_weekday ?? 'sun').toUpperCase()}`
+                        ? `Weekly: ${INT_TO_DAY[closure.recurrence_weekday ?? 0]}` // ✅ int → label
                         : 'One-off'}
                     </Badge>
                     <Button

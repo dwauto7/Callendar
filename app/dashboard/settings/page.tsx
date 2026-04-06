@@ -13,6 +13,7 @@ type HolidayClosure = {
   holiday_date: string | null
   description: string | null
   is_recurring: boolean
+  recurrence_weekday: number | null
 }
 
 export default async function SettingsPage() {
@@ -35,8 +36,9 @@ export default async function SettingsPage() {
       .maybeSingle(),
     supabase
       .from('clinic_holidays')
-      .select('id, holiday_date, description, is_recurring')
+      .select('id, holiday_date, description, is_recurring, recurrence_weekday')
       .eq('clinic_config_id', id)
+      .order('is_recurring', { ascending: false })
       .order('holiday_date', { ascending: true }),
   ])
 

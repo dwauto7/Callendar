@@ -15,6 +15,7 @@ const inputCls =
 export function ClinicSettingsPanel() {
   const { settings, role, updateSettings, loading, error } = useClinicSettings()
   const [saving, setSaving] = useState(false)
+  const [syncing, setSyncing] = useState(false)
   const [aiName, setAiName] = useState('')
   const [aiTone, setAiTone] = useState('')
   const [answeringMode, setAnsweringMode] = useState<AnsweringMode>('always_on')
@@ -94,6 +95,33 @@ export function ClinicSettingsPanel() {
     }
   }
 
+  async function handleSyncReports() {
+    if (role !== 'admin' && role !== 'owner') {
+      toast.error('Admin access required to sync reports.')
+      return
+    }
+    setSyncing(true)
+    try {
+      const res = await fetch('/api/reports/backfill', {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to sync reports')
+      }
+      if (data.monthsProcessed === 0) {
+        toast.info('No historical data to backfill')
+      } else {
+        toast.success(`Synced ${data.monthsProcessed} month(s) of report data`)
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to sync reports'
+      toast.error(message)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   if (loading) {
     return <div className="h-24 rounded-xl bg-white/5 animate-pulse" />
   }
@@ -104,7 +132,7 @@ export function ClinicSettingsPanel() {
 
   return (
     <div className="rounded-xl border border-[#1E2128] bg-[#111318] p-5 space-y-6">
-      <SystemModeToggle initialMode={answeringMode} onModeChange={setAnsweringMode} />
+      <SystemModeToggle initialMode={answeringMode} onModeChange={setAnsweringMode} aiName={aiName || 'Your AI'} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -200,7 +228,26 @@ export function ClinicSettingsPanel() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
+      {/* Sync Reports Section */}
+      <div className="border-t border-white/10 pt-6">
+        <p className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-3">
+          Data Management
+        </p>
+        <p className="text-xs text-white/50 mb-4">
+          Sync historical call logs and appointments to populate monthly reports. Useful for initial setup or recovery.
+        </p>
+        <Button
+          onClick={handleSyncReports}
+          disabled={syncing || (role !== 'admin' && role !== 'owner')}
+          variant="outline"
+          className="border-white/10 text-white/70 hover:text-white hover:bg-white/5 px-4"
+        >
+          {syncing ? 'Syncing...' : 'Sync Report Data'}
+        </Button>
+      </div>
+
+      {/* Save Settings */}
+      <div className="flex items-center justify-between border-t border-white/10 pt-6">
         <p className="text-xs text-white/40">
           {role === 'admin' || role === 'owner' ? 'Admin access granted' : 'Read-only access'}
         </p>

@@ -10,10 +10,11 @@ type AnsweringMode = 'always_on' | 'after_hours' | 'disabled'
 
 interface SystemModeToggleProps {
   initialMode: AnsweringMode
-  onModeChange: (mode: AnsweringMode) => void // Strictly typed callback
+  onModeChange: (mode: AnsweringMode) => void
+  aiName?: string
 }
 
-export function SystemModeToggle({ initialMode, onModeChange }: SystemModeToggleProps) {
+export function SystemModeToggle({ initialMode, onModeChange, aiName = 'Your AI' }: SystemModeToggleProps) {
   // Pass the type to useState
   const [mode, setMode] = useState<AnsweringMode>(initialMode)
 
@@ -79,9 +80,9 @@ export function SystemModeToggle({ initialMode, onModeChange }: SystemModeToggle
 
       <div className="mt-4 px-3 py-3 rounded-lg bg-white/[0.02] border border-white/5 min-h-[44px] flex items-center">
         <p className="text-[11px] text-white/60 leading-relaxed italic">
-          {mode === 'always_on' && "• AI Blizzard will pick up every call, 24/7."}
-          {mode === 'after_hours' && "• AI only triggers when your clinic is closed (based on KL business hours)."}
-          {mode === 'disabled' && "• AI is currently paused. Calls will go to your default voicemail."}
+          {mode === 'always_on' && `• ${aiName} will pick up every call, 24/7.`}
+          {mode === 'after_hours' && `• ${aiName} only triggers when your clinic is closed (based on KL business hours).`}
+          {mode === 'disabled' && `• ${aiName} is currently paused. Calls will go to your default voicemail.`}
         </p>
       </div>
     </div>
