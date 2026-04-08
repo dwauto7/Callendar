@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     await resend.emails.send({
-      from: "AI Blizzard <noreply@beaconhorizons.io>",
+      from: "Beacon Horizons <noreply@beaconhorizons.io>",
       to: "admin@beaconhorizons.io",
       replyTo: email,
       subject: `Automation Audit Request — ${company}`,

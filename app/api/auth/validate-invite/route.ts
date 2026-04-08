@@ -1,5 +1,3 @@
-// app/api/auth/validate-invite/route.ts
-
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -69,7 +67,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Validatio
       )
     }
 
-    const inviteData = invite as InviteRecord
+    const inviteData = invite 
 
     // Check if already accepted
     if (inviteData.accepted_at) {

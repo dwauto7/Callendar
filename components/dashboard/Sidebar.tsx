@@ -49,7 +49,6 @@ export function Sidebar({ clinicName, userEmail }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile top bar - AI Blizzard Branding */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-5 h-16 bg-[#0B0D10]/80 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center gap-2">
           <div className="size-7 bg-[#40E0FF] rounded flex items-center justify-center shadow-[0_0_15px_rgba(64,224,255,0.3)]">
