@@ -21,7 +21,7 @@ interface SettingsFormProps {
 }
 
 const inputCls =
-  'w-full h-9 rounded-md border border-[#1E2128] bg-[#0D0F12] px-3 text-sm text-[#F1F5F9] placeholder:text-[#64748B]/50 focus:border-[#10B981] focus:outline-none transition-colors'
+  'w-full h-9 rounded-md border border-[#212129] bg-[#0D0D11] px-3 text-sm text-white placeholder:text-white/30/50 focus:border-[#2DD4BF] focus:outline-none transition-colors'
 
 const fieldGroups = [
   {
@@ -206,10 +206,10 @@ export function SettingsForm({ config }: SettingsFormProps) {
   return (
     <div className="space-y-8">
       {fieldGroups.map((group) => (
-        <div key={group.heading} className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-[#1E2128]">
+        <div key={group.heading} className="rounded-xl border border-[#212129] bg-[#121216] overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-[#212129]">
             <p
-              className="text-sm font-semibold text-[#F1F5F9]"
+              className="text-sm font-semibold text-white"
               style={{ fontFamily: 'var(--font-syne)' }}
             >
               {group.heading}
@@ -218,7 +218,7 @@ export function SettingsForm({ config }: SettingsFormProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5">
             {group.fields.map((field) => (
               <div key={field.key}>
-                <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+                <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
                   {field.label}
                 </Label>
                 <input
@@ -229,7 +229,7 @@ export function SettingsForm({ config }: SettingsFormProps) {
                   className={inputCls}
                 />
                 {field.key === 'working_hours' && form.working_hours ? (
-                  <p className="mt-1 text-[11px] text-[#64748B]">
+                  <p className="mt-1 text-[11px] text-white/30">
                     {formatWorkingHours(form.working_hours)
                       ? `Local time (en-MY): ${formatWorkingHours(form.working_hours)}`
                       : 'Provide JSON or a time range like 09:00-18:00.'}
@@ -245,7 +245,7 @@ export function SettingsForm({ config }: SettingsFormProps) {
         <Button
           onClick={handleSave}
           disabled={saving || role !== 'admin' && role !== 'owner'}
-          className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold px-6"
+          className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold px-6"
         >
           {saving ? (
             <Loader2 className="size-4 animate-spin mr-2" />

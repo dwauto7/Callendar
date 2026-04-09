@@ -35,16 +35,19 @@ export default async function CallsPage() {
   }
 
   return (
-    <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-7xl mx-auto">
-      <div className="mb-8 flex items-center gap-3">
-        <div className="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-          <PhoneCall className="size-5 text-emerald-400" />
+    <div className="px-6 py-8 lg:px-10 lg:py-12 max-w-[1600px] mx-auto">
+      <div className="relative mb-8 rounded-3xl border border-[#212129] bg-[#121216] p-6 md:p-8 overflow-hidden flex items-center gap-3">
+        <div className="p-3 rounded-xl border border-[#2DD4BF]/20 bg-[#2DD4BF]/10">
+          <PhoneCall className="size-5 text-[#2DD4BF]" />
         </div>
-        <h1 className="text-3xl font-bold text-white tracking-tighter" style={{ fontFamily: 'var(--font-syne)' }}>
+        <h1
+          className="text-4xl md:text-5xl font-semibold tracking-tight leading-none text-white tabular-nums"
+          style={{ fontFamily: 'var(--font-syne)' }}
+        >
           Voice Logs ({callLogs?.length ?? 0})
         </h1>
         {callLogsError && (
-          <p className="text-red-500 text-sm ml-auto">(Error: {callLogsError.message})</p>
+          <p className="text-red-400 text-sm font-semibold ml-auto">(Error: {callLogsError.message})</p>
         )}
       </div>
 

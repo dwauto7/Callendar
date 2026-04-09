@@ -7,7 +7,7 @@ import styles from './Footer.module.css'
 const YEAR = new Date().getFullYear()
 
 const solutions = [
-  { label: 'Voice Systems',        href: '#how-it-works' },
+  { label: 'Voice Systems',         href: '#how-it-works' },
   { label: 'Clinical Intelligence', href: '#features'     },
   { label: 'Revenue Engine',        href: '#pricing'      },
   { label: 'Client Portal',         href: '/dashboard'    },
@@ -21,11 +21,9 @@ const compliance = [
 
 export function Footer() {
   return (
-    // transform-gpu promotes footer to its own compositor layer — no repaint on scroll
-    <footer className="transform-gpu bg-background border-t border-white/5 py-20 relative overflow-hidden">
+    <footer className="transform-gpu bg-[#0A0A0B] border-t border-[#212129] py-20 relative overflow-hidden">
 
-      {/* Reduced blur + will-change so GPU handles it without triggering repaint */}
-      <div className="absolute bottom-0 right-0 size-64 bg-[#40E0FF]/5 blur-[80px] pointer-events-none will-change-transform" />
+      <div className="absolute bottom-0 right-0 size-64 bg-[#2DD4BF]/5 blur-[80px] pointer-events-none will-change-transform" />
 
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
@@ -33,8 +31,8 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <div className="size-6 bg-[#40E0FF] rounded flex items-center justify-center">
-                <Zap className="size-4 text-[#0B0D10] fill-current" />
+              <div className="size-7 rounded-xl border border-[#2DD4BF]/20 bg-[#2DD4BF]/10 flex items-center justify-center">
+                <Zap className="size-4 text-[#2DD4BF]" />
               </div>
               <span
                 className="text-lg font-black text-white tracking-tighter uppercase"
@@ -48,7 +46,7 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Solutions — plain <a> for hash anchors */}
+          {/* Solutions */}
           <div>
             <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-6">
               Solutions
@@ -58,7 +56,7 @@ export function Footer() {
                 <li key={l.label}>
                   <a
                     href={l.href}
-                    className="text-sm text-white/40 hover:text-[#40E0FF] transition-colors duration-300"
+                    className="text-sm text-white/40 hover:text-[#2DD4BF] transition-colors duration-200"
                   >
                     {l.label}
                   </a>
@@ -77,7 +75,7 @@ export function Footer() {
             </p>
             <Link
               href="/contact"
-              className="w-full inline-block rounded-md bg-[#40E0FF] text-[#0B0D10] text-xs font-black uppercase tracking-[0.2em] py-3 text-center transition hover:brightness-110"
+              className="w-full inline-block rounded-full bg-[#2DD4BF] text-[#0A0A0B] text-[11px] font-black uppercase tracking-widest py-3 text-center transition-colors hover:bg-[#2DD4BF]/90"
             >
               Contact Us
             </Link>
@@ -105,22 +103,21 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="border-t border-[#212129] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
-              © {YEAR} Beacon Horizons
+            <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+              &copy; {YEAR} Beacon Horizons
             </p>
             <span className="text-white/10 text-xs">|</span>
-            <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
+            <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
               beaconhorizons.io
             </p>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/5 contain-layout">
-            {/* GPU-optimized pulse using opacity instead of opacity + scale */}
-            <span className={`size-1.5 rounded-full bg-[#40E0FF] ${styles.pulse}`} />
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-tighter">
-              Operating in PJ &amp; KL, Malaysia 🇲🇾
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 border border-[#212129] contain-layout">
+            <span className={`size-1.5 rounded-full bg-[#2DD4BF] ${styles.pulse}`} />
+            <p className="text-[10px] font-black text-white/40 uppercase tracking-tighter">
+              Operating in PJ &amp; KL, Malaysia
             </p>
           </div>
         </div>

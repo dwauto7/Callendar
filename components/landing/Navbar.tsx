@@ -56,9 +56,9 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         scrolled
-          ? 'py-3 bg-background/80 backdrop-blur-xl border-b border-white/5 shadow-2xl'
+          ? 'py-3 bg-[#0A0A0B]/80 backdrop-blur-md border-b border-[#212129]'
           : 'py-5 bg-transparent',
       )}
     >
@@ -66,8 +66,8 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="size-8 bg-[#40E0FF] rounded-lg flex items-center justify-center transition-transform group-hover:rotate-12">
-            <Zap className="size-5 text-[#0B0D10] fill-current" />
+          <div className="size-9 rounded-xl border border-[#2DD4BF]/20 bg-[#2DD4BF]/10 flex items-center justify-center transition-transform group-hover:-rotate-3">
+            <Zap className="size-5 text-[#2DD4BF]" />
           </div>
         </Link>
 
@@ -77,7 +77,7 @@ export function Navbar() {
             <Link
               key={l.href}
               href={l.href}
-              className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 hover:text-[#40E0FF] transition-colors duration-300"
+              className="text-[11px] font-black uppercase tracking-[0.25em] text-white/50 hover:text-[#2DD4BF] transition-colors duration-200"
             >
               {l.label}
             </Link>
@@ -87,11 +87,11 @@ export function Navbar() {
         {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-3">
           {authed === null ? (
-            <div className="w-28 h-9 rounded-lg bg-white/5 animate-pulse" />
+            <div className="w-28 h-9 rounded-full bg-white/5 animate-pulse" />
           ) : authed ? (
             <Button
               onClick={handleDashboard}
-              className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black text-xs uppercase tracking-widest px-6 h-9 rounded-lg transition-all hover:scale-105"
+              className="bg-[#2DD4BF] text-[#0A0A0B] font-black uppercase tracking-widest text-[11px] px-6 py-3 rounded-full hover:bg-[#2DD4BF]/90 transition-colors h-auto"
             >
               Dashboard
             </Button>
@@ -100,13 +100,13 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 onClick={handleOAuth}
-                className="text-xs font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 h-9"
+                className="border border-[#212129] text-white/60 font-black uppercase tracking-widest text-[11px] px-6 py-3 rounded-full hover:border-[#2DD4BF]/40 hover:text-white transition-colors h-auto"
               >
                 Log In
               </Button>
               <Button
                 onClick={handleOAuth}
-                className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black text-xs uppercase tracking-widest px-5 h-9 rounded-lg transition-all hover:scale-105"
+                className="bg-[#2DD4BF] text-[#0A0A0B] font-black uppercase tracking-widest text-[11px] px-6 py-3 rounded-full hover:bg-[#2DD4BF]/90 transition-colors h-auto"
               >
                 Sign Up
               </Button>
@@ -116,7 +116,7 @@ export function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden text-white/60 hover:text-[#40E0FF] transition-colors"
+          className="md:hidden text-white/60 hover:text-[#2DD4BF] transition-colors"
           onClick={() => setMobileOpen(o => !o)}
         >
           {mobileOpen ? <X className="size-6" /> : <Menu className="size-6" />}
@@ -125,13 +125,13 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden glass-panel border-b border-white/10 px-6 py-8 space-y-6 animate-fade-in-up">
+        <div className="md:hidden bg-[#0A0A0B]/95 border-b border-[#212129] px-6 py-8 space-y-6">
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={closeMobile}
-              className="block text-sm font-bold uppercase tracking-widest text-white/60 hover:text-[#40E0FF]"
+              className="block text-sm font-black uppercase tracking-widest text-white/60 hover:text-[#2DD4BF]"
             >
               {l.label}
             </Link>
@@ -140,7 +140,7 @@ export function Navbar() {
             {authed ? (
               <Button
                 onClick={() => { handleDashboard(); closeMobile() }}
-                className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black h-12"
+                className="bg-[#2DD4BF] text-[#0A0A0B] font-black uppercase tracking-widest text-[11px] px-6 py-3 rounded-full hover:bg-[#2DD4BF]/90 transition-colors h-auto"
               >
                 Dashboard
               </Button>
@@ -149,13 +149,13 @@ export function Navbar() {
                 <Button
                   variant="outline"
                   onClick={() => { handleOAuth(); closeMobile() }}
-                  className="border-white/10 text-white bg-white/5 h-12"
+                  className="border border-[#212129] text-white/60 font-black uppercase tracking-widest text-[11px] px-6 py-3 rounded-full hover:border-[#2DD4BF]/40 hover:text-white transition-colors h-auto"
                 >
                   Log In
                 </Button>
                 <Button
                   onClick={() => { handleOAuth(); closeMobile() }}
-                  className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black h-12"
+                  className="bg-[#2DD4BF] text-[#0A0A0B] font-black uppercase tracking-widest text-[11px] px-6 py-3 rounded-full hover:bg-[#2DD4BF]/90 transition-colors h-auto"
                 >
                   Sign Up
                 </Button>

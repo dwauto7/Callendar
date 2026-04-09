@@ -50,12 +50,12 @@ export function TermsAcceptanceModal({ clinicConfigId, onAccepted }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-      <div className="bg-[#0F1117] border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+      <div className="bg-[#0F1117] border border-[#212129] rounded-2xl p-8 max-w-md w-full shadow-2xl">
 
         <h2 className="text-xl font-semibold text-white mb-1">
           Before you continue
         </h2>
-        <p className="text-sm text-slate-400 mb-6">
+        <p className="text-sm text-white/40 mb-6">
           Please review and accept the following to access your dashboard.
         </p>
 
@@ -65,15 +65,15 @@ export function TermsAcceptanceModal({ clinicConfigId, onAccepted }: Props) {
               type="checkbox"
               checked={agreedToS}
               onChange={e => setAgreedToS(e.target.checked)}
-              className="mt-0.5 accent-[#40E0FF] w-4 h-4 cursor-pointer"
+              className="mt-0.5 accent-[#2DD4BF] w-4 h-4 cursor-pointer"
             />
-            <span className="text-sm text-slate-300">
+            <span className="text-sm text-white/40">
               I agree to the{' '}
               <a
                 href="/terms-of-service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#40E0FF] underline underline-offset-2 hover:text-white transition-colors"
+                className="text-[#2DD4BF] underline underline-offset-2 hover:text-white transition-colors"
               >
                 Terms of Service
               </a>
@@ -85,15 +85,15 @@ export function TermsAcceptanceModal({ clinicConfigId, onAccepted }: Props) {
               type="checkbox"
               checked={agreedPrivacy}
               onChange={e => setAgreedPrivacy(e.target.checked)}
-              className="mt-0.5 accent-[#40E0FF] w-4 h-4 cursor-pointer"
+              className="mt-0.5 accent-[#2DD4BF] w-4 h-4 cursor-pointer"
             />
-            <span className="text-sm text-slate-300">
+            <span className="text-sm text-white/40">
               I acknowledge the{' '}
               <a
                 href="/privacy-policy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#40E0FF] underline underline-offset-2 hover:text-white transition-colors"
+                className="text-[#2DD4BF] underline underline-offset-2 hover:text-white transition-colors"
               >
                 Privacy Policy
               </a>{' '}
@@ -110,19 +110,19 @@ export function TermsAcceptanceModal({ clinicConfigId, onAccepted }: Props) {
           <button
             onClick={handleAccept}
             disabled={!canAccept || loading}
-            className="flex-1 bg-[#40E0FF] text-[#0B0D10] font-semibold py-2.5 rounded-lg text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white transition-colors"
+            className="flex-1 bg-[#2DD4BF] text-white font-semibold py-2.5 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#2DD4BF]/90 transition-colors"
           >
             {loading ? 'Saving…' : 'Accept & Continue'}
           </button>
           <button
             onClick={handleExit}
-            className="px-4 py-2.5 rounded-lg text-sm text-slate-400 border border-white/10 hover:border-white/30 hover:text-white transition-colors"
+            className="px-4 py-2.5 rounded-xl text-sm text-white/40 border border-[#212129] hover:border-white/30 hover:text-white transition-colors"
           >
             Exit
           </button>
         </div>
 
-        <p className="text-xs text-slate-500 mt-4 text-center">
+        <p className="text-xs text-white/30 mt-4 text-center">
           Version {CURRENT_TERMS_VERSION} · Acceptance is recorded with a timestamp
         </p>
       </div>

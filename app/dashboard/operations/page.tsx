@@ -25,18 +25,21 @@ export default async function OperationsPage() {
   const clinicId = clinicContext.clinicConfigId as string
 
   return (
-    <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-7xl mx-auto">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="px-6 py-8 lg:px-10 lg:py-12 max-w-[1600px] mx-auto">
+      <div className="relative mb-8 rounded-3xl border border-[#212129] bg-[#121216] p-6 md:p-8 overflow-hidden flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-[#40E0FF]/10 rounded-lg border border-[#40E0FF]/20">
-              <CalendarCheck className="size-5 text-[#40E0FF]" />
+            <div className="p-3 rounded-xl border border-[#2DD4BF]/20 bg-[#2DD4BF]/10">
+              <CalendarCheck className="size-5 text-[#2DD4BF]" />
             </div>
-          <h1 className="text-3xl font-bold text-white tracking-tighter" style={{ fontFamily: 'var(--font-syne)' }}>
+            <h1
+              className="text-4xl md:text-5xl font-semibold tracking-tight leading-none text-white"
+              style={{ fontFamily: 'var(--font-syne)' }}
+            >
               Operations
-          </h1>
+            </h1>
           </div>
-          <p className="text-sm text-white/40 max-w-2xl">
+          <p className="text-sm md:text-base uppercase tracking-tight text-white/30 max-w-2xl" style={{ fontFamily: 'var(--font-syne)' }}>
             Bookings in one view with a live calendar. The calendar syncs in real time.
           </p>
         </div>

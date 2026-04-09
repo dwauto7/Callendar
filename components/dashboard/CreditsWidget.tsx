@@ -28,10 +28,10 @@ export function CreditsWidget({
 
   const modeConfig = {
     always_on: {
-      color: 'text-emerald-400',
-      bg: 'bg-emerald-500/10',
-      border: 'border-emerald-500/20',
-      dot: 'bg-emerald-500',
+      color: 'text-[#2DD4BF]',
+      bg: 'bg-[#2DD4BF]/10',
+      border: 'border-[#2DD4BF]/20',
+      dot: 'bg-[#2DD4BF]',
       label: '24/7 Availability',
       icon: ShieldCheck,
     },
@@ -59,8 +59,8 @@ export function CreditsWidget({
   return (
     <Card
       className={cn(
-        'rounded-2xl border bg-white/[0.02] transition-all duration-500 glass-panel relative overflow-hidden group',
-        isLow ? 'border-amber-500/20' : 'border-white/5',
+        'rounded-2xl border bg-[#121216] transition-all duration-500 glass-panel relative overflow-hidden group',
+        isLow ? 'border-amber-500/20' : 'border-[#212129]',
       )}
     >
       <CardContent className="p-6 relative">
@@ -71,8 +71,8 @@ export function CreditsWidget({
             isLow
               ? 'bg-amber-500'
               : answeringMode === 'always_on'
-              ? 'bg-emerald-500'
-              : 'bg-[#40E0FF]',
+              ? 'bg-[#2DD4BF]'
+              : 'bg-[#2DD4BF]',
           )}
         />
 
@@ -80,8 +80,8 @@ export function CreditsWidget({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 
           {/* Balance (Remaining) - Cyan */}
-          <div className="rounded-xl p-4 bg-[#40E0FF]/5 border border-[#40E0FF]/20">
-            <p className="text-[10px] font-semibold text-[#40E0FF]/70 uppercase tracking-[0.15em] mb-2">
+          <div className="rounded-xl p-4 bg-[#2DD4BF]/5 border border-[#2DD4BF]/20">
+            <p className="text-[10px] font-semibold text-[#2DD4BF]/70 uppercase tracking-[0.15em] mb-2">
               Balance Available
             </p>
             <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
@@ -102,8 +102,8 @@ export function CreditsWidget({
           </div>
 
           {/* Total Minutes - Emerald */}
-          <div className="rounded-xl p-4 bg-emerald-500/5 border border-emerald-500/20">
-            <p className="text-[10px] font-semibold text-emerald-500/70 uppercase tracking-[0.15em] mb-2">
+          <div className="rounded-xl p-4 bg-[#2DD4BF]/5 border border-[#2DD4BF]/20">
+            <p className="text-[10px] font-semibold text-[#2DD4BF]/70 uppercase tracking-[0.15em] mb-2">
               Total Minutes
             </p>
             <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
@@ -116,7 +116,7 @@ export function CreditsWidget({
         {/* ── Status & Mode badges ── */}
         <div className="flex items-center gap-2 flex-wrap mb-6">
           {status && (
-            <Badge className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest border rounded-full bg-white/5 text-white/40 border-white/10">
+            <Badge className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest border rounded-full bg-black/20 text-white/40 border-[#212129]">
               Status: {status}
             </Badge>
           )}
@@ -151,17 +151,17 @@ export function CreditsWidget({
         <div className="space-y-3">
           <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-widest text-white/40">
             <span>Usage Progress</span>
-            <span className={isLow ? 'text-amber-500 font-bold' : 'text-[#40E0FF]'}>
+            <span className={isLow ? 'text-amber-500 font-semibold' : 'text-[#2DD4BF]'}>
               {remainingPct}% remaining
             </span>
           </div>
-          <div className="h-2 bg-black/40 border border-white/5 rounded-full overflow-hidden">
+          <div className="h-2 bg-black/40 border border-[#212129] rounded-full overflow-hidden">
             <div
               className={cn(
                 'h-full transition-all duration-500',
                 isLow
                   ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]'
-                  : 'bg-[#40E0FF] shadow-[0_0_10px_rgba(64,224,255,0.5)]',
+                  : 'bg-[#2DD4BF] shadow-[0_0_10px_rgba(64,224,255,0.5)]',
               )}
               style={{ width: `${usedPct}%` }}
             />
@@ -169,7 +169,7 @@ export function CreditsWidget({
         </div>
 
         {agentId && (
-          <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+          <div className="mt-6 pt-4 border-t border-[#212129] flex items-center justify-between">
             <span className="text-[9px] text-white/20 font-mono tracking-tighter uppercase">
               Processor ID: {agentId}
             </span>
@@ -180,3 +180,4 @@ export function CreditsWidget({
     </Card>
   )
 }
+

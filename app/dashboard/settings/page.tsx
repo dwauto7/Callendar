@@ -27,7 +27,6 @@ export default async function SettingsPage() {
 
   const id = clinicContext.clinicConfigId
 
-  // All 3 queries fire in parallel — no waterfall, no duplicate table hits
   const [clinicConfigRes, closuresRes] = await Promise.all([
     supabase
       .from('clinic_configs')
@@ -48,54 +47,59 @@ export default async function SettingsPage() {
   const closures = (closuresRes.data ?? []) as HolidayClosure[]
 
   return (
-    <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-3xl mx-auto space-y-8">
-      <div className="flex items-center gap-2">
-        <Settings className="size-5 text-[#10B981]" />
-        <h1 className="text-2xl font-bold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-syne)' }}>
+    <div className="px-6 py-8 lg:px-10 lg:py-12 max-w-[1600px] mx-auto space-y-8">
+      <div className="relative rounded-3xl border border-[#212129] bg-[#121216] p-6 md:p-8 overflow-hidden flex items-center gap-3">
+        <div className="p-3 rounded-xl border border-[#2DD4BF]/20 bg-[#2DD4BF]/10">
+          <Settings className="size-5 text-[#2DD4BF]" />
+        </div>
+        <h1
+          className="text-4xl md:text-5xl font-semibold tracking-tight leading-none text-white"
+          style={{ fontFamily: 'var(--font-syne)' }}
+        >
           Settings
         </h1>
         {clinicConfig
-          ? <span className="text-xs text-emerald-400 ml-auto">Clinic Config: Loaded ✓</span>
-          : <span className="text-xs text-red-400 ml-auto">Clinic Config: Not Found ✗</span>
+          ? <span className="ml-auto text-[10px] font-black uppercase tracking-widest rounded-full border border-[#2DD4BF]/20 bg-[#2DD4BF]/10 text-[#2DD4BF] px-3 py-1.5">Clinic Config: Loaded</span>
+          : <span className="ml-auto text-[10px] font-black uppercase tracking-widest rounded-full border border-red-500/20 bg-red-500/10 text-red-400 px-3 py-1.5">Clinic Config: Not Found</span>
         }
       </div>
 
       {clinicConfig ? (
-        <div className="rounded-xl border border-[#1E2128] bg-[#111318] p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-[#F1F5F9] uppercase tracking-widest">Clinic Configuration</h2>
+        <div className="rounded-2xl border border-[#212129] bg-[#121216] p-6 space-y-4">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Clinic Configuration</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5">Clinic Name</p>
-              <p className="text-sm text-[#F1F5F9]">{clinicConfig.clinic_name || '—'}</p>
+            <div className="rounded-xl border border-[#212129] bg-black/20 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Clinic Name</p>
+              <p className="text-sm text-white">{clinicConfig.clinic_name || '—'}</p>
             </div>
-            <div>
-              <p className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5">Owner Phone</p>
-              <p className="text-sm text-[#F1F5F9]">{clinicConfig.owner_phone || '—'}</p>
+            <div className="rounded-xl border border-[#212129] bg-black/20 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Owner Phone</p>
+              <p className="text-sm text-white">{clinicConfig.owner_phone || '—'}</p>
             </div>
-            <div>
-              <p className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5">WhatsApp Number</p>
-              <p className="text-sm text-[#F1F5F9]">{clinicConfig.clinic_whatsapp || '—'}</p>
+            <div className="rounded-xl border border-[#212129] bg-black/20 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">WhatsApp Number</p>
+              <p className="text-sm text-white">{clinicConfig.clinic_whatsapp || '—'}</p>
             </div>
-            <div>
-              <p className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5">Agent ID</p>
-              <p className="text-sm text-[#F1F5F9] font-mono text-xs">{clinicConfig.agent_id || '—'}</p>
+            <div className="rounded-xl border border-[#212129] bg-black/20 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Agent ID</p>
+              <p className="text-sm text-white font-mono text-xs">{clinicConfig.agent_id || '—'}</p>
             </div>
-            <div>
-              <p className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5">Google Calendar ID</p>
-              <p className="text-sm text-[#F1F5F9] font-mono text-xs truncate">{clinicConfig.google_calendar_id || '—'}</p>
+            <div className="rounded-xl border border-[#212129] bg-black/20 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Google Calendar ID</p>
+              <p className="text-sm text-white font-mono text-xs truncate">{clinicConfig.google_calendar_id || '—'}</p>
             </div>
-            <div>
-              <p className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5">System Status</p>
-              <p className={`text-sm font-semibold ${clinicConfig.is_active ? 'text-emerald-400' : 'text-red-400'}`}>
+            <div className="rounded-xl border border-[#212129] bg-black/20 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">System Status</p>
+              <p className={`text-sm font-semibold ${clinicConfig.is_active ? 'text-[#2DD4BF]' : 'text-red-400'}`}>
                 {clinicConfig.is_active ? '● Active' : '● Inactive'}
               </p>
             </div>
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-red-900/50 bg-red-950/20 p-5 space-y-2">
+        <div className="rounded-2xl border border-red-500/20 bg-[#121216] p-6 space-y-2">
           <p className="text-red-400 text-sm">Clinic configuration not found. Please refresh the page.</p>
-          <p className="text-yellow-400 text-xs font-mono">Clinic ID: {id}</p>
+          <p className="text-amber-400 text-xs font-mono">Clinic ID: {id}</p>
           {clinicConfigError && (
             <p className="text-red-400 text-xs">Error: {JSON.stringify(clinicConfigError)}</p>
           )}

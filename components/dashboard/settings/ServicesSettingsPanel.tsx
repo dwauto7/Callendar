@@ -10,7 +10,7 @@ import { Plus, Trash2, Loader2 } from 'lucide-react'
 import { useClinicContext } from '@/components/providers/ClinicProvider'
 
 const inputCls =
-  'w-full h-9 rounded-md border border-[#1E2128] bg-[#0D0F12] px-3 text-sm text-[#F1F5F9] placeholder:text-[#64748B]/50 focus:border-[#10B981] focus:outline-none transition-colors'
+  'w-full h-9 rounded-md border border-[#212129] bg-[#0D0D11] px-3 text-sm text-white placeholder:text-white/30/50 focus:border-[#2DD4BF] focus:outline-none transition-colors'
 
 type ServiceRow = {
   id: string
@@ -120,10 +120,10 @@ export function ServicesSettingsPanel() {
 
   return (
     <>
-      <div className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1E2128]">
+      <div className="rounded-xl border border-[#212129] bg-[#121216] overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#212129]">
           <div>
-            <p className="text-sm font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-syne)' }}>
+            <p className="text-sm font-semibold text-white" style={{ fontFamily: 'var(--font-syne)' }}>
               Services & Pricing
             </p>
             <p className="text-xs text-white/40 mt-1">
@@ -133,7 +133,7 @@ export function ServicesSettingsPanel() {
           <Button
             onClick={() => setDialogOpen(true)}
             size="sm"
-            className="h-8 bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold text-xs"
+            className="h-8 bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold text-xs"
             disabled={role !== 'admin' && role !== 'owner'}
           >
             <Plus className="size-3.5 mr-1.5" />
@@ -142,9 +142,9 @@ export function ServicesSettingsPanel() {
         </div>
 
         {loading ? (
-          <div className="h-24 rounded-lg bg-white/5 animate-pulse" />
+          <div className="h-24 rounded-xl bg-black/20 animate-pulse" />
         ) : services.length === 0 ? (
-          <div className="py-12 text-center text-sm text-[#64748B]">
+          <div className="py-12 text-center text-sm text-white/30">
             No services added yet
           </div>
         ) : (
@@ -155,12 +155,12 @@ export function ServicesSettingsPanel() {
                 className="flex items-center justify-between px-5 py-3.5 hover:bg-[#161B22] transition-colors"
               >
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#F1F5F9] truncate">
+                  <p className="text-sm font-medium text-white truncate">
                     {service.service_name}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-[#0B0D10] bg-[#40E0FF] px-2.5 py-1 rounded-full">
+                  <span className="text-[11px] font-semibold text-white bg-[#2DD4BF] px-2.5 py-1 rounded-full">
                     RM {service.price}
                   </span>
                   <Button
@@ -168,7 +168,7 @@ export function ServicesSettingsPanel() {
                     size="icon-sm"
                     onClick={() => setDeleteTarget(service)}
                     disabled={deleting === service.id || (role !== 'admin' && role !== 'owner')}
-                    className="text-[#64748B] hover:text-[#EF4444] hover:bg-[#EF4444]/10"
+                    className="text-white/30 hover:text-red-400 hover:bg-[#EF4444]/10"
                   >
                     {deleting === service.id ? (
                       <Loader2 className="size-3.5 animate-spin" />
@@ -184,16 +184,16 @@ export function ServicesSettingsPanel() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-[#111318] border-[#1E2128] text-[#F1F5F9] max-w-sm">
+        <DialogContent className="bg-[#121216] border-[#212129] text-white max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold" style={{ fontFamily: 'var(--font-syne)' }}>
+            <DialogTitle className="text-base font-semibold" style={{ fontFamily: 'var(--font-syne)' }}>
               Add Service
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div>
-              <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+              <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
                 Service Name
               </Label>
               <input
@@ -205,7 +205,7 @@ export function ServicesSettingsPanel() {
               />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+              <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
                 Price (RM)
               </Label>
               <input
@@ -224,14 +224,14 @@ export function ServicesSettingsPanel() {
             <Button
               variant="ghost"
               onClick={() => setDialogOpen(false)}
-              className="text-[#64748B] hover:text-[#F1F5F9]"
+              className="text-white/30 hover:text-white"
             >
               Cancel
             </Button>
             <Button
               onClick={handleAdd}
               disabled={saving}
-              className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold"
+              className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold"
             >
               {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
               {saving ? 'Adding?' : 'Add Service'}
@@ -241,9 +241,9 @@ export function ServicesSettingsPanel() {
       </Dialog>
 
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <DialogContent className="bg-[#111318] border-[#1E2128] text-[#F1F5F9] max-w-sm">
+        <DialogContent className="bg-[#121216] border-[#212129] text-white max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold" style={{ fontFamily: 'var(--font-syne)' }}>
+            <DialogTitle className="text-base font-semibold" style={{ fontFamily: 'var(--font-syne)' }}>
               Delete Service?
             </DialogTitle>
           </DialogHeader>
@@ -255,7 +255,7 @@ export function ServicesSettingsPanel() {
             <Button
               variant="ghost"
               onClick={() => setDeleteTarget(null)}
-              className="text-[#64748B] hover:text-[#F1F5F9]"
+              className="text-white/30 hover:text-white"
             >
               Cancel
             </Button>
@@ -277,3 +277,4 @@ export function ServicesSettingsPanel() {
     </>
   )
 }
+

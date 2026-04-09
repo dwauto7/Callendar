@@ -56,12 +56,12 @@ export default async function DoctorProfilePage({ params }: { params: { id: stri
 
   return (
     <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-5xl mx-auto space-y-6">
-      <div className="rounded-xl border border-[#1E2128] bg-[#111318] p-5 space-y-2">
-        <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-syne)' }}>
+      <div className="rounded-xl border border-[#212129] bg-[#121216] p-5 space-y-2">
+        <h1 className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-syne)' }}>
           {profile.display_name}
         </h1>
-        <p className="text-xs text-[#64748B]">Role: {profile.role ?? 'doctor'}</p>
-        <p className="text-xs text-[#64748B]">
+        <p className="text-xs text-white/30">Role: {profile.role ?? 'doctor'}</p>
+        <p className="text-xs text-white/30">
           Calendar ID: {profile.google_calendar_id ?? 'Not linked'}
         </p>
       </div>

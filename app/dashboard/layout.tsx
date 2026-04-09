@@ -71,12 +71,12 @@ export default async function DashboardLayout({
 
   // 6. Render layout
   return (
-    <div className="dashboard-amber min-h-screen bg-[#0B0D10] aurora-bg grain text-slate-200 selection:bg-[#40E0FF]/30 relative overflow-hidden">
+    <div className="dashboard-amber min-h-screen bg-[#0A0A0B] aurora-bg grain text-white/50 selection:bg-[#2DD4BF]/30 relative overflow-hidden">
 
       {/* ── Background: Dynamic Glow ── */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#40E0FF]/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-[#40E0FF]/3 rounded-full blur-[100px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#2DD4BF]/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-[#2DD4BF]/3 rounded-full blur-[100px]" />
       </div>
 
       {/* ── Background: Subtle Grid ── */}
@@ -137,3 +137,4 @@ export default async function DashboardLayout({
     </div>
   )
 }
+

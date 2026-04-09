@@ -10,7 +10,7 @@ import { useClinicSettings } from '@/lib/hooks/useClinicSettings'
 type AnsweringMode = 'always_on' | 'after_hours' | 'disabled'
 
 const inputCls =
-  'w-full h-9 rounded-md border border-[#1E2128] bg-[#0D0F12] px-3 text-sm text-[#F1F5F9] placeholder:text-[#64748B]/50 focus:border-[#10B981] focus:outline-none transition-colors'
+  'w-full h-9 rounded-md border border-[#212129] bg-[#0D0D11] px-3 text-sm text-white placeholder:text-white/30/50 focus:border-[#2DD4BF] focus:outline-none transition-colors'
 
 export function ClinicSettingsPanel() {
   const { settings, role, updateSettings, loading, error } = useClinicSettings()
@@ -123,7 +123,7 @@ export function ClinicSettingsPanel() {
   }
 
   if (loading) {
-    return <div className="h-24 rounded-xl bg-white/5 animate-pulse" />
+    return <div className="h-24 rounded-xl bg-black/20 animate-pulse" />
   }
 
   if (error) {
@@ -131,12 +131,12 @@ export function ClinicSettingsPanel() {
   }
 
   return (
-    <div className="rounded-xl border border-[#1E2128] bg-[#111318] p-5 space-y-6">
+    <div className="rounded-xl border border-[#212129] bg-[#121216] p-5 space-y-6">
       <SystemModeToggle initialMode={answeringMode} onModeChange={setAnsweringMode} aiName={aiName || 'Your AI'} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             AI Name
           </Label>
           <input
@@ -148,7 +148,7 @@ export function ClinicSettingsPanel() {
           />
         </div>
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             AI Tone
           </Label>
           <input
@@ -160,7 +160,7 @@ export function ClinicSettingsPanel() {
           />
         </div>
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             Opening Time
           </Label>
           <input
@@ -171,7 +171,7 @@ export function ClinicSettingsPanel() {
           />
         </div>
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             Closing Time
           </Label>
           <input
@@ -182,7 +182,7 @@ export function ClinicSettingsPanel() {
           />
         </div>
         <div className="md:col-span-2">
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-2 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-2 block">
             Working Days
           </Label>
           <div className="grid grid-cols-7 gap-2">
@@ -193,8 +193,8 @@ export function ClinicSettingsPanel() {
                 onClick={() => toggleDay(day.value)}
                 className={
                   selectedDays.includes(day.value)
-                    ? 'h-9 rounded-lg bg-[#40E0FF]/10 border border-[#40E0FF]/40 text-[#40E0FF] text-[11px] font-bold uppercase'
-                    : 'h-9 rounded-lg bg-white/5 border border-white/10 text-white/30 text-[11px] font-bold uppercase hover:border-white/30'
+                    ? 'h-9 rounded-xl bg-[#2DD4BF]/10 border border-[#2DD4BF]/40 text-[#2DD4BF] text-[11px] font-semibold uppercase'
+                    : 'h-9 rounded-xl bg-black/20 border border-[#212129] text-white/30 text-[11px] font-semibold uppercase hover:border-white/30'
                 }
               >
                 {day.label}
@@ -203,7 +203,7 @@ export function ClinicSettingsPanel() {
           </div>
         </div>
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             Timezone
           </Label>
           <input
@@ -215,7 +215,7 @@ export function ClinicSettingsPanel() {
           />
         </div>
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             Emergency Contact
           </Label>
           <input
@@ -229,8 +229,8 @@ export function ClinicSettingsPanel() {
       </div>
 
       {/* Sync Reports Section */}
-      <div className="border-t border-white/10 pt-6">
-        <p className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-3">
+      <div className="border-t border-[#212129] pt-6">
+        <p className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-3">
           Data Management
         </p>
         <p className="text-xs text-white/50 mb-4">
@@ -240,21 +240,21 @@ export function ClinicSettingsPanel() {
           onClick={handleSyncReports}
           disabled={syncing || (role !== 'admin' && role !== 'owner')}
           variant="outline"
-          className="border-white/10 text-white/70 hover:text-white hover:bg-white/5 px-4"
+          className="border-[#212129] text-white/70 hover:text-white hover:bg-black/20 px-4"
         >
           {syncing ? 'Syncing...' : 'Sync Report Data'}
         </Button>
       </div>
 
       {/* Save Settings */}
-      <div className="flex items-center justify-between border-t border-white/10 pt-6">
+      <div className="flex items-center justify-between border-t border-[#212129] pt-6">
         <p className="text-xs text-white/40">
           {role === 'admin' || role === 'owner' ? 'Admin access granted' : 'Read-only access'}
         </p>
         <Button
           onClick={handleSave}
           disabled={saving || role !== 'admin' && role !== 'owner'}
-          className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold px-6"
+          className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold px-6"
         >
           {saving ? 'Saving...' : 'Save System Settings'}
         </Button>
@@ -262,3 +262,4 @@ export function ClinicSettingsPanel() {
     </div>
   )
 }
+

@@ -20,11 +20,11 @@ interface RecentCallsTableProps {
 
 export function RecentCallsTable({ calls }: RecentCallsTableProps) {
   return (
-    <Card className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden glass-panel flex flex-col">
-      <CardHeader className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-white/[0.01]">
+    <Card className="rounded-2xl border border-[#212129] bg-[#121216] overflow-hidden glass-panel flex flex-col">
+      <CardHeader className="flex items-center justify-between px-6 py-5 border-b border-[#212129] bg-black/20">
         <div className="flex items-center gap-3">
-          <div className="size-8 rounded-lg bg-[#40E0FF]/10 flex items-center justify-center border border-[#40E0FF]/20">
-            <PhoneCall className="size-4 text-[#40E0FF]" />
+          <div className="size-8 rounded-xl bg-[#2DD4BF]/10 flex items-center justify-center border border-[#2DD4BF]/20">
+            <PhoneCall className="size-4 text-[#2DD4BF]" />
           </div>
           <h2
             className="text-sm font-black text-white uppercase tracking-widest"
@@ -35,7 +35,7 @@ export function RecentCallsTable({ calls }: RecentCallsTableProps) {
         </div>
         <Link
           href="/dashboard/operations"
-          className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-[#40E0FF] transition-all"
+          className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-[#2DD4BF] transition-all"
         >
           Detailed Records
           <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
@@ -44,7 +44,7 @@ export function RecentCallsTable({ calls }: RecentCallsTableProps) {
 
       {/* Rows */}
       {calls.length === 0 ? (
-        <CardContent className="px-6 py-12 text-center text-xs font-bold uppercase tracking-widest text-white/20 italic">
+        <CardContent className="px-6 py-12 text-center text-xs font-semibold uppercase tracking-widest text-white/20 italic">
           Waiting for system activity...
         </CardContent>
       ) : (
@@ -52,16 +52,16 @@ export function RecentCallsTable({ calls }: RecentCallsTableProps) {
           {calls.map((call) => (
             <div
               key={call.id}
-              className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition-all duration-300 group"
+              className="flex items-center justify-between px-6 py-4 hover:bg-[#121216] transition-all duration-300 group"
             >
               <div className="flex items-center gap-4 min-w-0">
-                <div className="size-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:border-[#40E0FF]/30 transition-colors">
+                <div className="size-10 rounded-xl bg-black/20 border border-[#212129] flex items-center justify-center shrink-0 group-hover:border-[#2DD4BF]/30 transition-colors">
                   <span className="text-xs font-black text-white/60">
                     {(call.client_name?.[0] ?? '?').toUpperCase()}
                   </span>
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-white tracking-tight truncate">
+                  <p className="text-sm font-semibold text-white tracking-tight truncate">
                     {call.client_name || call.patient_phone || 'Incoming Signal...'}
                   </p>
                   <p className="text-[10px] font-mono text-white/30 tracking-tighter truncate">
@@ -78,15 +78,15 @@ export function RecentCallsTable({ calls }: RecentCallsTableProps) {
                     </Badge>
                   )}
                   {call.appointment_id && (
-                    <Badge className="bg-[#40E0FF]/10 text-[#40E0FF] border-0 text-[9px] font-black uppercase tracking-widest rounded-md">
+                    <Badge className="bg-[#2DD4BF]/10 text-[#2DD4BF] border-0 text-[9px] font-black uppercase tracking-widest rounded-md">
                       Success
                     </Badge>
                   )}
                 </div>
                 
                 <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-white/50 tabular-nums">
-                    <Clock className="size-3 text-[#40E0FF]" />
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold text-white/50 tabular-nums">
+                    <Clock className="size-3 text-[#2DD4BF]" />
                     {Number(call.duration_min).toFixed(1)}m
                   </div>
                   <p className="text-[9px] font-black text-white/20 uppercase tracking-tighter">
@@ -100,10 +100,11 @@ export function RecentCallsTable({ calls }: RecentCallsTableProps) {
       )}
       
       {/* Footer Decoration */}
-      <div className="mt-auto px-6 py-3 bg-white/[0.01] border-t border-white/5 flex items-center gap-2">
-        <ShieldCheck className="size-3 text-[#40E0FF]/40" />
+      <div className="mt-auto px-6 py-3 bg-black/20 border-t border-[#212129] flex items-center gap-2">
+        <ShieldCheck className="size-3 text-[#2DD4BF]/40" />
         <span className="text-[9px] font-black text-white/10 uppercase tracking-[0.2em]">End-to-End Encrypted Intelligence</span>
       </div>
     </Card>
   )
 }
+

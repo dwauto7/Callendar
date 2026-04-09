@@ -24,14 +24,14 @@ export default async function OverviewPage() {
 
   const clinicName = clinicContext.clinicName ?? 'Partner'
   const isActive: boolean = clinicContext.isActive ?? false
-  const id = clinicContext.clinicConfigId
+  const clinicConfigId = clinicContext.clinicConfigId
 
   // Fetch answering_mode on server side (fast, only once)
   const { data: settingsData } = await timeAsync('overview:settings', async () =>
     supabase
       .from('clinic_settings')
       .select('answering_mode')
-      .eq('clinic_config_id', id)
+      .eq('clinic_config_id', clinicConfigId)
       .single()
   )
 
@@ -43,7 +43,7 @@ export default async function OverviewPage() {
     <OverviewContent
       clinicName={clinicName}
       isActive={isActive}
-      clinicConfigId={id}
+      clinicConfigId={clinicConfigId}
       answeringMode={answeringMode}
     />
   )

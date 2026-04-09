@@ -60,7 +60,7 @@ export function DailyUsageChart({ calls }: DailyUsageChartProps) {
         <XAxis dataKey="date" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} unit="m" />
         <Tooltip {...blizzardTooltip} formatter={(v) => [`${Number(v ?? 0).toFixed(1)} min`, 'Usage']} />
-        <Bar dataKey="mins" fill="#40E0FF" radius={[4, 4, 0, 0]} maxBarSize={32} />
+        <Bar dataKey="mins" fill="#2DD4BF" radius={[4, 4, 0, 0]} maxBarSize={32} />
       </BarChart>
     </ResponsiveContainer>
   )

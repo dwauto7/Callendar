@@ -28,7 +28,7 @@ export default async function NewDoctorProfilePage() {
   return (
     <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white tracking-tighter" style={{ fontFamily: 'var(--font-syne)' }}>
+        <h1 className="text-3xl font-semibold text-white tracking-tighter" style={{ fontFamily: 'var(--font-syne)' }}>
           New Profile
         </h1>
         <p className="text-sm text-white/40 mt-2">

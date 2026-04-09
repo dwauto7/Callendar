@@ -34,19 +34,19 @@ export function SystemModeToggle({ initialMode, onModeChange, aiName = 'Your AI'
   return (
     <div className="space-y-4 p-1">
       <div className="flex flex-col gap-1 mb-4">
-        <h3 className="text-sm font-bold text-white/90 uppercase tracking-tight">Answering Protocol</h3>
+        <h3 className="text-sm font-semibold text-white/90 uppercase tracking-tight">Answering Protocol</h3>
         <p className="text-xs text-white/40">Select how the AI handles incoming voice traffic.</p>
       </div>
 
       <Tabs value={mode} onValueChange={handleValueChange} className="w-full">
         {/* Added w-full and grid-cols-3 to ensure it fills the space */}
-        <TabsList className="grid w-full grid-cols-3 bg-black/40 border border-white/5 h-12 p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-3 bg-black/40 border border-[#212129] h-12 p-1 rounded-xl">
           
           <TabsTrigger 
             value="always_on" 
             className={cn(
-              "rounded-lg gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white transition-all duration-300",
-              "text-white/40 font-bold text-[10px] uppercase tracking-widest h-full"
+              "rounded-xl gap-2 data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white transition-all duration-300",
+              "text-white/40 font-semibold text-[10px] uppercase tracking-widest h-full"
             )}
           >
             <Zap className="size-3" />
@@ -56,8 +56,8 @@ export function SystemModeToggle({ initialMode, onModeChange, aiName = 'Your AI'
           <TabsTrigger 
             value="after_hours" 
             className={cn(
-              "rounded-lg gap-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300",
-              "text-white/40 font-bold text-[10px] uppercase tracking-widest h-full"
+              "rounded-xl gap-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300",
+              "text-white/40 font-semibold text-[10px] uppercase tracking-widest h-full"
             )}
           >
             <Clock className="size-3" />
@@ -67,8 +67,8 @@ export function SystemModeToggle({ initialMode, onModeChange, aiName = 'Your AI'
           <TabsTrigger 
             value="disabled" 
             className={cn(
-              "rounded-lg gap-2 data-[state=active]:bg-red-500 data-[state=active]:text-white transition-all duration-300",
-              "text-white/40 font-bold text-[10px] uppercase tracking-widest h-full"
+              "rounded-xl gap-2 data-[state=active]:bg-red-500 data-[state=active]:text-white transition-all duration-300",
+              "text-white/40 font-semibold text-[10px] uppercase tracking-widest h-full"
             )}
           >
             <Power className="size-3" />
@@ -78,7 +78,7 @@ export function SystemModeToggle({ initialMode, onModeChange, aiName = 'Your AI'
         </TabsList>
       </Tabs>
 
-      <div className="mt-4 px-3 py-3 rounded-lg bg-white/[0.02] border border-white/5 min-h-[44px] flex items-center">
+      <div className="mt-4 px-3 py-3 rounded-xl bg-[#121216] border border-[#212129] min-h-[44px] flex items-center">
         <p className="text-[11px] text-white/60 leading-relaxed italic">
           {mode === 'always_on' && `• ${aiName} will pick up every call, 24/7.`}
           {mode === 'after_hours' && `• ${aiName} only triggers when your clinic is closed (based on KL business hours).`}

@@ -80,20 +80,20 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
       {/* Summary bar */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
         {[
-          { icon: CalendarCheck, label: 'Booked', value: totalBooked.toLocaleString(), color: '#10B981' },
-          { icon: CheckCircle2, label: 'Confirmed', value: totalConfirmed.toLocaleString(), color: '#3B82F6' },
-          { icon: DollarSign, label: 'Projected Revenue', value: formatRM(totalRevenue), color: '#10B981' },
+          { icon: CalendarCheck, label: 'Booked', value: totalBooked.toLocaleString(), color: '#2DD4BF' },
+          { icon: CheckCircle2, label: 'Confirmed', value: totalConfirmed.toLocaleString(), color: '#2DD4BF' },
+          { icon: DollarSign, label: 'Projected Revenue', value: formatRM(totalRevenue), color: '#2DD4BF' },
         ].map(({ icon: Icon, label, value, color }) => (
           <div
             key={label}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 flex items-center gap-3 glass-panel"
+            className="rounded-2xl border border-[#212129] bg-[#121216] px-4 py-3.5 flex items-center gap-3 glass-panel"
           >
-            <div className="rounded-lg p-2 shrink-0" style={{ background: `${color}18` }}>
+            <div className="rounded-xl p-2 shrink-0" style={{ background: `${color}18` }}>
               <Icon className="size-4" style={{ color }} />
             </div>
             <div>
               <p className="text-[10px] text-white/40 uppercase tracking-widest font-semibold">{label}</p>
-              <p className="text-lg font-bold text-white tabular-nums" style={{ fontFamily: 'var(--font-syne)' }}>
+              <p className="text-lg font-semibold text-white tabular-nums" style={{ fontFamily: 'var(--font-syne)' }}>
                 {value}
               </p>
             </div>
@@ -109,10 +109,10 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
         </div>
 
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="h-8 w-[120px] border-white/10 bg-white/[0.04] text-xs text-white focus:ring-0 focus:border-[#40E0FF]">
+          <SelectTrigger className="h-8 w-[120px] border-[#212129] bg-[#121216] text-xs text-white focus:ring-0 focus:border-[#2DD4BF]">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-[#0D1014] border-white/10">
+          <SelectContent className="bg-[#0D1014] border-[#212129]">
             <SelectItem value="all" className="text-xs text-white">All statuses</SelectItem>
             <SelectItem value="Booked" className="text-xs text-white">Booked</SelectItem>
             <SelectItem value="Cancelled" className="text-xs text-white">Cancelled</SelectItem>
@@ -124,23 +124,23 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="h-8 rounded-md border border-white/10 bg-white/[0.04] px-2.5 text-xs text-white [color-scheme:dark] focus:border-[#40E0FF] focus:outline-none transition-colors"
+            className="h-8 rounded-md border border-[#212129] bg-[#121216] px-2.5 text-xs text-white [color-scheme:dark] focus:border-[#2DD4BF] focus:outline-none transition-colors"
           />
           <span className="text-white/30 text-xs">to</span>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="h-8 rounded-md border border-white/10 bg-white/[0.04] px-2.5 text-xs text-white [color-scheme:dark] focus:border-[#40E0FF] focus:outline-none transition-colors"
+            className="h-8 rounded-md border border-[#212129] bg-[#121216] px-2.5 text-xs text-white [color-scheme:dark] focus:border-[#2DD4BF] focus:outline-none transition-colors"
           />
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/[0.04] backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-[#212129] bg-[#121216] backdrop-blur-md">
           <Switch
             id="confirmed-only"
             checked={filterConfirmed}
             onCheckedChange={setFilterConfirmed}
-            className="data-[state=checked]:bg-[#40E0FF] scale-75"
+            className="data-[state=checked]:bg-[#2DD4BF] scale-75"
           />
           <Label htmlFor="confirmed-only" className="text-xs text-white/40 cursor-pointer">
             Confirmed only
@@ -150,7 +150,7 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
         {hasFilters && (
           <button
             onClick={clearFilters}
-            className="flex items-center gap-1 text-xs text-white/40 hover:text-[#EF4444] transition-colors"
+            className="flex items-center gap-1 text-xs text-white/40 hover:text-red-400 transition-colors"
           >
             <X className="size-3.5" />
             Clear
@@ -163,10 +163,10 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden overflow-x-auto glass-panel">
+      <div className="rounded-2xl border border-[#212129] bg-[#121216] overflow-hidden overflow-x-auto glass-panel">
         <Table className="min-w-[700px]">
           <TableHeader>
-            <TableRow className="border-b border-white/10 text-[10px] font-semibold text-white/40 uppercase tracking-widest">
+            <TableRow className="border-b border-[#212129] text-[10px] font-semibold text-white/40 uppercase tracking-widest">
               <TableHead className="text-left px-5 py-3">Patient</TableHead>
               <TableHead className="text-left px-3 py-3">Date / Time</TableHead>
               <TableHead className="text-left px-3 py-3">Status</TableHead>
@@ -187,7 +187,7 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
               filtered.map((appt) => (
                 <TableRow
                   key={appt.id}
-                  className="hover:bg-white/[0.03] transition-colors duration-200"
+                  className="hover:bg-[#121216] transition-colors duration-200"
                 >
                   <TableCell className="px-5 py-3.5">
                     <p className="font-medium text-white truncate max-w-[160px]">
@@ -203,8 +203,8 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
                     <Badge
                       className={
                         appt.status === 'Booked'
-                          ? 'bg-[#10B981]/15 text-[#10B981] border-0 text-[10px] font-bold uppercase'
-                          : 'bg-[#EF4444]/15 text-[#EF4444] border-0 text-[10px] font-bold uppercase'
+                          ? 'bg-[#2DD4BF]/15 text-[#2DD4BF] border-0 text-[10px] font-semibold uppercase'
+                          : 'bg-[#EF4444]/15 text-red-400 border-0 text-[10px] font-semibold uppercase'
                       }
                     >
                       {appt.status}
@@ -212,13 +212,13 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
                   </TableCell>
                   <TableCell className="px-3 py-3.5 text-center">
                     <span
-                      className={`inline-block size-2 rounded-full ${appt.appointment_confirmed ? 'bg-[#10B981]' : 'bg-white/10'}`}
+                      className={`inline-block size-2 rounded-full ${appt.appointment_confirmed ? 'bg-[#2DD4BF]' : 'bg-black/20'}`}
                       title={appt.appointment_confirmed ? 'Confirmed' : 'Not confirmed'}
                     />
                   </TableCell>
                   <TableCell className="px-3 py-3.5 text-center">
                     <span
-                      className={`inline-block size-2 rounded-full ${appt.reminder_sent ? 'bg-[#3B82F6]' : 'bg-white/10'}`}
+                      className={`inline-block size-2 rounded-full ${appt.reminder_sent ? 'bg-[#2DD4BF]' : 'bg-black/20'}`}
                       title={appt.reminder_sent ? 'Sent' : 'Not sent'}
                     />
                   </TableCell>
@@ -226,7 +226,7 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
                     <span className="text-xs text-white/30">{appt.patient_status || '—'}</span>
                   </TableCell>
                   <TableCell className="px-5 py-3.5 text-right">
-                    <span className="text-sm font-semibold text-[#10B981] tabular-nums">
+                    <span className="text-sm font-semibold text-[#2DD4BF] tabular-nums">
                       {formatRM(appt.projected_revenue)}
                     </span>
                   </TableCell>
@@ -239,3 +239,4 @@ export function AppointmentsClient({ appointments }: AppointmentsClientProps) {
     </>
   )
 }
+

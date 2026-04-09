@@ -27,27 +27,27 @@ export function CreditsLogsClient({ calls, onSelectCall }: CreditsLogsClientProp
   }, [calls, search])
 
   return (
-    <div className="glass-panel rounded-3xl border border-white/5 overflow-hidden">
-      <div className="px-6 py-5 border-b border-white/5 bg-white/[0.01] flex items-center justify-between gap-4">
+    <div className="glass-panel rounded-3xl border border-[#212129] overflow-hidden">
+      <div className="px-6 py-5 border-b border-[#212129] bg-black/20 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <PhoneCall className="size-4 text-[#40E0FF]" />
+          <PhoneCall className="size-4 text-[#2DD4BF]" />
           <p className="text-[10px] font-black uppercase tracking-widest text-white/40">
             Voice Logs
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-white/40">
-          <Badge className="bg-white/5 text-white/50 border border-white/10">
+          <Badge className="bg-black/20 text-white/50 border border-[#212129]">
             {filtered.length} logs
           </Badge>
         </div>
       </div>
 
-      <div className="px-6 py-4 border-b border-white/5">
+      <div className="px-6 py-4 border-b border-[#212129]">
         <div className="flex items-center gap-3">
           <Search className="size-4 text-white/30" />
           <Input
             placeholder="Search calls..."
-            className="bg-black/20 border-white/5 rounded-xl h-10 text-white focus-visible:ring-[#40E0FF]/30"
+            className="bg-black/20 border-[#212129] rounded-xl h-10 text-white focus-visible:ring-[#2DD4BF]/30"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -64,7 +64,7 @@ export function CreditsLogsClient({ calls, onSelectCall }: CreditsLogsClientProp
             <button
               key={call.id}
               onClick={() => onSelectCall(call)}
-              className="w-full text-left px-6 py-4 hover:bg-white/[0.03] transition-colors"
+              className="w-full text-left px-6 py-4 hover:bg-[#121216] transition-colors"
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="min-w-0">
@@ -90,9 +90,9 @@ export function CreditsLogsClient({ calls, onSelectCall }: CreditsLogsClientProp
       </div>
 
       {filtered.length > visible && (
-        <div className="px-6 py-3 border-t border-white/5 bg-white/[0.01] flex justify-center">
+        <div className="px-6 py-3 border-t border-[#212129] bg-black/20 flex justify-center">
           <button
-            className="text-[10px] uppercase tracking-widest font-black text-[#40E0FF] hover:text-white transition-colors"
+            className="text-[10px] uppercase tracking-widest font-black text-[#2DD4BF] hover:text-white transition-colors"
             onClick={() => setVisible((prev) => prev + 60)}
           >
             Load more logs
@@ -102,3 +102,4 @@ export function CreditsLogsClient({ calls, onSelectCall }: CreditsLogsClientProp
     </div>
   )
 }
+

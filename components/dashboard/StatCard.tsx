@@ -25,7 +25,7 @@ export function StatCard({
   value,
   description,
   iconName,
-  accentColor = '#40E0FF', 
+  accentColor = '#2DD4BF', 
   className,
 }: StatCardProps) {
   // Select the icon based on the string passed
@@ -34,8 +34,8 @@ export function StatCard({
   return (
     <Card
       className={cn(
-        'relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] glass-panel',
-        'transition-all duration-500 hover:-translate-y-1 hover:border-[#40E0FF]/30 group',
+        'relative overflow-hidden rounded-2xl border border-[#212129] bg-[#121216] glass-panel',
+        'transition-all duration-500 hover:-translate-y-1 hover:border-[#2DD4BF]/30 group',
         className,
       )}
     >
@@ -51,7 +51,7 @@ export function StatCard({
               {title}
             </p>
             <p
-              className="text-3xl font-bold text-white leading-none tracking-tighter"
+              className="text-3xl font-semibold text-white leading-none tracking-tighter"
               style={{ fontFamily: 'var(--font-syne)' }}
             >
               {value}
@@ -63,11 +63,12 @@ export function StatCard({
             )}
           </div>
 
-          <div className="shrink-0 rounded-xl p-3 bg-white/5 border border-white/10 group-hover:cyan-glow transition-all duration-500">
-            <Icon className="size-5 text-[#40E0FF]" />
+          <div className="shrink-0 rounded-xl p-3 bg-black/20 border border-[#212129] group-hover:cyan-glow transition-all duration-500">
+            <Icon className="size-5 text-[#2DD4BF]" />
           </div>
         </div>
       </CardContent>
     </Card>
   )
 }
+

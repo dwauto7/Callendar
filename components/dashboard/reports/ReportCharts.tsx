@@ -29,7 +29,7 @@ type ChartPoint = {
 export function CallsTrendChart({ data }: { data: ChartPoint[] }) {
   if (data.length === 0)
     return (
-      <div className="h-[240px] flex items-center justify-center text-xs font-mono text-white/20 uppercase tracking-widest">
+      <div className="h-[240px] flex items-center justify-center text-xs font-black text-white/20 uppercase tracking-widest">
         Awaiting Data
       </div>
     )
@@ -41,8 +41,8 @@ export function CallsTrendChart({ data }: { data: ChartPoint[] }) {
         <XAxis dataKey="period" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
         <Tooltip {...blizzardTooltip} />
-        <Line type="monotone" dataKey="calls" stroke="#40E0FF" strokeWidth={4} dot={false} name="Total Calls" />
-        <Line type="monotone" dataKey="bookings" stroke="#10B981" strokeWidth={4} dot={false} name="Bookings" />
+        <Line type="monotone" dataKey="calls" stroke="#2DD4BF" strokeWidth={4} dot={false} name="Total Calls" />
+        <Line type="monotone" dataKey="bookings" stroke="#2DD4BF" strokeWidth={4} dot={false} name="Bookings" />
       </LineChart>
     </ResponsiveContainer>
   )
@@ -51,7 +51,7 @@ export function CallsTrendChart({ data }: { data: ChartPoint[] }) {
 export function BookingsRevenueChart({ data }: { data: ChartPoint[] }) {
   if (data.length === 0)
     return (
-      <div className="h-[240px] flex items-center justify-center text-xs font-mono text-white/20 uppercase tracking-widest">
+      <div className="h-[240px] flex items-center justify-center text-xs font-black text-white/20 uppercase tracking-widest">
         Awaiting Data
       </div>
     )
@@ -67,8 +67,9 @@ export function BookingsRevenueChart({ data }: { data: ChartPoint[] }) {
           formatter={(v, name) => [typeof v === 'number' ? `RM ${v.toLocaleString()}` : v, name]}
         />
         <Bar dataKey="investment" name="Cost" fill="rgba(255,255,255,0.05)" radius={[6, 6, 0, 0]} maxBarSize={20} />
-        <Bar dataKey="revenue" name="Revenue" fill="#40E0FF" radius={[6, 6, 0, 0]} maxBarSize={20} className="cyan-glow-bar" />
+        <Bar dataKey="revenue" name="Revenue" fill="#2DD4BF" radius={[6, 6, 0, 0]} maxBarSize={20} className="cyan-glow-bar" />
       </BarChart>
     </ResponsiveContainer>
   )
 }
+

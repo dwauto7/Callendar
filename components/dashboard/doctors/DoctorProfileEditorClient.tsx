@@ -27,7 +27,7 @@ type Appointment = {
 }
 
 const inputCls =
-  'w-full h-9 rounded-md border border-[#1E2128] bg-[#0D0F12] px-3 text-sm text-[#F1F5F9] placeholder:text-[#64748B]/50 focus:border-[#10B981] focus:outline-none transition-colors'
+  'w-full h-9 rounded-md border border-[#212129] bg-[#0D0D11] px-3 text-sm text-white placeholder:text-white/30/50 focus:border-[#2DD4BF] focus:outline-none transition-colors'
 
 function formatDate(date: string | null) {
   if (!date) return '—'
@@ -299,9 +299,9 @@ export function DoctorProfileEditorClient({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-[#1E2128] bg-[#111318] p-5 space-y-4">
+      <div className="rounded-xl border border-[#212129] bg-[#121216] p-5 space-y-4">
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             Display Name
           </Label>
           <input
@@ -315,7 +315,7 @@ export function DoctorProfileEditorClient({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+            <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
               Role
             </Label>
             <select
@@ -329,7 +329,7 @@ export function DoctorProfileEditorClient({
             </select>
           </div>
           <div>
-            <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+            <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
               Google Calendar ID
             </Label>
             <input
@@ -344,7 +344,7 @@ export function DoctorProfileEditorClient({
 
         {isAdmin && (
           <div>
-            <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+            <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
               Linked Staff Account
             </Label>
             <select
@@ -363,17 +363,17 @@ export function DoctorProfileEditorClient({
         )}
 
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             Invite Status
           </Label>
-          <span className="inline-flex items-center gap-2 text-[11px] font-bold text-white/70">
+          <span className="inline-flex items-center gap-2 text-[11px] font-semibold text-white/70">
             {inviteStatus === 'active' ? 'Active' : inviteStatus === 'pending' ? 'Pending Invite' : inviteStatus === 'expired' ? 'Invite Expired' : 'Not Invited'}
           </span>
         </div>
 
         {isAdmin && (
           <div>
-            <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+            <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
               Invite User
             </Label>
             <div className="flex flex-col md:flex-row gap-2">
@@ -388,7 +388,7 @@ export function DoctorProfileEditorClient({
                 type="button"
                 onClick={handleInvite}
                 disabled={inviting}
-                className="bg-[#40E0FF] text-[#0B0D10] font-semibold"
+                className="bg-[#2DD4BF] text-white font-semibold"
               >
                 {inviting ? 'Sending…' : 'Invite User'}
               </Button>
@@ -406,7 +406,7 @@ export function DoctorProfileEditorClient({
           <Button
             onClick={handleSave}
             disabled={!canEdit || saving}
-            className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold px-6"
+            className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold px-6"
           >
             {saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
             {saving ? 'Saving...' : 'Save Profile'}
@@ -414,28 +414,28 @@ export function DoctorProfileEditorClient({
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
-        <div className="px-5 py-3 border-b border-[#1E2128] text-xs font-semibold text-white/70 uppercase tracking-widest">
+      <div className="rounded-xl border border-[#212129] bg-[#121216] overflow-hidden">
+        <div className="px-5 py-3 border-b border-[#212129] text-xs font-semibold text-white/70 uppercase tracking-widest">
           Incoming Appointments
         </div>
         {loadingAppointments ? (
-          <div className="py-8 text-center text-sm text-[#64748B]">Loading appointments…</div>
+          <div className="py-8 text-center text-sm text-white/30">Loading appointments…</div>
         ) : assigned.length === 0 ? (
-          <div className="py-8 text-center text-sm text-[#64748B]">No assigned appointments yet.</div>
+          <div className="py-8 text-center text-sm text-white/30">No assigned appointments yet.</div>
         ) : (
           <div className="divide-y divide-[#1E2128]">
             {assigned.map((appt) => (
               <div key={appt.id} className="px-5 py-4 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#F1F5F9]">
+                  <p className="text-sm font-medium text-white">
                     {appt.patient_name ?? 'Unnamed Patient'}
                   </p>
-                  <p className="text-xs text-[#64748B] mt-1">
+                  <p className="text-xs text-white/30 mt-1">
                     {formatDate(appt.appointment_date)} {formatTime(appt.appointment_time)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-[#0B0D10] bg-[#40E0FF] px-2.5 py-1 rounded-full">
+                  <span className="text-[10px] font-semibold text-white bg-[#2DD4BF] px-2.5 py-1 rounded-full">
                     {appt.status ?? 'Booked'}
                   </span>
                   {isAdmin && (
@@ -455,8 +455,8 @@ export function DoctorProfileEditorClient({
         )}
       </div>
 
-      <div className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
-        <div className="px-5 py-3 border-b border-[#1E2128] flex items-center justify-between">
+      <div className="rounded-xl border border-[#212129] bg-[#121216] overflow-hidden">
+        <div className="px-5 py-3 border-b border-[#212129] flex items-center justify-between">
           <p className="text-xs font-semibold text-white/70 uppercase tracking-widest">Calendar View</p>
           <div className="flex items-center gap-2">
             <Button
@@ -496,14 +496,14 @@ export function DoctorProfileEditorClient({
                 type="button"
                 onClick={() => setSelectedDate(day.date)}
                 className={[
-                  'h-16 rounded-lg border text-left px-2 pt-2 transition',
-                  day.inMonth ? 'border-[#1E2128] text-white/80' : 'border-transparent text-white/20',
-                  active ? 'bg-[#40E0FF]/10 border-[#40E0FF]/40' : 'hover:bg-white/5',
+                  'h-16 rounded-xl border text-left px-2 pt-2 transition',
+                  day.inMonth ? 'border-[#212129] text-white/80' : 'border-transparent text-white/20',
+                  active ? 'bg-[#2DD4BF]/10 border-[#2DD4BF]/40' : 'hover:bg-black/20',
                 ].join(' ')}
               >
                 <div className="text-xs font-semibold">{day.day}</div>
                 {count > 0 && (
-                  <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-[#40E0FF]">
+                  <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-[#2DD4BF]">
                     {count} appt
                   </div>
                 )}
@@ -512,12 +512,12 @@ export function DoctorProfileEditorClient({
           })}
         </div>
 
-        <div className="border-t border-[#1E2128] px-5 py-4">
+        <div className="border-t border-[#212129] px-5 py-4">
           <p className="text-[11px] uppercase tracking-widest text-white/40 mb-2">
             {selectedDate ? `Appointments on ${formatDate(selectedDate)}` : 'Select a day'}
           </p>
           {selectedDate && selectedAppointments.length === 0 ? (
-            <p className="text-sm text-[#64748B]">No appointments on this day.</p>
+            <p className="text-sm text-white/30">No appointments on this day.</p>
           ) : selectedDate ? (
             <div className="space-y-2">
               {selectedAppointments.map((appt) => (
@@ -532,30 +532,30 @@ export function DoctorProfileEditorClient({
       </div>
 
       {isAdmin && (
-        <div className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
-          <div className="px-5 py-3 border-b border-[#1E2128] text-xs font-semibold text-white/70 uppercase tracking-widest">
+        <div className="rounded-xl border border-[#212129] bg-[#121216] overflow-hidden">
+          <div className="px-5 py-3 border-b border-[#212129] text-xs font-semibold text-white/70 uppercase tracking-widest">
             Unassigned Appointments
           </div>
           {loadingAppointments ? (
-            <div className="py-8 text-center text-sm text-[#64748B]">Loading appointments…</div>
+            <div className="py-8 text-center text-sm text-white/30">Loading appointments…</div>
           ) : unassigned.length === 0 ? (
-            <div className="py-8 text-center text-sm text-[#64748B]">No unassigned appointments.</div>
+            <div className="py-8 text-center text-sm text-white/30">No unassigned appointments.</div>
           ) : (
             <div className="divide-y divide-[#1E2128]">
               {unassigned.map((appt) => (
                 <div key={appt.id} className="px-5 py-4 flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-[#F1F5F9]">
+                    <p className="text-sm font-medium text-white">
                       {appt.patient_name ?? 'Unnamed Patient'}
                     </p>
-                    <p className="text-xs text-[#64748B] mt-1">
+                    <p className="text-xs text-white/30 mt-1">
                       {formatDate(appt.appointment_date)} {formatTime(appt.appointment_time)}
                     </p>
                   </div>
                   <Button
                     size="sm"
                     onClick={() => assignAppointment(appt.id)}
-                    className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold"
+                    className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold"
                   >
                     Assign
                   </Button>
@@ -568,3 +568,4 @@ export function DoctorProfileEditorClient({
     </div>
   )
 }
+

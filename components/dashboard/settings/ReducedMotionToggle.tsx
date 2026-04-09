@@ -32,17 +32,17 @@ export function ReducedMotionToggle() {
   )
 
   return (
-    <div className="rounded-xl border border-[#1E2128] bg-[#111318] px-5 py-4 flex items-center justify-between gap-4">
+    <div className="rounded-xl border border-[#212129] bg-[#121216] px-5 py-4 flex items-center justify-between gap-4">
       <div>
-        <p className="text-sm font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-syne)' }}>
+        <p className="text-sm font-semibold text-white" style={{ fontFamily: 'var(--font-syne)' }}>
           Reduced Motion
         </p>
-        <p className="text-xs text-[#64748B] mt-1">
+        <p className="text-xs text-white/30 mt-1">
           Minimizes decorative animations and motion effects across the app.
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-[11px] font-bold uppercase tracking-widest text-white/40">
+        <span className="text-[11px] font-semibold uppercase tracking-widest text-white/40">
           {label}
         </span>
         <Switch checked={enabled} onCheckedChange={setEnabled} />

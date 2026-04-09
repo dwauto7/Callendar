@@ -4,10 +4,10 @@ import { ArrowRight, CalendarCheck, Clock, TrendingUp, Zap, CheckCircle2, Shield
 // Updated Mockup with Live Call Activity and Glassmorphism
 function DashboardMockup() {
   const stats = [
-    { label: 'Revenue Recovered', value: 'RM 14,250', icon: TrendingUp, color: '#40E0FF' },
-    { label: 'Appointments booked', value: '42', icon: CalendarCheck, color: '#40E0FF' },
-    { label: 'Front Desk Hours Saved', value: '18.5h', icon: Clock, color: '#40E0FF' },
-    { label: 'Live Call Alerts', value: '12', icon: Search, color: '#EF7E71' },
+    { label: 'Revenue Recovered', value: 'RM 14,250', icon: TrendingUp, color: '#2DD4BF' },
+    { label: 'Appointments booked', value: '42', icon: CalendarCheck, color: '#2DD4BF' },
+    { label: 'Front Desk Hours Saved', value: '18.5h', icon: Clock, color: '#2DD4BF' },
+    { label: 'Live Call Alerts', value: '12', icon: Search, color: '#2DD4BF' },
   ]
 
   const calls = [
@@ -21,26 +21,26 @@ function DashboardMockup() {
       className="relative w-full max-w-[560px] mx-auto [--mockup-transform:none] lg:[--mockup-transform:perspective(1200px)_rotateY(-8deg)_rotateX(4deg)] [transform:var(--mockup-transform)]"
     >
       {/* Background Glow */}
-      <div className="absolute inset-0 rounded-2xl bg-[#40E0FF]/10 blur-3xl scale-95 opacity-40 pointer-events-none" />
+      <div className="absolute inset-0 rounded-2xl bg-[#2DD4BF]/10 blur-3xl scale-95 opacity-40 pointer-events-none" />
 
       {/* Main Glass Window */}
-      <div className="relative rounded-2xl glass-panel overflow-hidden shadow-2xl">
+      <div className="relative rounded-2xl border border-[#212129] bg-[#121216] overflow-hidden shadow-2xl">
         {/* Window Chrome */}
-        <div className="flex items-center gap-1.5 px-4 py-3 border-b border-white/10 bg-white/5">
-          <div className="size-2.5 rounded-full bg-[#EF7E71]/70" />
+        <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[#212129] bg-black/20">
           <div className="size-2.5 rounded-full bg-white/20" />
-          <div className="size-2.5 rounded-full bg-[#40E0FF]/70" />
-          <div className="flex-1 mx-4 h-5 rounded-md bg-white/5 flex items-center px-2">
+          <div className="size-2.5 rounded-full bg-white/10" />
+          <div className="size-2.5 rounded-full bg-[#2DD4BF]/60" />
+          <div className="flex-1 mx-4 h-5 rounded-md bg-black/20 flex items-center px-2">
             <span className="text-[9px] text-white/40 tracking-tight">beaconhorizons.io/portal</span>
           </div>
         </div>
 
         <div className="flex">
           {/* Sidebar */}
-          <div className="hidden sm:flex w-[150px] flex-col border-r border-white/5 bg-black/20 p-4">
+          <div className="hidden sm:flex w-[150px] flex-col border-r border-[#212129] bg-black/20 p-4">
             <div className="flex items-center gap-2 mb-6">
-              <div className="size-7 rounded-lg bg-[#40E0FF] flex items-center justify-center">
-                <Zap className="size-4 text-[#0B0D10]" />
+              <div className="size-7 rounded-lg border border-[#2DD4BF]/20 bg-[#2DD4BF]/10 flex items-center justify-center">
+                <Zap className="size-4 text-[#2DD4BF]" />
               </div>
               <span className="text-[10px] font-black text-white uppercase tracking-widest">Beacon Horizons</span>
             </div>
@@ -49,14 +49,14 @@ function DashboardMockup() {
                 key={label}
                 className={`mb-2 rounded-lg px-3 py-2 text-[9px] font-black uppercase tracking-widest ${
                   idx === 1
-                    ? 'bg-[#40E0FF]/10 text-[#40E0FF] border border-[#40E0FF]/20'
+                    ? 'bg-[#2DD4BF]/10 text-[#2DD4BF] border border-[#2DD4BF]/20'
                     : 'text-white/40'
                 }`}
               >
                 {label}
               </div>
             ))}
-            <div className="mt-auto rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2 text-[8px] text-white/40 uppercase tracking-widest">
+            <div className="mt-auto rounded-lg border border-[#212129] bg-black/20 px-3 py-2 text-[8px] text-white/40 uppercase tracking-widest">
               Node: KL-PJ-01
             </div>
           </div>
@@ -64,10 +64,10 @@ function DashboardMockup() {
           {/* Content */}
           <div className="flex-1 p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-[11px] font-bold text-white uppercase tracking-widest" style={{ fontFamily: 'var(--font-syne)' }}>
+              <p className="text-[11px] font-black text-white uppercase tracking-widest" style={{ fontFamily: 'var(--font-syne)' }}>
                 Intelligence Hub
               </p>
-              <span className="text-[8px] px-2 py-0.5 rounded-full bg-[#40E0FF]/10 text-[#40E0FF] border border-[#40E0FF]/20 animate-pulse">
+              <span className="text-[8px] px-2 py-0.5 rounded-full bg-[#2DD4BF]/10 text-[#2DD4BF] border border-[#2DD4BF]/20 animate-pulse">
                 System Active
               </span>
             </div>
@@ -75,12 +75,12 @@ function DashboardMockup() {
             {/* Stat cards */}
             <div className="grid grid-cols-2 gap-3">
               {stats.map(({ label, value, icon: Icon, color }) => (
-                <div key={label} className="rounded-xl border border-white/5 bg-white/5 p-3">
+                <div key={label} className="rounded-xl border border-[#212129] bg-black/20 p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-[8px] text-white/50 uppercase">{label}</p>
+                    <p className="text-[8px] text-white/50 uppercase tracking-widest">{label}</p>
                     <Icon className="size-3" style={{ color }} />
                   </div>
-                  <p className="text-sm font-bold text-white tracking-tight" style={{ fontFamily: 'var(--font-syne)' }}>
+                  <p className="text-sm font-semibold text-white tracking-tight" style={{ fontFamily: 'var(--font-syne)' }}>
                     {value}
                   </p>
                 </div>
@@ -88,20 +88,20 @@ function DashboardMockup() {
             </div>
 
             {/* Call Log Preview */}
-            <div className="rounded-xl border border-white/5 bg-black/20 overflow-hidden">
-              <div className="flex items-center justify-between px-3 py-2.5 bg-white/5 border-b border-white/5">
-                <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">
+            <div className="rounded-xl border border-[#212129] bg-black/20 overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2.5 bg-black/20 border-b border-[#212129]">
+                <p className="text-[8px] font-black text-white/40 uppercase tracking-widest">
                   Voice Logs
                 </p>
                 <span className="text-[8px] text-white/20 uppercase tracking-widest">Live</span>
               </div>
               {calls.map((c) => (
-                <div key={c.name} className="flex items-center justify-between px-3 py-2 border-b border-white/5 last:border-0">
+                <div key={c.name} className="flex items-center justify-between px-3 py-2 border-b border-[#212129] last:border-0">
                   <div>
-                    <p className="text-[10px] font-medium text-white">{c.name}</p>
+                    <p className="text-[10px] font-semibold text-white">{c.name}</p>
                     <p className="text-[8px] text-white/40">{c.time} | {c.dur}</p>
                   </div>
-                  <span className="text-[8px] font-bold px-2 py-0.5 rounded bg-[#40E0FF]/10 text-[#40E0FF]">
+                  <span className="text-[8px] font-black px-2 py-0.5 rounded bg-[#2DD4BF]/10 text-[#2DD4BF] border border-[#2DD4BF]/20">
                     {c.status}
                   </span>
                 </div>
@@ -112,9 +112,9 @@ function DashboardMockup() {
       </div>
 
       {/* Floating PDPA Badge */}
-      <div className="absolute -bottom-4 -left-4 glass-panel px-4 py-2 rounded-xl flex items-center gap-2 border border-white/20">
-        <ShieldCheck className="size-4 text-[#40E0FF]" />
-        <span className="text-[10px] font-bold text-white">PDPA 2010 Compliant</span>
+      <div className="absolute -bottom-4 -left-4 bg-black/20 px-4 py-2 rounded-xl flex items-center gap-2 border border-[#212129]">
+        <ShieldCheck className="size-4 text-[#2DD4BF]" />
+        <span className="text-[10px] font-black text-white">PDPA 2010 Compliant</span>
       </div>
     </div>
   )
@@ -123,35 +123,36 @@ function DashboardMockup() {
 export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-24">
-      {/* Refined Grid Overlay */}
-      <div className="absolute inset-0 opacity-[0.15] pointer-events-none"
-        style={{ backgroundImage: `radial-gradient(#40E0FF 0.5px, transparent 0.5px)`, backgroundSize: '40px 40px' }} />
+      <div
+        className="absolute inset-0 opacity-[0.15] pointer-events-none hidden"
+        style={{ backgroundImage: 'radial-gradient(#2DD4BF 0.5px, transparent 0.5px)', backgroundSize: '40px 40px' }}
+      />
 
       <div className="relative max-w-6xl mx-auto px-6 py-24 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 bg-[#40E0FF]/10 border border-[#40E0FF]/20 rounded-full px-4 py-1.5 mb-8">
-              <Zap className="size-3.5 text-[#40E0FF]" />
-            <span className="text-xs font-bold text-[#40E0FF] tracking-wide uppercase">
-              Intelligence
+            <div className="inline-flex items-center gap-2 border border-[#2DD4BF]/20 bg-[#2DD4BF]/10 rounded-full px-4 py-1.5 mb-8">
+              <Zap className="size-3.5 text-[#2DD4BF]" />
+              <span className="text-[10px] font-black text-[#2DD4BF] uppercase tracking-[0.25em]">
+                Intelligence
               </span>
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight mb-8" style={{ fontFamily: 'var(--font-syne)' }}>
+            <h1 className="text-5xl md:text-7xl font-semibold text-white leading-[1.05] tracking-tight mb-8" style={{ fontFamily: 'var(--font-syne)' }}>
               Never Miss <br />
-              <span className="text-[#40E0FF]">A Patient.</span>
+              <span className="text-[#2DD4BF]">A Patient.</span>
             </h1>
 
-            <p className="text-lg text-white/60 leading-relaxed mb-10 max-w-lg">
+            <p className="text-base md:text-lg text-white/50 font-normal max-w-xl leading-relaxed mb-10">
               Aya answers every call instantly and books appointments while your team stays focused.
               Handles concurrent calls with zero hold time.
-              <span className="text-white font-medium"> Fully PDPA-safe.</span>
+              <span className="text-white font-semibold"> Fully PDPA-safe.</span>
             </p>
 
             <div className="flex flex-wrap gap-4">
               <Button
                 asChild
-                className="bg-[#40E0FF] hover:bg-[#40E0FF]/80 text-[#0B0D10] font-black text-sm h-14 px-8 rounded-xl transition-all cyan-glow"
+                className="bg-[#2DD4BF] text-[#0A0A0B] font-black uppercase tracking-widest text-[11px] px-6 py-3 rounded-full hover:bg-[#2DD4BF]/90 transition-colors h-auto"
               >
                 <a href="https://calendly.com/dwautomate7/30min" target="_blank" rel="noopener noreferrer">
                   BOOK A DEMO
@@ -161,25 +162,25 @@ export function Hero() {
               <Button
                 asChild
                 variant="outline"
-                className="border-white/10 bg-white/5 text-white hover:bg-white/10 h-14 px-8 rounded-xl text-sm font-bold backdrop-blur-md"
+                className="border border-[#212129] text-white/60 font-black uppercase tracking-widest text-[11px] px-6 py-3 rounded-full hover:border-[#2DD4BF]/40 hover:text-white transition-colors h-auto"
               >
                 <a href="/#demo">SEE A LIVE CALL</a>
               </Button>
             </div>
 
-            <div className="mt-8 text-xs font-bold uppercase tracking-widest text-white/40">
-              Always‑on coverage, zero missed calls.
+            <div className="mt-8 text-[10px] font-black uppercase tracking-widest text-white/40">
+              Always-on coverage, zero missed calls.
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-6 opacity-70">
-               <div className="flex items-center gap-2">
-                 <CheckCircle2 className="size-4 text-[#40E0FF]" />
-                 <span className="text-[11px] font-bold text-white tracking-widest uppercase">14-Day Data Purge</span>
-               </div>
-               <div className="flex items-center gap-2">
-                 <CheckCircle2 className="size-4 text-[#40E0FF]" />
-                 <span className="text-[11px] font-bold text-white tracking-widest uppercase">Local PJ/KL Support</span>
-               </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="size-4 text-[#2DD4BF]" />
+                <span className="text-[11px] font-black text-white tracking-widest uppercase">14-Day Data Purge</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="size-4 text-[#2DD4BF]" />
+                <span className="text-[11px] font-black text-white tracking-widest uppercase">Local PJ/KL Support</span>
+              </div>
             </div>
           </div>
 

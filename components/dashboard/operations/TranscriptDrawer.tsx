@@ -173,13 +173,13 @@ export function TranscriptDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="bg-[#0A0A0B] border-l border-white/10 text-white sm:max-w-md p-0 flex flex-col">
-        <SheetHeader className="p-6 border-b border-white/5 bg-white/[0.02]">
-          <SheetTitle className="text-2xl font-bold tracking-tighter text-white">
+      <SheetContent className="bg-[#0A0A0B] border-l border-[#212129] text-white sm:max-w-md p-0 flex flex-col">
+        <SheetHeader className="p-6 border-b border-[#212129] bg-[#121216]">
+          <SheetTitle className="text-2xl font-semibold tracking-tighter text-white">
             Interaction Data
           </SheetTitle>
           <div className="flex gap-2 mt-2">
-            <Badge variant="outline" className="border-white/10 text-white/40">
+            <Badge variant="outline" className="border-[#212129] text-white/40">
               {call?.patient_phone || 'Unknown'}
             </Badge>
           </div>
@@ -187,12 +187,12 @@ export function TranscriptDrawer({
 
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
           {loading ? (
-            <div className="h-40 animate-pulse bg-white/5 rounded-xl" />
+            <div className="h-40 animate-pulse bg-black/20 rounded-xl" />
           ) : (
             <>
-              <Card className="glass-panel border border-white/10 bg-white/[0.03]">
+              <Card className="glass-panel border border-[#212129] bg-[#121216]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-[10px] font-black uppercase text-[#40E0FF] tracking-widest">
+                  <CardTitle className="text-[10px] font-black uppercase text-[#2DD4BF] tracking-widest">
                     Aya Summary
                   </CardTitle>
                 </CardHeader>
@@ -208,7 +208,7 @@ export function TranscriptDrawer({
                   <h4 className="text-[10px] font-black uppercase text-white/20 tracking-widest">
                     Live Stream Transcript
                   </h4>
-                  <Badge className="bg-white/5 text-white/40 border border-white/10 text-[9px] font-black uppercase tracking-widest">
+                  <Badge className="bg-black/20 text-white/40 border border-[#212129] text-[9px] font-black uppercase tracking-widest">
                     Aya Voice Log
                   </Badge>
                 </div>
@@ -226,8 +226,8 @@ export function TranscriptDrawer({
                           className={cn(
                             'mb-2 text-[9px] font-black uppercase tracking-widest',
                             msg.role === 'agent'
-                              ? 'bg-white/5 text-white/40 border border-white/10'
-                              : 'bg-[#40E0FF]/10 text-[#40E0FF] border border-[#40E0FF]/20'
+                              ? 'bg-black/20 text-white/40 border border-[#212129]'
+                              : 'bg-[#2DD4BF]/10 text-[#2DD4BF] border border-[#2DD4BF]/20'
                           )}
                         >
                           {msg.role === 'agent' ? 'Aya' : 'Patient'}
@@ -236,8 +236,8 @@ export function TranscriptDrawer({
                           className={cn(
                             'px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-[0_10px_30px_rgba(0,0,0,0.25)]',
                             msg.role === 'agent'
-                              ? 'bg-white/5 border border-white/5 text-white/80 rounded-tl-none'
-                              : 'bg-[#40E0FF]/10 border border-[#40E0FF]/20 text-[#40E0FF] rounded-tr-none'
+                              ? 'bg-black/20 border border-[#212129] text-white/80 rounded-tl-none'
+                              : 'bg-[#2DD4BF]/10 border border-[#2DD4BF]/20 text-[#2DD4BF] rounded-tr-none'
                           )}
                         >
                           {msg.content}

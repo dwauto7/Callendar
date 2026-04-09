@@ -24,7 +24,7 @@ interface SpecialClosuresProps {
 }
 
 const inputCls =
-  'w-full h-9 rounded-md border border-[#1E2128] bg-[#0D0F12] px-3 text-sm text-[#F1F5F9] placeholder:text-[#64748B]/50 focus:border-[#10B981] focus:outline-none transition-colors'
+  'w-full h-9 rounded-md border border-[#212129] bg-[#0D0D11] px-3 text-sm text-white placeholder:text-white/30/50 focus:border-[#2DD4BF] focus:outline-none transition-colors'
 
 const DAY_TO_INT: Record<string, number> = {
   sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6,
@@ -212,12 +212,12 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
 
   return (
     <>
-      <div className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1E2128]">
+      <div className="rounded-xl border border-[#212129] bg-[#121216] overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#212129]">
           <div className="flex items-center gap-2">
-            <CalendarOff className="size-4 text-[#F59E0B]" />
+            <CalendarOff className="size-4 text-amber-400" />
             <p
-              className="text-sm font-semibold text-[#F1F5F9]"
+              className="text-sm font-semibold text-white"
               style={{ fontFamily: 'var(--font-syne)' }}
             >
               Special Closures
@@ -226,7 +226,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
           <Button
             onClick={handleOpenAdd}
             size="sm"
-            className="h-8 bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold text-xs"
+            className="h-8 bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold text-xs"
           >
             <Plus className="size-3.5 mr-1.5" />
             Add Date
@@ -234,7 +234,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
         </div>
 
         {closures.length === 0 ? (
-          <div className="py-12 text-center text-sm text-[#64748B]">
+          <div className="py-12 text-center text-sm text-white/30">
             No special closures set
           </div>
         ) : (
@@ -252,11 +252,11 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                     className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
                   >
                     <div>
-                      <p className="text-sm font-medium text-[#F1F5F9]">
+                      <p className="text-sm font-medium text-white">
                         {fmtDate(closure.holiday_date)}
                       </p>
                       {closure.description && (
-                        <p className="text-xs text-[#64748B] mt-0.5 truncate max-w-[260px]">
+                        <p className="text-xs text-white/30 mt-0.5 truncate max-w-[260px]">
                           {closure.description}
                         </p>
                       )}
@@ -268,8 +268,8 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                     <Badge
                       className={
                         closure.is_recurring
-                          ? 'bg-[#10B981]/15 text-[#F59E0B] border-0 text-[10px] font-bold uppercase'
-                          : 'bg-[#64748B]/15 text-[#64748B] border-0 text-[10px] font-bold uppercase'
+                          ? 'bg-[#2DD4BF]/15 text-amber-400 border-0 text-[10px] font-semibold uppercase'
+                          : 'bg-[#64748B]/15 text-white/30 border-0 text-[10px] font-semibold uppercase'
                       }
                     >
                       {closure.is_recurring
@@ -285,7 +285,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                         e.stopPropagation()
                         handleOpenEdit(closure)
                       }}
-                      className="text-[#64748B] hover:text-[#40E0FF] hover:bg-[#40E0FF]/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-white/30 hover:text-[#2DD4BF] hover:bg-[#2DD4BF]/10 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Edit2 className="size-3.5" />
                     </Button>
@@ -296,7 +296,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                       size="icon-sm"
                       onClick={() => handleDelete(closure.id)}
                       disabled={deleting === closure.id}
-                      className="text-[#64748B] hover:text-[#EF4444] hover:bg-[#EF4444]/10"
+                      className="text-white/30 hover:text-red-400 hover:bg-[#EF4444]/10"
                     >
                       {deleting === closure.id ? (
                         <Loader2 className="size-3.5 animate-spin" />
@@ -313,10 +313,10 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
 
       {/* ✅ Unified Dialog for Add/Edit */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-[#111318] border-[#1E2128] text-[#F1F5F9] max-w-sm">
+        <DialogContent className="bg-[#121216] border-[#212129] text-white max-w-sm">
           <DialogHeader>
             <DialogTitle
-              className="text-base font-bold"
+              className="text-base font-semibold"
               style={{ fontFamily: 'var(--font-syne)' }}
             >
               {editingId ? 'Edit Closure' : 'Add Special Closure'}
@@ -327,7 +327,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
             {/* Date input - only shown for one-off closures */}
             {!newIsRecurring && (
               <div>
-                <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+                <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
                   Date
                 </Label>
                 <input
@@ -341,7 +341,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
 
             {/* Reason input */}
             <div>
-              <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+              <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
                 Reason
               </Label>
               <input
@@ -355,11 +355,11 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
 
             {/* Recurring toggle */}
             <div className="flex items-center justify-between">
-              <Label className="text-sm text-[#F1F5F9]">Weekly recurrence</Label>
+              <Label className="text-sm text-white">Weekly recurrence</Label>
               <Switch
                 checked={newIsRecurring}
                 onCheckedChange={setNewIsRecurring}
-                className="data-[state=checked]:bg-[#10B981]"
+                className="data-[state=checked]:bg-[#2DD4BF]"
               />
             </div>
 
@@ -373,7 +373,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                   setNewIsRecurring(true)
                   setWeeklyDay('sun')
                 }}
-                className="h-8 border-white/10 bg-white/5 text-white text-xs"
+                className="h-8 border-[#212129] bg-black/20 text-white text-xs"
               >
                 Close Every Sunday
               </Button>
@@ -382,7 +382,7 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
             {/* Weekly recurrence picker */}
             {newIsRecurring ? (
               <div>
-                <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-2 block">
+                <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-2 block">
                   Repeat every
                 </Label>
                 <div className="grid grid-cols-7 gap-2">
@@ -393,8 +393,8 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
                       onClick={() => setWeeklyDay(day.value)}
                       className={
                         weeklyDay === day.value
-                          ? 'h-9 rounded-lg bg-[#40E0FF]/10 border border-[#40E0FF]/40 text-[#40E0FF] text-[11px] font-bold uppercase'
-                          : 'h-9 rounded-lg bg-white/5 border border-white/10 text-white/30 text-[11px] font-bold uppercase hover:border-white/30'
+                          ? 'h-9 rounded-xl bg-[#2DD4BF]/10 border border-[#2DD4BF]/40 text-[#2DD4BF] text-[11px] font-semibold uppercase'
+                          : 'h-9 rounded-xl bg-black/20 border border-[#212129] text-white/30 text-[11px] font-semibold uppercase hover:border-white/30'
                       }
                     >
                       {day.label}
@@ -412,14 +412,14 @@ export function SpecialClosures({ closures: initial, clinicConfigId }: SpecialCl
             <Button
               variant="ghost"
               onClick={() => setDialogOpen(false)}
-              className="text-[#64748B] hover:text-[#F1F5F9]"
+              className="text-white/30 hover:text-white"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold"
+              className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold"
             >
               {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
               {saving ? (editingId ? 'Updating…' : 'Adding…') : (editingId ? 'Update Closure' : 'Add Closure')}

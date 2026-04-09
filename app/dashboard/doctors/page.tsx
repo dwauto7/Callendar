@@ -47,10 +47,10 @@ export default async function DoctorsPage() {
   return (
     <div className="px-5 py-6 lg:px-8 lg:py-8 max-w-5xl mx-auto space-y-6">
       <div>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-semibold">
           {clinicContext.clinicName ?? 'Your Clinic'}
         </p>
-        <h1 className="text-3xl font-bold text-white tracking-tighter mt-2" style={{ fontFamily: 'var(--font-syne)' }}>
+        <h1 className="text-3xl font-semibold text-white tracking-tighter mt-2" style={{ fontFamily: 'var(--font-syne)' }}>
           Profiles
         </h1>
         <p className="text-sm text-white/40 mt-2">
@@ -62,7 +62,7 @@ export default async function DoctorsPage() {
         <div className="flex justify-end">
           <Button
             asChild
-            className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold"
+            className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold"
           >
             <Link href="/dashboard/doctors/new">Add Profile</Link>
           </Button>
@@ -70,7 +70,7 @@ export default async function DoctorsPage() {
       )}
 
       {profiles && profiles.length > 0 ? (
-        <div className="rounded-xl border border-[#1E2128] bg-[#111318] overflow-hidden">
+        <div className="rounded-xl border border-[#212129] bg-[#121216] overflow-hidden">
           <div className="divide-y divide-[#1E2128]">
             {profiles.map((profile) => (
               <Link
@@ -79,14 +79,14 @@ export default async function DoctorsPage() {
                 className="flex items-center justify-between px-5 py-4 hover:bg-[#161B22] transition-colors"
               >
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#F1F5F9] truncate">
+                  <p className="text-sm font-semibold text-white truncate">
                     {profile.display_name}
                   </p>
-                  <p className="text-xs text-[#64748B] mt-1">
+                  <p className="text-xs text-white/30 mt-1">
                     Role: {profile.role ?? 'doctor'}
                   </p>
                 </div>
-                <span className="text-[10px] font-bold text-[#0B0D10] bg-[#40E0FF] px-2.5 py-1 rounded-full">
+                <span className="text-[10px] font-semibold text-white bg-[#2DD4BF] px-2.5 py-1 rounded-full">
                   {profile.google_calendar_id ? 'Calendar Linked' : 'No Calendar'}
                 </span>
               </Link>
@@ -94,10 +94,11 @@ export default async function DoctorsPage() {
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-[#1E2128] bg-[#111318] p-6 text-sm text-[#64748B]">
+        <div className="rounded-xl border border-[#212129] bg-[#121216] p-6 text-sm text-white/30">
           No doctor profiles found yet.
         </div>
       )}
     </div>
   )
 }
+

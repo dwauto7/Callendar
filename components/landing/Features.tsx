@@ -55,21 +55,21 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="py-32 bg-background relative">
+    <section id="features" className="py-24 md:py-32 relative">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 bg-[#40E0FF]/10 border border-[#40E0FF]/20 rounded-full px-4 py-1.5 mb-6">
-            <Zap className="size-3 text-[#40E0FF]" />
-            <span className="text-[10px] font-bold text-[#40E0FF] uppercase tracking-widest">Outcomes</span>
+          <div className="inline-flex items-center gap-2 border border-[#2DD4BF]/20 bg-[#2DD4BF]/10 rounded-full px-4 py-1.5 mb-6">
+            <Zap className="size-3 text-[#2DD4BF]" />
+            <span className="text-[10px] font-black text-[#2DD4BF] uppercase tracking-[0.25em]">Outcomes</span>
           </div>
           <h2
-            className="text-4xl md:text-5xl font-bold text-white mb-6"
+            className="text-4xl md:text-5xl font-semibold text-white mb-6"
             style={{ fontFamily: 'var(--font-syne)' }}
           >
             Secure more patients.{' '}
-            <span className="text-[#40E0FF]">Stress less.</span>
+            <span className="text-[#2DD4BF]">Stress less.</span>
           </h2>
-          <p className="text-white/40 max-w-2xl mx-auto text-lg leading-relaxed">
+          <p className="text-white/40 max-w-2xl mx-auto text-sm leading-relaxed">
             Aya turns every inbound call into a booked appointment or a clear next step, without extra headcount.
           </p>
         </div>
@@ -78,24 +78,21 @@ export function Features() {
           {features.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="relative rounded-2xl border border-white/5 bg-white/[0.02] p-8 transition-all duration-500 hover:-translate-y-2 group glass-panel overflow-hidden"
+              className="relative rounded-2xl border border-[#212129] bg-[#121216] p-8 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2DD4BF]/40"
             >
-              {/* Hover Glow Effect */}
-              <div className="absolute -bottom-10 -right-10 size-32 bg-[#40E0FF]/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
               <div className="relative z-10">
                 <div
-                  className="size-12 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:cyan-glow bg-white/5 border border-white/10"
+                  className="size-12 rounded-xl flex items-center justify-center mb-6 border border-[#2DD4BF]/20 bg-[#2DD4BF]/10"
                 >
-                  <Icon className="size-6 text-[#40E0FF]" />
+                  <Icon className="size-6 text-[#2DD4BF]" />
                 </div>
                 <h3
-                  className="text-lg font-bold text-white mb-3 tracking-tight"
+                  className="text-lg font-semibold text-white mb-3 tracking-tight"
                   style={{ fontFamily: 'var(--font-syne)' }}
                 >
                   {title}
                 </h3>
-                <p className="text-sm text-white/50 leading-relaxed group-hover:text-white/70 transition-colors">
+                <p className="text-sm text-white/40 leading-relaxed">
                   {description}
                 </p>
               </div>

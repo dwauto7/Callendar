@@ -155,19 +155,19 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
   return (
     <div className="space-y-6">
       {/* Control Bar */}
-      <div className="flex flex-col md:flex-row items-center gap-4 p-4 glass-panel rounded-2xl border border-white/5 bg-white/[0.02]">
+      <div className="flex flex-col md:flex-row items-center gap-4 p-4 glass-panel rounded-2xl border border-[#212129] bg-[#121216]">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-white/20" />
           <Input
             placeholder="Search signals..."
-            className="w-full bg-black/20 border-white/5 rounded-xl pl-10 h-11 text-white focus-visible:ring-[#40E0FF]/30 outline-none"
+            className="w-full bg-black/20 border-[#212129] rounded-xl pl-10 h-11 text-white focus-visible:ring-[#2DD4BF]/30 outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="flex items-center gap-3 px-4 h-11 rounded-xl bg-black/20 border border-white/5 flex-1 md:flex-none">
+          <div className="flex items-center gap-3 px-4 h-11 rounded-xl bg-black/20 border border-[#212129] flex-1 md:flex-none">
             <Switch checked={filterAfterHours} onCheckedChange={setFilterAfterHours} />
             <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 cursor-pointer">After-Hours</Label>
           </div>
@@ -176,7 +176,7 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
             variant="outline"
             onClick={exportToCSV}
             disabled={filtered.length === 0}
-            className="h-11 px-4 bg-white/5 border-white/5 hover:bg-[#40E0FF]/10 hover:text-[#40E0FF] transition-all rounded-xl gap-2 text-[10px] font-black uppercase tracking-widest"
+            className="h-11 px-4 bg-black/20 border-[#212129] hover:bg-[#2DD4BF]/10 hover:text-[#2DD4BF] transition-all rounded-xl gap-2 text-[10px] font-black uppercase tracking-widest"
           >
             <Download className="size-3" />
             Export
@@ -185,8 +185,8 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
       </div>
 
       {/* Table */}
-      <Card className="glass-panel rounded-2xl border border-white/5 overflow-hidden bg-white/[0.01] p-0">
-        <CardHeader className="px-6 py-4 border-b border-white/5">
+      <Card className="glass-panel rounded-2xl border border-[#212129] overflow-hidden bg-black/20 p-0">
+        <CardHeader className="px-6 py-4 border-b border-[#212129]">
           <div className="grid grid-cols-[2fr_1fr_1fr_auto] gap-4 text-[10px] font-black uppercase text-white/20">
             <span>Caller / Timestamp</span>
             <span className="text-center">Duration</span>
@@ -209,10 +209,10 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
                 <TableRow>
                   <TableCell colSpan={4} className="py-24">
                     <div className="flex flex-col items-center justify-center text-center space-y-4">
-                      <div className="size-16 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center animate-pulse">
+                      <div className="size-16 rounded-full bg-[#121216] border border-[#212129] flex items-center justify-center animate-pulse">
                         <Activity className="size-8 text-white/10" />
                       </div>
-                      <p className="text-sm font-bold text-white uppercase tracking-widest">Monitoring Live Stream...</p>
+                      <p className="text-sm font-semibold text-white uppercase tracking-widest">Monitoring Live Stream...</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -221,11 +221,11 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
                   <TableRow
                     key={call.id}
                     onClick={() => handleOpen(call)}
-                    className="group cursor-pointer hover:bg-[#40E0FF]/[0.03] transition-all"
+                    className="group cursor-pointer hover:bg-[#2DD4BF]/[0.03] transition-all"
                   >
                     <TableCell className="px-6 py-4">
                       <div className="text-left flex flex-col">
-                        <span className="text-sm font-bold text-white group-hover:text-[#40E0FF] transition-colors">
+                        <span className="text-sm font-semibold text-white group-hover:text-[#2DD4BF] transition-colors">
                           {call.client_name || 'Anonymous Signal'}
                         </span>
                         <span className="text-[10px] font-mono text-white/30">
@@ -237,7 +237,7 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
                       {call.duration_min?.toFixed(1)}m
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge className="bg-emerald-500/10 text-emerald-400 border-0 text-[9px] font-black">
+                      <Badge className="bg-[#2DD4BF]/10 text-[#2DD4BF] border-0 text-[9px] font-black">
                         +{call.minutes_saved}m
                       </Badge>
                     </TableCell>
@@ -254,25 +254,25 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
 
       {/* Sidebar */}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent className="bg-[#0A0A0B] border-l border-white/10 text-white sm:max-w-md p-0 flex flex-col">
-          <SheetHeader className="p-6 border-b border-white/5 bg-white/[0.02]">
-            <SheetTitle className="text-2xl font-bold tracking-tighter text-white">Interaction Data</SheetTitle>
+        <SheetContent className="bg-[#0A0A0B] border-l border-[#212129] text-white sm:max-w-md p-0 flex flex-col">
+          <SheetHeader className="p-6 border-b border-[#212129] bg-[#121216]">
+            <SheetTitle className="text-2xl font-semibold tracking-tighter text-white">Interaction Data</SheetTitle>
             <div className="flex gap-2 mt-2">
               <span className="text-sm font-semibold text-white/70">{selected?.client_name || 'Unknown Caller'}</span>
-              <Badge variant="outline" className="border-white/10 text-white/40">{selected?.patient_phone}</Badge>
+              <Badge variant="outline" className="border-[#212129] text-white/40">{selected?.patient_phone}</Badge>
             </div>
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-8">
             {loading ? (
-              <div className="h-40 animate-pulse bg-white/5 rounded-xl" />
+              <div className="h-40 animate-pulse bg-black/20 rounded-xl" />
             ) : (
               <>
                 {/* Transcript FIRST */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="text-[10px] font-black uppercase text-white/20 tracking-widest">Live Stream Transcript</h4>
-                    <Badge className="bg-white/5 text-white/40 border border-white/10 text-[9px] font-black uppercase tracking-widest">
+                    <Badge className="bg-black/20 text-white/40 border border-[#212129] text-[9px] font-black uppercase tracking-widest">
                       Aya Voice Log
                     </Badge>
                   </div>
@@ -290,8 +290,8 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
                             className={cn(
                               'mb-2 text-[9px] font-black uppercase tracking-widest',
                               msg.role === 'agent'
-                                ? 'bg-white/5 text-white/40 border border-white/10'
-                                : 'bg-[#40E0FF]/10 text-[#40E0FF] border border-[#40E0FF]/20'
+                                ? 'bg-black/20 text-white/40 border border-[#212129]'
+                                : 'bg-[#2DD4BF]/10 text-[#2DD4BF] border border-[#2DD4BF]/20'
                             )}
                           >
                             {msg.role === 'agent' ? 'Aya' : 'Patient'}
@@ -300,8 +300,8 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
                             className={cn(
                               'px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-[0_10px_30px_rgba(0,0,0,0.25)]',
                               msg.role === 'agent'
-                                ? 'bg-white/5 border border-white/5 text-white/80 rounded-tl-none'
-                                : 'bg-[#40E0FF]/10 border border-[#40E0FF]/20 text-[#40E0FF] rounded-tr-none'
+                                ? 'bg-black/20 border border-[#212129] text-white/80 rounded-tl-none'
+                                : 'bg-[#2DD4BF]/10 border border-[#2DD4BF]/20 text-[#2DD4BF] rounded-tr-none'
                             )}
                           >
                             {msg.content}
@@ -315,9 +315,9 @@ export function CallsClient({ initialCalls }: { initialCalls: CallLogRow[] }) {
                 </div>
 
                 {/* Summary SECOND */}
-                <Card className="glass-panel border border-white/10 bg-white/[0.03]">
+                <Card className="glass-panel border border-[#212129] bg-[#121216]">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-[10px] font-black uppercase text-[#40E0FF] tracking-widest">
+                    <CardTitle className="text-[10px] font-black uppercase text-[#2DD4BF] tracking-widest">
                       Aya Summary
                     </CardTitle>
                   </CardHeader>

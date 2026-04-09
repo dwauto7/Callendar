@@ -45,9 +45,9 @@ export function CreditsChartsClient({ calls }: { calls: UsageEntry[] }) {
 
   return (
     <div ref={ref} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="glass-panel p-6 rounded-3xl border border-white/5 min-h-[260px]">
+      <div className="glass-panel p-6 rounded-3xl border border-[#212129] min-h-[260px]">
         <div className="flex items-center gap-2 mb-6">
-          <Activity className="size-4 text-[#40E0FF]" />
+          <Activity className="size-4 text-[#2DD4BF]" />
           <p className="text-[10px] font-black uppercase tracking-widest text-white/40">
             Throughput (min)
           </p>
@@ -55,11 +55,11 @@ export function CreditsChartsClient({ calls }: { calls: UsageEntry[] }) {
         {visible ? (
           <DailyUsageChart calls={calls} />
         ) : (
-          <div className="h-[200px] rounded-xl bg-white/[0.02] animate-pulse" />
+          <div className="h-[200px] rounded-xl bg-[#121216] animate-pulse" />
         )}
       </div>
 
-      <div className="glass-panel p-6 rounded-3xl border border-white/5 min-h-[200px]">
+      <div className="glass-panel p-6 rounded-3xl border border-[#212129] min-h-[200px]">
         <div className="flex items-center gap-2 mb-6">
           <DollarSign className="size-4 text-amber-500" />
           <p className="text-[10px] font-black uppercase tracking-widest text-white/40">
@@ -69,9 +69,10 @@ export function CreditsChartsClient({ calls }: { calls: UsageEntry[] }) {
         {visible ? (
           <UsageCostChart calls={calls} />
         ) : (
-          <div className="h-[120px] rounded-xl bg-white/[0.02] animate-pulse" />
+          <div className="h-[120px] rounded-xl bg-[#121216] animate-pulse" />
         )}
       </div>
     </div>
   )
 }
+

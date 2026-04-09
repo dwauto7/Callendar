@@ -64,97 +64,84 @@ const tiers = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-20 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
-      {/* Subtle background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none opacity-30" />
-
-      <div className="relative max-w-7xl mx-auto px-6">
+    <section id="pricing" className="py-24 md:py-32 relative overflow-hidden">
+      <div className="relative max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">
+          <div className="inline-flex items-center gap-2 border border-[#2DD4BF]/20 bg-[#2DD4BF]/10 rounded-full px-4 py-1.5 mb-6">
+            <span className="text-[10px] font-black text-[#2DD4BF] uppercase tracking-[0.25em]">Pricing</span>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-semibold text-white mb-4" style={{ fontFamily: 'var(--font-syne)' }}>
             Simple, transparent pricing
           </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+          <p className="text-white/40 text-sm max-w-2xl mx-auto leading-relaxed">
             Flat monthly rates with no surprises. All plans include dashboard access, full call handling, transcripts, and 24/7 support.
           </p>
         </div>
 
-        {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch perspective">
-          {tiers.map((tier, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+          {tiers.map((tier) => (
             <div
               key={tier.name}
-              className={`relative rounded-2xl transition-all duration-300 ${
-                tier.highlight
-                  ? 'ring-2 ring-cyan-500/50 shadow-2xl shadow-cyan-500/20 md:scale-105'
-                  : 'hover:shadow-lg hover:shadow-slate-800/50'
-              }`}
-              style={{
-                background: tier.highlight
-                  ? 'linear-gradient(135deg, rgba(6, 28, 43, 0.8) 0%, rgba(8, 51, 68, 0.7) 100%)'
-                  : 'linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(20, 28, 50, 0.5) 100%)',
-                backdropFilter: 'blur(12px)',
-                border: tier.highlight ? '1px solid rgba(34, 211, 238, 0.3)' : '1px solid rgba(71, 85, 105, 0.3)',
-              }}
+              className={
+                `relative rounded-2xl border ${
+                  tier.highlight
+                    ? 'border-[#2DD4BF]/40 shadow-[0_0_20px_rgba(45,212,191,0.15)]'
+                    : 'border-[#212129]'
+                } bg-[#121216]`
+              }
             >
-              {/* Badge for highlighted tier */}
               {tier.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                  <div
-                    className="px-3 py-1 rounded-full text-xs font-semibold text-white"
-                    style={{ backgroundColor: 'rgb(34, 211, 238)' }}
-                  >
+                  <div className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-[#2DD4BF] bg-[#2DD4BF]/10 border border-[#2DD4BF]/20">
                     {tier.badge}
                   </div>
                 </div>
               )}
 
-              <div className="p-8">
-                {/* Tier Name */}
+              <div className="p-8 flex flex-col h-full">
                 <div className="mb-6">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
+                  <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3">
                     {tier.name}
                   </p>
                   <div className="mb-4">
-                    <span className="text-5xl font-bold text-white">{tier.price}</span>
-                    <span className="text-slate-400 font-normal ml-2">{tier.period}</span>
+                    <span className="text-4xl font-semibold text-white" style={{ fontFamily: 'var(--font-syne)' }}>{tier.price}</span>
+                    <span className="text-white/40 font-normal ml-2">{tier.period}</span>
                   </div>
-                  <p className="text-sm text-slate-400">{tier.setupFee}</p>
+                  <p className="text-sm text-white/40">{tier.setupFee}</p>
                 </div>
 
-                {/* Description */}
-                <p className="text-sm text-slate-300 mb-6 leading-relaxed">{tier.description}</p>
+                <p className="text-sm text-white/40 mb-6 leading-relaxed">{tier.description}</p>
 
-                {/* CTA Button */}
                 <Button
                   asChild
-                  className={`w-full h-12 rounded-xl font-semibold text-sm mb-8 transition-all duration-200 ${
-                    tier.highlight
-                      ? 'bg-cyan-500 hover:bg-cyan-600 text-slate-950'
-                      : 'bg-slate-700 hover:bg-slate-600 text-white border border-slate-600'
-                  }`}
+                  className={
+                    `w-full h-auto rounded-full font-black uppercase tracking-widest text-[11px] mb-8 transition-colors ${
+                      tier.highlight
+                        ? 'bg-[#2DD4BF] text-[#0A0A0B] hover:bg-[#2DD4BF]/90'
+                        : 'border border-[#212129] text-white/60 hover:border-[#2DD4BF]/40 hover:text-white'
+                    }`
+                  }
                 >
                   <a href="https://calendly.com/dwautomate7/30min" target="_blank" rel="noopener noreferrer">
                     {tier.cta}
                   </a>
                 </Button>
 
-                {/* Features List */}
                 <ul className="space-y-3 mb-8 flex-1">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-slate-300 leading-snug">{feature}</span>
+                      <CheckCircle2 className="w-4 h-4 text-[#2DD4BF] shrink-0 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-white/40 leading-snug">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                {/* Divider */}
-                <div className="border-t border-slate-700/50 pt-6">
+                <div className="border-t border-[#212129] pt-6">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-slate-500">
-                      <span className="font-semibold text-slate-400">{tier.credits}</span>
+                    <p className="text-xs text-white/40">
+                      <span className="font-semibold text-white/60">{tier.credits}</span>
                     </p>
-                    <p className="text-xs text-slate-500">{tier.overageRate}</p>
+                    <p className="text-xs text-white/40">{tier.overageRate}</p>
                   </div>
                 </div>
               </div>
@@ -162,12 +149,11 @@ export function Pricing() {
           ))}
         </div>
 
-        {/* Bottom CTA Section */}
         <div className="mt-16 text-center">
-          <p className="text-slate-400 text-sm">
-            Need something custom? <a href="tel:+601114399466" className="text-cyan-400 hover:text-cyan-300 font-semibold">Contact us</a>
+          <p className="text-white/40 text-sm">
+            Need something custom? <a href="tel:+601114399466" className="text-[#2DD4BF] hover:text-[#2DD4BF]/80 font-semibold">Contact us</a>
           </p>
-          <p className="text-xs text-slate-500 mt-4">
+          <p className="text-xs text-white/30 mt-4">
             All plans include on-site staff training for PJ/KL clinics
           </p>
         </div>

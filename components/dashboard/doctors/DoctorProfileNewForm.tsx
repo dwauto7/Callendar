@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Loader2, Save } from 'lucide-react'
 
 const inputCls =
-  'w-full h-9 rounded-md border border-[#1E2128] bg-[#0D0F12] px-3 text-sm text-[#F1F5F9] placeholder:text-[#64748B]/50 focus:border-[#10B981] focus:outline-none transition-colors'
+  'w-full h-9 rounded-md border border-[#212129] bg-[#0D0D11] px-3 text-sm text-white placeholder:text-white/30/50 focus:border-[#2DD4BF] focus:outline-none transition-colors'
 
 export function DoctorProfileNewForm({
   clinicConfigId,
@@ -50,9 +50,9 @@ export function DoctorProfileNewForm({
   }
 
   return (
-    <div className="rounded-xl border border-[#1E2128] bg-[#111318] p-5 space-y-4">
+    <div className="rounded-xl border border-[#212129] bg-[#121216] p-5 space-y-4">
       <div>
-        <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+        <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
           Display Name
         </Label>
         <input
@@ -65,7 +65,7 @@ export function DoctorProfileNewForm({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             Role
           </Label>
           <select
@@ -78,7 +78,7 @@ export function DoctorProfileNewForm({
           </select>
         </div>
         <div>
-          <Label className="text-xs text-[#64748B] uppercase tracking-widest font-semibold mb-1.5 block">
+          <Label className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-1.5 block">
             Google Calendar ID
           </Label>
           <input
@@ -94,7 +94,7 @@ export function DoctorProfileNewForm({
         <Button
           onClick={handleCreate}
           disabled={saving}
-          className="bg-[#10B981] hover:bg-[#10B981]/90 text-[#0A0A0A] font-semibold px-6"
+          className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold px-6"
         >
           {saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
           {saving ? 'Creating…' : 'Create Profile'}
@@ -103,3 +103,4 @@ export function DoctorProfileNewForm({
     </div>
   )
 }
+

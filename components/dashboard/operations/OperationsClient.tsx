@@ -68,13 +68,13 @@ function buildCalendar(month: Date) {
 }
 
 const STATUS_CONFIG = {
-  Booked:      { dot: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  Booked:      { dot: 'bg-[#2DD4BF]', badge: 'bg-[#2DD4BF]/10 text-[#2DD4BF] border-[#2DD4BF]/20' },
   Cancelled:   { dot: 'bg-red-400',     badge: 'bg-red-500/10 text-red-400 border-red-500/20' },
   Rescheduled: { dot: 'bg-amber-400',   badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
 } as const
 
 function statusConfig(status: string | null) {
-  return STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ?? { dot: 'bg-white/20', badge: 'bg-white/5 text-white/40 border-white/10' }
+  return STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ?? { dot: 'bg-black/20', badge: 'bg-black/20 text-white/40 border-[#212129]' }
 }
 
 export function OperationsClient({ clinicId }: { clinicId: string }) {
@@ -122,7 +122,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
 
   if (error) return (
     <div className="border border-red-500/20 rounded-xl p-6 text-red-400 text-sm">
-      <p className="font-bold mb-1">Error loading operations data</p>
+      <p className="font-semibold mb-1">Error loading operations data</p>
       <p className="text-red-400/60">{error.message}</p>
     </div>
   )
@@ -133,8 +133,8 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
       {/* ── CREDITS STRIP (Color-Coordinated) ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Balance Available - Cyan */}
-        <div className="rounded-xl p-4 bg-[#40E0FF]/5 border border-[#40E0FF]/20 flex flex-col md:block">
-          <p className="text-[10px] font-semibold text-[#40E0FF]/70 uppercase tracking-[0.15em] mb-2">
+        <div className="rounded-xl p-4 bg-[#2DD4BF]/5 border border-[#2DD4BF]/20 flex flex-col md:block">
+          <p className="text-[10px] font-semibold text-[#2DD4BF]/70 uppercase tracking-[0.15em] mb-2">
             Balance Available
           </p>
           <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
@@ -155,8 +155,8 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
         </div>
 
         {/* Total Minutes - Emerald */}
-        <div className="rounded-xl p-4 bg-emerald-500/5 border border-emerald-500/20 flex flex-col md:block">
-          <p className="text-[10px] font-semibold text-emerald-500/70 uppercase tracking-[0.15em] mb-2">
+        <div className="rounded-xl p-4 bg-[#2DD4BF]/5 border border-[#2DD4BF]/20 flex flex-col md:block">
+          <p className="text-[10px] font-semibold text-[#2DD4BF]/70 uppercase tracking-[0.15em] mb-2">
             Total Minutes
           </p>
           <p className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-dm-sans)' }}>
@@ -173,7 +173,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
           placeholder="Search patient or phone..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="pl-9 h-9 bg-[#0D0F12] border-white/[0.06] text-white/80 placeholder:text-white/20 text-sm focus:border-white/20 transition-colors"
+          className="pl-9 h-9 bg-[#0D0D11] border-[#212129] text-white/80 placeholder:text-white/20 text-sm focus:border-white/20 transition-colors"
         />
         {search && (
           <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -209,7 +209,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                   <button
                     key={appt.id}
                     onClick={() => setDetailAppt(appt)}
-                    className="group w-full text-left bg-[#0D0F12] border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.12] hover:bg-[#111318] transition-all duration-150"
+                    className="group w-full text-left bg-[#0D0D11] border border-[#212129] rounded-xl p-4 hover:border-white/[0.12] hover:bg-[#121216] transition-all duration-150"
                   >
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div className="min-w-0">
@@ -225,7 +225,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                       <span className="text-xs text-white/30">
                         {fmtDateLabel(appt.appointment_date)} · {fmtTime(appt.appointment_time)}
                       </span>
-                      <span className="text-xs font-bold text-emerald-400 tabular-nums">
+                      <span className="text-xs font-semibold text-[#2DD4BF] tabular-nums">
                         RM {appt.projected_revenue?.toFixed(2) || '0.00'}
                       </span>
                     </div>
@@ -245,7 +245,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
             {visibleAppointments < filteredAppointments.length && (
               <button
                 onClick={() => setVisibleAppointments(v => v + 40)}
-                className="py-2 text-xs text-white/30 hover:text-white/60 transition-colors uppercase tracking-widest font-bold"
+                className="py-2 text-xs text-white/30 hover:text-white/60 transition-colors uppercase tracking-widest font-semibold"
               >
                 Load more
               </button>
@@ -254,16 +254,16 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
         </div>
 
         {/* RIGHT — CALENDAR */}
-        <div className="bg-[#0D0F12] border border-white/[0.06] rounded-xl p-5">
+        <div className="bg-[#0D0D11] border border-[#212129] rounded-xl p-5">
           {/* Month Nav */}
           <div className="flex items-center justify-between mb-5">
-            <p className="text-sm font-bold text-white/80">{monthLabel}</p>
+            <p className="text-sm font-semibold text-white/80">{monthLabel}</p>
             <div className="flex gap-1">
               {[
                 { icon: ChevronLeft, onClick: () => setMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1)) },
                 { icon: ChevronRight, onClick: () => setMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1)) },
               ].map(({ icon: Icon, onClick }, i) => (
-                <button key={i} onClick={onClick} className="size-7 flex items-center justify-center rounded-lg hover:bg-white/[0.06] transition-colors">
+                <button key={i} onClick={onClick} className="size-7 flex items-center justify-center rounded-xl hover:bg-[#0D0D11] transition-colors">
                   <Icon className="size-3.5 text-white/40" />
                 </button>
               ))}
@@ -296,10 +296,10 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                   key={dateStr}
                   onClick={() => setSelectedDate(isSelected ? null : dateStr)}
                   className={cn(
-                    'relative aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all duration-150',
+                    'relative aspect-square rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all duration-150',
                     !isCurrentMonth && 'opacity-20',
-                    isSelected && 'bg-white/10 ring-1 ring-white/20',
-                    !isSelected && isCurrentMonth && 'hover:bg-white/[0.04]',
+                    isSelected && 'bg-black/20 ring-1 ring-white/20',
+                    !isSelected && isCurrentMonth && 'hover:bg-[#121216]',
                     isToday && !isSelected && 'ring-1 ring-white/15',
                   )}
                 >
@@ -312,7 +312,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                   </span>
                   {dayAppts.length > 0 && (
                     <div className="flex gap-0.5 items-center">
-                      {hasBooked      && <span className="size-1 rounded-full bg-emerald-400" />}
+                      {hasBooked      && <span className="size-1 rounded-full bg-[#2DD4BF]" />}
                       {hasRescheduled && <span className="size-1 rounded-full bg-amber-400" />}
                       {hasCancelled   && <span className="size-1 rounded-full bg-red-400" />}
                     </div>
@@ -325,13 +325,13 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
           {/* Legend */}
           <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/[0.05]">
             {[
-              { color: 'bg-emerald-400', label: 'Booked' },
+              { color: 'bg-[#2DD4BF]', label: 'Booked' },
               { color: 'bg-amber-400',   label: 'Rescheduled' },
               { color: 'bg-red-400',     label: 'Cancelled' },
             ].map(({ color, label }) => (
               <div key={label} className="flex items-center gap-1.5">
                 <span className={cn('size-1.5 rounded-full', color)} />
-                <span className="text-[9px] uppercase tracking-widest font-bold text-white/25">{label}</span>
+                <span className="text-[9px] uppercase tracking-widest font-semibold text-white/25">{label}</span>
               </div>
             ))}
           </div>
@@ -339,7 +339,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
       </div>
 
       {/* ── VOICE LOGS ── */}
-      <div className="bg-[#0D0F12] border border-white/[0.06] rounded-xl overflow-hidden">
+      <div className="bg-[#0D0D11] border border-[#212129] rounded-xl overflow-hidden">
         <div className="px-5 py-3.5 border-b border-white/[0.05] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Mic className="size-3.5 text-white/25" />
@@ -356,7 +356,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
               <button
                 key={call.id}
                 onClick={() => { setSelectedCall(call); setTranscriptOpen(true) }}
-                className="px-5 py-3.5 hover:bg-white/[0.02] transition-colors text-left flex items-center justify-between gap-4"
+                className="px-5 py-3.5 hover:bg-[#121216] transition-colors text-left flex items-center justify-between gap-4"
               >
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-white/80 truncate">{call.client_name || 'Unknown Caller'}</p>
@@ -388,14 +388,14 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end lg:items-center lg:justify-end">
           <div className="w-full lg:w-[440px] bg-[#0A0B0E] border border-white/[0.08] h-full lg:h-auto lg:max-h-[90vh] lg:rounded-2xl lg:mr-6 flex flex-col overflow-hidden">
 
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#212129]">
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/25 mb-0.5">Appointment</p>
-                <h2 className="text-base font-bold text-white">{detailAppt.patient_name || '—'}</h2>
+                <h2 className="text-base font-semibold text-white">{detailAppt.patient_name || '—'}</h2>
               </div>
               <button
                 onClick={() => setDetailAppt(null)}
-                className="size-8 flex items-center justify-center rounded-lg hover:bg-white/[0.06] transition-colors"
+                className="size-8 flex items-center justify-center rounded-xl hover:bg-[#0D0D11] transition-colors"
               >
                 <X className="size-4 text-white/40" />
               </button>
@@ -428,7 +428,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                 ))}
                 <div className="flex items-center justify-between py-2.5">
                   <span className="text-xs text-white/30">Revenue</span>
-                  <span className="text-sm font-bold text-emerald-400 tabular-nums">
+                  <span className="text-sm font-semibold text-[#2DD4BF] tabular-nums">
                     RM {detailAppt.projected_revenue?.toFixed(2) || '0.00'}
                   </span>
                 </div>
@@ -440,7 +440,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                 return linkedCall ? (
                   <div className="space-y-3">
                     <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/25">Call Record</p>
-                    <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 space-y-2">
+                    <div className="bg-[#121216] border border-[#212129] rounded-xl p-4 space-y-2">
                       {[
                         { label: 'Duration',       value: `${linkedCall.duration_min?.toFixed(1) || '0'} min` },
                         { label: 'Minutes Saved',  value: `${linkedCall.minutes_saved?.toFixed(1) || '0'} min` },
@@ -451,7 +451,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                         </div>
                       ))}
                       {linkedCall.is_after_hours && (
-                        <div className="pt-2 border-t border-white/[0.06]">
+                        <div className="pt-2 border-t border-[#212129]">
                           <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             After Hours
                           </span>
@@ -460,7 +460,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                     </div>
                     <button
                       onClick={() => { setDetailAppt(null); setSelectedCall(linkedCall); setTranscriptOpen(true) }}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-white/50 text-xs font-bold hover:bg-white/[0.06] hover:text-white/70 hover:border-white/20 transition-all"
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#212129] bg-[#121216] text-white/50 text-xs font-semibold hover:bg-[#0D0D11] hover:text-white/70 hover:border-[#2DD4BF]/20 transition-all"
                     >
                       <PhoneCall className="size-3.5" />
                       View Transcript

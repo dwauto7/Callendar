@@ -31,7 +31,7 @@ export function OperationsContent({
     return (
       <div className="px-6 py-8 lg:px-10 lg:py-12 max-w-[1600px] mx-auto">
         <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 text-red-400">
-          <p className="font-bold">Error loading operations data</p>
+          <p className="font-semibold">Error loading operations data</p>
           <p className="text-sm text-red-400/70 mt-1">{error.message}</p>
         </div>
       </div>
@@ -44,7 +44,7 @@ export function OperationsContent({
       <div className="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div>
           <h1
-            className="text-4xl md:text-5xl font-bold text-white tracking-tighter leading-none"
+            className="text-4xl md:text-5xl font-semibold text-white tracking-tighter leading-none"
             style={{ fontFamily: 'var(--font-syne)' }}
           >
             {clinicName}
@@ -63,14 +63,14 @@ export function OperationsContent({
             className={cn(
               'inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[11px] font-black uppercase tracking-widest transition-all duration-300',
               isActive
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+                ? 'bg-[#2DD4BF]/10 border-[#2DD4BF]/20 text-[#2DD4BF] shadow-[0_0_12px_rgba(16,185,129,0.15)]'
                 : 'bg-red-500/10 border-red-500/20 text-red-400',
             )}
           >
             <span
               className={cn(
                 'size-2 rounded-full shrink-0',
-                isActive ? 'bg-emerald-500 animate-pulse' : 'bg-red-500',
+                isActive ? 'bg-[#2DD4BF] animate-pulse' : 'bg-red-500',
               )}
             />
             {isActive ? 'Active' : 'Inactive'}
@@ -80,41 +80,41 @@ export function OperationsContent({
 
       {/* ── Quick stats ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4">
+        <div className="bg-[#121216] border border-[#212129] rounded-2xl p-4">
           <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] mb-2">
             Engine Capacity
           </p>
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-semibold text-white">
             {balance.toLocaleString()}
             <span className="text-xs font-medium text-white/30 ml-1">mins</span>
           </p>
         </div>
 
-        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4">
+        <div className="bg-[#121216] border border-[#212129] rounded-2xl p-4">
           <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] mb-2">
             Minutes Used
           </p>
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-semibold text-white">
             {minutesUsed.toLocaleString()}
             <span className="text-xs font-medium text-white/30 ml-1">mins</span>
           </p>
         </div>
 
-        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4">
+        <div className="bg-[#121216] border border-[#212129] rounded-2xl p-4">
           <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] mb-2">
             Total Allocation
           </p>
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-semibold text-white">
             {totalCredits.toLocaleString()}
             <span className="text-xs font-medium text-white/30 ml-1">mins</span>
           </p>
         </div>
 
-        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4">
+        <div className="bg-[#121216] border border-[#212129] rounded-2xl p-4">
           <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em] mb-2">
             Active Appointments
           </p>
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-semibold text-white">
             {appointmentCount}
             <span className="text-xs font-medium text-white/30 ml-1">booked</span>
           </p>
@@ -124,7 +124,7 @@ export function OperationsContent({
       {/* ── Two-column layout ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Appointments Calendar (left - 2 cols) */}
-        <div className="lg:col-span-2 bg-white/[0.02] border border-white/5 rounded-2xl p-6">
+        <div className="lg:col-span-2 bg-[#121216] border border-[#212129] rounded-2xl p-6">
           <h2 className="text-sm font-black text-white uppercase tracking-widest mb-4">
             Appointment Schedule
           </h2>
@@ -138,11 +138,11 @@ export function OperationsContent({
               {activeAppointments.map((apt) => (
                 <div
                   key={apt.id}
-                  className="bg-white/[0.02] border border-white/5 rounded-lg p-3 hover:bg-white/[0.04] transition-all"
+                  className="bg-[#121216] border border-[#212129] rounded-xl p-3 hover:bg-[#121216] transition-all"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold text-white truncate">
+                      <p className="text-sm font-semibold text-white truncate">
                         {apt.patient_name || apt.patient_phone || 'Unknown'}
                       </p>
                       <p className="text-xs text-white/40 font-mono">
@@ -157,7 +157,7 @@ export function OperationsContent({
                         className={cn(
                           'inline-block text-xs font-black px-2 py-1 rounded-md',
                           apt.status === 'booked'
-                            ? 'bg-[#40E0FF]/10 text-[#40E0FF]'
+                            ? 'bg-[#2DD4BF]/10 text-[#2DD4BF]'
                             : 'bg-amber-500/10 text-amber-500'
                         )}
                       >
@@ -177,7 +177,7 @@ export function OperationsContent({
         </div>
 
         {/* Call Logs (right - 1 col) */}
-        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
+        <div className="bg-[#121216] border border-[#212129] rounded-2xl p-6">
           <h2 className="text-sm font-black text-white uppercase tracking-widest mb-4">
             Recent Calls
           </h2>
@@ -191,11 +191,11 @@ export function OperationsContent({
               {callLogs.slice(0, 20).map((call) => (
                 <div
                   key={call.id}
-                  className="bg-white/[0.02] border border-white/5 rounded-lg p-3 hover:bg-white/[0.04] transition-all"
+                  className="bg-[#121216] border border-[#212129] rounded-xl p-3 hover:bg-[#121216] transition-all"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-bold text-white truncate">
+                      <p className="text-xs font-semibold text-white truncate">
                         {call.client_name || call.patient_phone || 'Incoming'}
                       </p>
                       <p className="text-[10px] text-white/40 font-mono truncate">
@@ -211,7 +211,7 @@ export function OperationsContent({
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-xs font-bold text-[#40E0FF]">
+                      <p className="text-xs font-semibold text-[#2DD4BF]">
                         {Number(call.duration_min).toFixed(1)}m
                       </p>
                       {call.is_after_hours && (
