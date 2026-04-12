@@ -5,10 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertCircle, CheckCircle, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 
 interface InviteValidationResponse {
   valid: boolean
@@ -16,6 +14,7 @@ interface InviteValidationResponse {
   clinicId?: string
   role?: string
   expiresAt?: string
+  error?: string
 }
 
 export default function AcceptInvitePage() {
@@ -25,33 +24,11 @@ export default function AcceptInvitePage() {
 
   const token = searchParams.get('token')
 
-  const [fullName, setFullName] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
-
   const [validating, setValidating] = useState(true)
   const [inviteValid, setInviteValid] = useState(false)
   const [prefilledEmail, setPrefilledEmail] = useState<string>('')
-  const [inviteExpired, setInviteExpired] = useState(false)
-
-  const isValidPassword = (password: string): boolean => {
-    return password.length >= 8
-  }
-
-  const passwordStrength = (password: string): number => {
-    if (password.length === 0) return 0
-    let strength = 1
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1
-    if (/\d/.test(password)) strength += 1
-    if (/[^a-zA-Z\d]/.test(password)) strength += 1
-    return Math.min(strength, 4)
-  }
+  const [error, setError] = useState<string | null>(null)
+  const [signingIn, setSigningIn] = useState(false)
 
   useEffect(() => {
     const validateInvite = async () => {
@@ -74,15 +51,14 @@ export default function AcceptInvitePage() {
           setPrefilledEmail(data.email || '')
           setInviteValid(true)
           setError(null)
+
+          // Store token in a short-lived cookie so the OAuth callback can pick it up
+          document.cookie = `invite_token=${token}; path=/; max-age=600; SameSite=Lax`
         } else {
           if (response.status === 410) {
-            setInviteExpired(true)
             setError('This invite link has expired. Please contact your clinic admin for a new link.')
           } else {
-            setError(
-              (data as any)?.error ||
-              'This invite link is invalid. Please contact your clinic admin.'
-            )
+            setError(data.error || 'This invite link is invalid. Please contact your clinic admin.')
           }
           setInviteValid(false)
         }
@@ -98,114 +74,51 @@ export default function AcceptInvitePage() {
     validateInvite()
   }, [token])
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleGoogleSignIn = async () => {
+    setSigningIn(true)
     setError(null)
 
-    if (!fullName.trim()) {
-      setError('Full name is required')
-      return
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (oauthError) {
+      console.error('OAuth error:', oauthError)
+      setError('Failed to start Google sign-in. Please try again.')
+      setSigningIn(false)
     }
-
-    if (fullName.trim().length < 2) {
-      setError('Full name must be at least 2 characters')
-      return
-    }
-
-    if (!isValidPassword(password)) {
-      setError('Password must be at least 8 characters')
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      const response = await fetch('/api/auth/accept-invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          invite_token: token,
-          password,
-          full_name: fullName.trim(),
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError((data as any)?.error || 'Something went wrong. Please try again.')
-        return
-      }
-
-      const responseEmail = (data as any)?.email
-      if (!responseEmail) {
-        setError('Server error: no email returned. Please contact support.')
-        return
-      }
-
-      const { error: loginError, data: session } =
-        await supabase.auth.signInWithPassword({
-          email: responseEmail,
-          password,
-        })
-
-      if (loginError) {
-        console.error('Login error:', loginError)
-        setError('Account created successfully! Please log in manually.')
-        setTimeout(() => router.push('/auth/login'), 2000)
-        return
-      }
-
-      if (!session?.user) {
-        setError('Session not established. Please log in manually.')
-        setTimeout(() => router.push('/auth/login'), 2000)
-        return
-      }
-
-      if (session.user.email !== responseEmail) {
-        setError('Session validation failed. Please log in manually.')
-        setTimeout(() => router.push('/auth/login'), 2000)
-        return
-      }
-
-      setSuccess(true)
-      setTimeout(() => router.push('/auth/post-auth'), 2000)
-
-    } catch (err) {
-      console.error('Accept invite error:', err)
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Network error. Please check your connection and try again.'
-      )
-    } finally {
-      setLoading(false)
-    }
+    // If no error, browser redirects — no further action needed
   }
 
+  // ── Loading state ──────────────────────────────────────────────
   if (validating) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
       </div>
     )
   }
 
+  // ── Invalid / expired invite ───────────────────────────────────
   if (!inviteValid) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
+        <Card className="max-w-md w-full bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-red-500">Invalid Invite</CardTitle>
-            <CardDescription>{error}</CardDescription>
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-400" />
+              <CardTitle className="text-red-400">Invalid Invite</CardTitle>
+            </div>
+            <CardDescription className="text-slate-400">{error}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push('/auth/login')} className="w-full">
+            <Button
+              onClick={() => router.push('/auth/login')}
+              className="w-full bg-teal-600 hover:bg-teal-500"
+            >
               Back to Login
             </Button>
           </CardContent>
@@ -214,50 +127,61 @@ export default function AcceptInvitePage() {
     )
   }
 
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <CheckCircle className="w-12 h-12 text-green-500" />
-        <p className="text-white ml-2">Account created! Redirecting...</p>
-      </div>
-    )
-  }
-
+  // ── Valid invite — show Google sign-in ─────────────────────────
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900">
-      <Card className="max-w-md w-full">
-        <CardHeader>
-          <CardTitle>Create Account</CardTitle>
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
+      <Card className="max-w-md w-full bg-slate-800 border-slate-700">
+        <CardHeader className="text-center">
+          <CardTitle className="text-white text-2xl">You're invited</CardTitle>
+          <CardDescription className="text-slate-400">
+            {prefilledEmail
+              ? `Joining as ${prefilledEmail}`
+              : 'Sign in with Google to accept your invite and access the clinic dashboard.'}
+          </CardDescription>
         </CardHeader>
 
-        <CardContent>
-          {error && <Alert><AlertDescription>{error}</AlertDescription></Alert>}
+        <CardContent className="space-y-4">
+          {error && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-red-900/30 border border-red-700 text-red-300 text-sm">
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+              {error}
+            </div>
+          )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
+          <Button
+            onClick={handleGoogleSignIn}
+            disabled={signingIn}
+            className="w-full bg-white hover:bg-slate-100 text-slate-900 font-medium flex items-center justify-center gap-3"
+          >
+            {signingIn ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              // Google "G" icon inline SVG — no external dependency
+              <svg className="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+              </svg>
+            )}
+            {signingIn ? 'Redirecting to Google...' : 'Continue with Google'}
+          </Button>
 
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-
-            <Input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? 'Creating...' : 'Create Account'}
-            </Button>
-          </form>
+          <p className="text-center text-xs text-slate-500">
+            By continuing, you agree to Beacon Horizons's Terms of Service and Privacy Policy.
+          </p>
         </CardContent>
       </Card>
     </div>

@@ -5,6 +5,7 @@ import { SpecialClosures } from '@/components/dashboard/settings/SpecialClosures
 import { ClinicSettingsPanel } from '@/components/dashboard/settings/ClinicSettingsPanel'
 import { ServicesSettingsPanel } from '@/components/dashboard/settings/ServicesSettingsPanel'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
+import { StaffSection } from '@/components/dashboard/settings/StaffSection'
 
 export const metadata = { title: 'Settings - Callendar' }
 
@@ -112,6 +113,7 @@ export default async function SettingsPage() {
         closures={closures}
         clinicConfigId={id}
       />
+      <StaffSection clinicConfigId={id} />
     </div>
   )
 }

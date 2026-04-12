@@ -16,6 +16,11 @@ type Profile = {
   google_calendar_id: string | null
   user_id: string | null
   user_email?: string | null
+  specialty: string | null
+  is_active: boolean | null
+  avatar_url: string | null
+  bio: string | null
+  phone: string | null
 }
 
 type Appointment = {
@@ -211,6 +216,11 @@ export function DoctorProfileEditorClient({
         google_calendar_id: calendarId || null,
         user_id: isAdmin ? (linkedUserId || null) : profile.user_id,
         user_email: isAdmin ? (staff.find(s => s.user_id === linkedUserId)?.user_email ?? profile.user_email ?? null) : profile.user_email ?? null,
+        specialty: profile.specialty,
+        is_active: profile.is_active ?? undefined,
+        avatar_url: profile.avatar_url,
+        bio: profile.bio,
+        phone: profile.phone,
       })
       .eq('id', profile.id)
       .eq('clinic_config_id', clinicConfigId)

@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { Resend } from "resend";
+import nodemailer from 'nodemailer'
 import { nanoid } from "nanoid";
 
 const supabase = createClient(
@@ -7,7 +7,14 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+const transporter = nodemailer.createTransport({
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+})
 
 export async function POST(request: Request) {
   try {
@@ -56,7 +63,7 @@ export async function POST(request: Request) {
     // Check if requester is admin (using is_admin() RLS context)
     // For this, we rely on the RLS policy to enforce it
     // But we can do a simpler check: verify role = 'admin'
-    if (requesterClinicUser.role !== "admin") {
+    if (!['admin', 'owner'].includes(requesterClinicUser.role)) {
       return Response.json(
         { error: "Only admins can invite staff" },
         { status: 403 }
@@ -137,7 +144,7 @@ export async function POST(request: Request) {
     const acceptInviteUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/accept-invite?token=${invite_token}`;
 
     try {
-      await resend.emails.send({
+      await transporter.sendMail({
         from: "Callendar <noreply@beaconhorizons.io>",
         to: invitee_email,
         subject: "You're invited to join Callendar",
@@ -164,6 +171,9 @@ export async function POST(request: Request) {
       });
     } catch (emailError) {
       console.error("Email send error:", emailError);
+      return Response.json(
+        { error: "Failed to send invite email", details: String(emailError) },
+      )
       // Don't fail the whole request if email fails—staff record is created
     }
 

@@ -1,7 +1,7 @@
-# AGENT CONFIG: AI BLIZZARD DASHBOARD
+# AGENT CONFIG: Beacon Horizons DASHBOARD
 
 ## Project Identity
-- **Business Name**: AI Blizzard
+- **Business Name**: Beacon Horizons
 - **Target Market**: Dental & Chiropractic Clinics (Malaysia / PJ / KL)
 - **Primary Product**: "Aya" (AI Voice Receptionist)
 - **Design Aesthetic**: "Cyber-Medical" (Dark mode, glass-morphism, #40E0FF Electric Blue accents, #0A0A0B backgrounds)
@@ -30,4 +30,4 @@
 ## Active Missions
 - [ ] **Fix TypeScript Errors**: Resolve the red underlines in `CallsClient.tsx` regarding the transcript mapping.
 - [ ] **Beautify Interaction Data**: Make the sidebar (Sheet) transcript bubbles look like a premium chat interface.
-- [ ] **Dashboard Polish**: Ensure the main log table reflects the "AI Blizzard" brand (clean, fast, professional).
+- [ ] **Dashboard Polish**: Ensure the main log table reflects the "Beacon Horizons" brand (clean, fast, professional).

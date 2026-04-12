@@ -8,11 +8,19 @@ import { WeekCalendarPanel } from '@/components/dashboard/profiles/WeekCalendarP
 import { AppointmentDrawer } from '@/components/dashboard/profiles/AppointmentDrawer'
 
 export type DoctorProfile = {
+  id: string
   display_name: string | null
   specialty: string | null
+  role: string | null
   user_email: string | null
+  user_id: string | null
   is_active: boolean | null
   avatar_url: string | null
+  google_calendar_id: string | null
+  clinic_config_id: string | null
+  bio: string | null
+  phone: string | null
+  created_at: string | null
   clinic_configs: { clinic_name: string | null } | null
 }
 
@@ -36,7 +44,7 @@ export type Appointment = {
   appointment_confirmed: boolean | null
 }
 
-type NextAppointment = {
+export type NextAppointment = {
   id: string
   patient_name: string | null
   appointment_date: string | null

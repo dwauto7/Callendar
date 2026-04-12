@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import type { CallLogRow } from '@/components/dashboard/operations/TranscriptDrawer'
+import { VoiceLogsEnhanced } from '@/components/dashboard/operations/VoiceLogsEnhanced'
 
 const TranscriptDrawer = dynamic(
   () => import('@/components/dashboard/operations/TranscriptDrawer').then(m => m.TranscriptDrawer),
@@ -85,8 +86,6 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
   const [search, setSearch] = useState('')
   const [visibleAppointments, setVisibleAppointments] = useState(80)
   const [detailAppt, setDetailAppt] = useState<AppointmentRow | null>(null)
-  const [transcriptOpen, setTranscriptOpen] = useState(false)
-  const [selectedCall, setSelectedCall] = useState<CallLogRow | null>(null)
   const deferredSearch = useDeferredValue(search)
 
   useEffect(() => { setAppointments(hookAppointments) }, [hookAppointments])
@@ -339,49 +338,7 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
       </div>
 
       {/* ── VOICE LOGS ── */}
-      <div className="bg-[#0D0D11] border border-[#212129] rounded-xl overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-white/[0.05] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Mic className="size-3.5 text-white/25" />
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">Voice Logs</p>
-          </div>
-          <p className="text-[10px] font-mono text-white/20">{callLogs?.length ?? 0} records</p>
-        </div>
-
-        <div className="flex flex-col divide-y divide-white/[0.04] max-h-[360px] overflow-y-auto">
-          {!callLogs || callLogs.length === 0 ? (
-            <p className="text-xs text-white/20 text-center py-10 uppercase tracking-widest">No voice logs</p>
-          ) : (
-            callLogs.map(call => (
-              <button
-                key={call.id}
-                onClick={() => { setSelectedCall(call); setTranscriptOpen(true) }}
-                className="px-5 py-3.5 hover:bg-[#121216] transition-colors text-left flex items-center justify-between gap-4"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-white/80 truncate">{call.client_name || 'Unknown Caller'}</p>
-                  <p className="text-xs text-white/30 mt-0.5">{call.patient_phone || '—'}</p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  {call.is_after_hours && (
-                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      After Hours
-                    </span>
-                  )}
-                  <span className="text-xs font-mono text-white/25">
-                    {call.duration_min?.toFixed(1) || '0'}m
-                  </span>
-                </div>
-              </button>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* ── TRANSCRIPT DRAWER ── */}
-      {transcriptOpen && selectedCall && (
-        <TranscriptDrawer open={transcriptOpen} onOpenChange={setTranscriptOpen} call={selectedCall} />
-      )}
+      <VoiceLogsEnhanced callLogs={callLogs || []} />
 
       {/* ── APPOINTMENT DETAIL PANEL ── */}
       {detailAppt && (
@@ -458,13 +415,6 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
                         </div>
                       )}
                     </div>
-                    <button
-                      onClick={() => { setDetailAppt(null); setSelectedCall(linkedCall); setTranscriptOpen(true) }}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#212129] bg-[#121216] text-white/50 text-xs font-semibold hover:bg-[#0D0D11] hover:text-white/70 hover:border-[#2DD4BF]/20 transition-all"
-                    >
-                      <PhoneCall className="size-3.5" />
-                      View Transcript
-                    </button>
                   </div>
                 ) : (
                   <p className="text-xs text-white/20 italic">No call record linked.</p>

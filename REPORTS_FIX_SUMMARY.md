@@ -170,7 +170,7 @@ After running the SQL + deploying the code:
 ## Next Steps (Optional Enhancements)
 
 - Add a real-time sync indicator to the Reports page using Supabase realtime subscriptions
-- Expose `upsert_monthly_report` as a typed RPC in `lib/database.types.ts` for better DX
+- Expose `upsert_monthly_report` as a typed RPC in `@/types/supabase` for better DX
 - Add a scheduled job (Vercel Cron) to call `/api/reports/backfill` daily for extra resilience
 
 ---

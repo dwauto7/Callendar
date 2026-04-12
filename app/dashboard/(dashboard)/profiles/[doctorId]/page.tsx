@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DoctorProfileClient } from '@/components/dashboard/profiles/DoctorProfileClient'
+import type { DoctorStats, NextAppointment } from '@/components/dashboard/profiles/DoctorProfileClient'
+import Link from 'next/link'
 
 function toDateKey(date: Date) {
   const y = date.getFullYear()
@@ -9,13 +11,14 @@ function toDateKey(date: Date) {
   return `${y}-${m}-${d}`
 }
 
-export default async function DoctorProfilePage({ params }: { params: { doctorId: string } }) {
+export default async function DoctorProfilePage({ params }: { params: Promise<{ doctorId: string }> }) {
+  const { doctorId } = await params
   const supabase = await createClient()
 
   const { data: profile, error: profileError } = await supabase
     .from('clinic_profiles')
     .select('*, clinic_configs(clinic_name)')
-    .eq('id', params.doctorId)
+    .eq('id', doctorId)
     .single()
 
   if (profileError) {
@@ -44,35 +47,40 @@ export default async function DoctorProfilePage({ params }: { params: { doctorId
     )
   }
 
-  const { data: stats } = await supabase.rpc('get_doctor_stats', { p_doctor_id: params.doctorId })
-  const { data: nextAppointment } = await supabase.rpc('get_next_appointment', { p_doctor_id: params.doctorId })
+const [{ data: stats }, { data: nextAppointment }] = await Promise.all([
+  supabase.rpc('get_doctor_stats', { p_doctor_id: doctorId }),
+  supabase.rpc('get_next_appointment', { p_doctor_id: doctorId }),
+]) as [
+  { data: DoctorStats | null; error: any },
+  { data: NextAppointment | null; error: any }
+]
 
   const now = new Date()
   const day = now.getDay()
   const diffToMonday = day === 0 ? -6 : 1 - day
-  const startOfWeek = new Date(now)
-  startOfWeek.setDate(now.getDate() + diffToMonday)
-  const thirtyDaysAhead = new Date(now)
-  thirtyDaysAhead.setDate(now.getDate() + 30)
+  const todayKey = toDateKey(now)
+  const fourteenDaysAhead = new Date(now)
+  fourteenDaysAhead.setDate(now.getDate() + 14)
+  const fourteenDaysKey = toDateKey(fourteenDaysAhead)
 
-  const startOfWeekKey = toDateKey(startOfWeek)
-  const thirtyDaysAheadKey = toDateKey(thirtyDaysAhead)
 
   const { data: appointments } = await supabase
     .from('appointments')
     .select('id, patient_name, phone, email, appointment_date, appointment_time, appointment_type, service_category, status, appointment_confirmed')
-    .eq('doctor_profile_id', params.doctorId)
-    .gte('appointment_date', startOfWeekKey)
-    .lte('appointment_date', thirtyDaysAheadKey)
+    .eq('doctor_profile_id', doctorId)
+    .gte('appointment_date', todayKey)
+    .lte('appointment_date', fourteenDaysKey)
     .order('appointment_date', { ascending: true })
     .order('appointment_time', { ascending: true })
+
+  const typedAppointments = (appointments ?? []).map(a => ({...a, status: a.status as 'Booked' | 'Cancelled' | 'Completed' | 'No Show' | null }))
 
   return (
     <DoctorProfileClient
       doctor={profile}
       stats={stats ?? { today: 0, week: 0, month: 0, completion_rate: 0 }}
       nextAppointment={nextAppointment ?? null}
-      appointments={appointments ?? []}
+      appointments={typedAppointments ?? []}
     />
   )
 }

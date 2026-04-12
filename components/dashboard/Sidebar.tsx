@@ -182,6 +182,7 @@ export function Sidebar({ clinicName, userEmail }: SidebarProps) {
                 className="text-white/20 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
                 onClick={handleLogout}
                 title="Terminate Session"
+                suppressHydrationWarning
               >
                 <LogOut className="size-4" />
               </Button>
