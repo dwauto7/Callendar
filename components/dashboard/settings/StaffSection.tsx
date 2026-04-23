@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { UserPlus, Mail, Shield, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { UserPlus, Mail, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
 interface StaffMember {
   id: string
@@ -28,7 +28,6 @@ interface StaffMember {
   is_active: boolean
   invite_expires_at: string | null
   created_at: string
-  // null means invite not yet accepted (no auth user linked)
   user_id: string | null
 }
 
@@ -57,6 +56,10 @@ export function StaffSection({ clinicConfigId }: StaffSectionProps) {
   const [loading, setLoading] = useState(true)
   const [inviteOpen, setInviteOpen] = useState(false)
 
+  // Current user's role in this clinic
+  const [currentRole, setCurrentRole] = useState<string | null>(null)
+  const [roleLoading, setRoleLoading] = useState(true)
+
   // Invite form state
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<string>('staff')
@@ -64,9 +67,32 @@ export function StaffSection({ clinicConfigId }: StaffSectionProps) {
   const [inviteError, setInviteError] = useState<string | null>(null)
   const [inviteSuccess, setInviteSuccess] = useState(false)
 
+  // Only owner/admin can invite staff
+  const canInvite = currentRole === 'owner' || currentRole === 'admin'
+
   useEffect(() => {
+    fetchCurrentRole()
     fetchStaff()
   }, [clinicConfigId])
+
+  const fetchCurrentRole = async () => {
+    setRoleLoading(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setRoleLoading(false)
+      return
+    }
+
+    const { data } = await supabase
+      .from('clinic_users')
+      .select('role')
+      .eq('clinic_config_id', clinicConfigId)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    setCurrentRole(data?.role ?? null)
+    setRoleLoading(false)
+  }
 
   const fetchStaff = async () => {
     setLoading(true)
@@ -129,7 +155,6 @@ export function StaffSection({ clinicConfigId }: StaffSectionProps) {
       setInviteRole('staff')
       await fetchStaff()
 
-      // Auto-close after brief success moment
       setTimeout(() => {
         setInviteOpen(false)
         setInviteSuccess(false)
@@ -142,9 +167,7 @@ export function StaffSection({ clinicConfigId }: StaffSectionProps) {
   }
 
   const getInviteStatus = (member: StaffMember) => {
-    // Has a linked user_id = accepted
     if (member.user_id) return 'active'
-    // No user_id but exists = pending invite
     if (!member.invite_expires_at) return 'pending'
     const expired = new Date(member.invite_expires_at) < new Date()
     return expired ? 'expired' : 'pending'
@@ -184,90 +207,93 @@ export function StaffSection({ clinicConfigId }: StaffSectionProps) {
           <p className="text-slate-400 text-xs mt-0.5">Manage who has access to this clinic.</p>
         </div>
 
-        <Dialog open={inviteOpen} onOpenChange={(open) => {
-          setInviteOpen(open)
-          if (!open) {
-            setInviteEmail('')
-            setInviteRole('staff')
-            setInviteError(null)
-            setInviteSuccess(false)
-          }
-        }}>
-          <DialogTrigger asChild>
-            <Button
-              size="sm"
-              className="bg-teal-600 hover:bg-teal-500 text-white flex items-center gap-2"
-            >
-              <UserPlus className="w-4 h-4" />
-              Invite Staff
-            </Button>
-          </DialogTrigger>
+        {/* Invite button: only visible to owner/admin, hidden entirely for doctor/staff */}
+        {!roleLoading && canInvite && (
+          <Dialog open={inviteOpen} onOpenChange={(open) => {
+            setInviteOpen(open)
+            if (!open) {
+              setInviteEmail('')
+              setInviteRole('staff')
+              setInviteError(null)
+              setInviteSuccess(false)
+            }
+          }}>
+            <DialogTrigger asChild>
+              <Button
+                size="sm"
+                className="bg-teal-600 hover:bg-teal-500 text-white flex items-center gap-2"
+              >
+                <UserPlus className="w-4 h-4" />
+                Invite Staff
+              </Button>
+            </DialogTrigger>
 
-          <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Invite a team member</DialogTitle>
-              <DialogDescription className="text-slate-400">
-                They'll receive an email with a link to join via Google.
-              </DialogDescription>
-            </DialogHeader>
+            <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-sm">
+              <DialogHeader>
+                <DialogTitle>Invite a team member</DialogTitle>
+                <DialogDescription className="text-slate-400">
+                  They'll receive an email with a link to join via Google.
+                </DialogDescription>
+              </DialogHeader>
 
-            {inviteSuccess ? (
-              <div className="flex flex-col items-center gap-2 py-6 text-emerald-400">
-                <CheckCircle className="w-10 h-10" />
-                <p className="text-sm font-medium">Invite sent!</p>
-              </div>
-            ) : (
-              <div className="space-y-3 pt-2">
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-400">Email address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                    <Input
-                      type="email"
-                      placeholder="staff@clinic.com"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-                      className="pl-9 bg-slate-900 border-slate-600 text-white placeholder:text-slate-500"
-                    />
+              {inviteSuccess ? (
+                <div className="flex flex-col items-center gap-2 py-6 text-emerald-400">
+                  <CheckCircle className="w-10 h-10" />
+                  <p className="text-sm font-medium">Invite sent!</p>
+                </div>
+              ) : (
+                <div className="space-y-3 pt-2">
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-400">Email address</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <Input
+                        type="email"
+                        placeholder="staff@clinic.com"
+                        value={inviteEmail}
+                        onChange={(e) => setInviteEmail(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
+                        className="pl-9 bg-slate-900 border-slate-600 text-white placeholder:text-slate-500"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-400">Role</label>
-                  <Select value={inviteRole} onValueChange={setInviteRole}>
-                    <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                      <SelectItem value="doctor">Doctor</SelectItem>
-                      <SelectItem value="staff">Staff</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-400">Role</label>
+                    <Select value={inviteRole} onValueChange={setInviteRole}>
+                      <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                        <SelectItem value="doctor">Doctor</SelectItem>
+                        <SelectItem value="staff">Staff</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                {inviteError && (
-                  <p className="text-xs text-red-400 bg-red-400/10 border border-red-700 rounded-lg px-3 py-2">
-                    {inviteError}
-                  </p>
-                )}
-
-                <Button
-                  onClick={handleInvite}
-                  disabled={inviting}
-                  className="w-full bg-teal-600 hover:bg-teal-500"
-                >
-                  {inviting ? (
-                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Sending...</>
-                  ) : (
-                    'Send Invite'
+                  {inviteError && (
+                    <p className="text-xs text-red-400 bg-red-400/10 border border-red-700 rounded-lg px-3 py-2">
+                      {inviteError}
+                    </p>
                   )}
-                </Button>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+
+                  <Button
+                    onClick={handleInvite}
+                    disabled={inviting}
+                    className="w-full bg-teal-600 hover:bg-teal-500"
+                  >
+                    {inviting ? (
+                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Sending...</>
+                    ) : (
+                      'Send Invite'
+                    )}
+                  </Button>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* Staff list */}
@@ -287,7 +313,6 @@ export function StaffSection({ clinicConfigId }: StaffSectionProps) {
                 className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  {/* Avatar placeholder */}
                   <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-slate-300 font-medium shrink-0">
                     {member.user_email[0].toUpperCase()}
                   </div>

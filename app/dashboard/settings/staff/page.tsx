@@ -28,6 +28,7 @@ import { InviteModal } from '@/components/clinic/invite-modal';
 import { AlertCircle, Loader2, Trash2, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getClinicContext } from '@/lib/clinic/getClinicContext';
+import { canViewDashboardPage, getRolePermissions, normalizeClinicRole } from '@/lib/auth/permissions';
 
 interface StaffMember {
   id: string;
@@ -47,6 +48,7 @@ export default function StaffManagementPage() {
   );
 
   const [clinicConfigId, setClinicConfigId] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<'admin' | 'doctor' | 'receptionist' | null>(null);
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,6 +74,9 @@ export default function StaffManagementPage() {
           setError('Could not find your clinic. Please contact support.');
           return;
         }
+
+        const normalizedRole = normalizeClinicRole(clinicContext.role);
+        setUserRole(normalizedRole);
 
         setClinicConfigId(clinicContext.clinicConfigId);
       } catch (err) {
@@ -237,6 +242,11 @@ export default function StaffManagementPage() {
     }
   };
 
+  const permissions = getRolePermissions(userRole);
+  const canView = canViewDashboardPage(userRole, 'staff') && permissions.canView;
+  const canEdit = permissions.canEdit;
+  const canDelete = permissions.canDelete;
+
   if (!clinicConfigId) {
     return (
       <div className="space-y-4">
@@ -256,6 +266,15 @@ export default function StaffManagementPage() {
 
   return (
     <div className="space-y-6">
+      {!canView && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>Only admins can view and manage staff.</AlertDescription>
+        </Alert>
+      )}
+
+      {!canView ? null : (
+        <>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -264,10 +283,12 @@ export default function StaffManagementPage() {
             Manage your clinic team members and their access permissions
           </p>
         </div>
-        <InviteModal
-          clinicConfigId={clinicConfigId}
-          onInviteSuccess={handleInviteSuccess}
-        />
+        {canEdit && (
+          <InviteModal
+            clinicConfigId={clinicConfigId}
+            onInviteSuccess={handleInviteSuccess}
+          />
+        )}
       </div>
 
       {/* Error Alert */}
@@ -298,10 +319,12 @@ export default function StaffManagementPage() {
               <p className="text-muted-foreground mb-4">
                 No staff members in your clinic yet. Invite your first team member!
               </p>
-              <InviteModal
-                clinicConfigId={clinicConfigId}
-                onInviteSuccess={handleInviteSuccess}
-              />
+              {canEdit && (
+                <InviteModal
+                  clinicConfigId={clinicConfigId}
+                  onInviteSuccess={handleInviteSuccess}
+                />
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -338,7 +361,7 @@ export default function StaffManagementPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => setDeleteConfirm(member.id)}
-                            disabled={deleting !== null}
+                            disabled={deleting !== null || !canDelete}
                             className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -390,7 +413,7 @@ export default function StaffManagementPage() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>
-            • <strong>Invite</strong>: Click "Invite Staff" and enter their email address
+            • <strong>Invite</strong>: Click &quot;Invite Staff&quot; and enter their email address
           </p>
           <p>
             • <strong>Email Link</strong>: They receive an invite email with a secure link
@@ -406,6 +429,8 @@ export default function StaffManagementPage() {
           </p>
         </CardContent>
       </Card>
+        </>
+      )}
     </div>
   );
 }

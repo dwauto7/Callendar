@@ -19,12 +19,13 @@ export type CallLogRow = {
   patient_phone: string | null
   duration_min: number | null
   minutes_saved: number | null
-  is_after_hours: boolean
+  is_after_hours: boolean | null
   appointment_id: string | null
   clinic_config_id?: string | null
   summary?: string | null
   created_at: string
   recording_url: string | null
+  aya_usage_cost_rm?: number | null
 }
 
 type TranscriptMessage = {
@@ -32,39 +33,20 @@ type TranscriptMessage = {
   content: string
 }
 
-async function logTranscriptError(message: string, payload?: unknown) {
-  try {
-    await fetch('/api/error-log', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ message, payload, source: 'CallsClient' }),
-      keepalive: true,
-    })
-  } catch (error) {
-    console.error('Failed to send transcript error log', error)
-  }
-}
-
 function normalizeTranscript(raw: unknown): TranscriptMessage[] {
-  if (typeof raw === 'string' && raw.trim()) {
-    const lines = raw.split('\n').filter(Boolean)
-    return lines.map((line) => {
-      const agentMatch = line.match(/^(agent|aya):\s*(.+)/i)
-      const userMatch = line.match(/^(user|patient|caller):\s*(.+)/i)
-      if (agentMatch) return { role: 'agent', content: agentMatch[2] }
-      if (userMatch) return { role: 'user', content: userMatch[2] }
-      return { role: 'agent', content: line }
-    })
-  }
-
   let parsed: unknown = raw
-  if (typeof raw === 'string') {
+  if (typeof raw === 'string' && raw.trim()) {
     try {
       parsed = JSON.parse(raw)
-    } catch (e) {
-      console.error('Failed to parse transcript string', e)
-      void logTranscriptError('Failed to parse transcript JSON', { raw })
-      return []
+    } catch {
+      const lines = raw.split('\n').map((line) => line.trim()).filter(Boolean)
+      return lines.map((line) => {
+        const agentMatch = line.match(/^(agent|aya):\s*(.+)/i)
+        const userMatch = line.match(/^(user|patient|caller):\s*(.+)/i)
+        if (agentMatch) return { role: 'agent', content: agentMatch[2] }
+        if (userMatch) return { role: 'user', content: userMatch[2] }
+        return { role: 'agent', content: line }
+      })
     }
   }
 

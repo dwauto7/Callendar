@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { timeAsync } from '@/lib/perf'
 import { OperationsClient } from '@/components/dashboard/operations/OperationsClient'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
+import { canViewDashboardPage, getRolePermissions } from '@/lib/auth/permissions'
 
 export const metadata = { title: 'Operations — Callendar' }
 
@@ -21,6 +22,10 @@ export default async function OperationsPage() {
   )
 
   if (!clinicContext?.clinicConfigId) redirect('/onboarding')
+  const permissions = getRolePermissions(clinicContext.role)
+  if (!canViewDashboardPage(clinicContext.role, 'operations') || !permissions.canView) {
+    redirect('/dashboard/overview')
+  }
 
   const clinicId = clinicContext.clinicConfigId as string
 

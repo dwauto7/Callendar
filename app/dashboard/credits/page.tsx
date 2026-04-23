@@ -7,6 +7,7 @@ import { CreditsLogsClient } from '@/components/dashboard/credits/CreditsLogsCli
 import { cn } from '@/lib/utils'
 import { timeAsync } from '@/lib/perf'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
+import { canViewDashboardPage, getRolePermissions } from '@/lib/auth/permissions'
 
 export const metadata = { title: 'Credits — Callendar' }
 
@@ -40,6 +41,10 @@ export default async function CreditsPage() {
     getClinicContext(supabase, user.id)
   )
   if (!clinicContext?.clinicConfigId) redirect('/onboarding')
+  const permissions = getRolePermissions(clinicContext.role)
+  if (!canViewDashboardPage(clinicContext.role, 'credits') || !permissions.canView) {
+    redirect('/dashboard/overview')
+  }
 
   const id = clinicContext.clinicConfigId
 

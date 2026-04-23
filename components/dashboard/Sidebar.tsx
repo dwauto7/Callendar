@@ -20,23 +20,27 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Card, CardContent } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 
-const navItems = [
-  { label: 'Overview',    href: '/dashboard/overview',  icon: LayoutDashboard },
-  { label: 'Operations',  href: '/dashboard/operations',icon: CalendarCheck },
-  { label: 'Profiles',    href: '/dashboard/doctors',   icon: CalendarCheck },
-  { label: 'Reports',     href: '/dashboard/reports',   icon: BarChart3 },
-  { label: 'Settings',    href: '/dashboard/settings',  icon: Settings },
-]
-
 interface SidebarProps {
   clinicName: string
   userEmail: string
+  role?: 'admin' | 'doctor' | 'receptionist' | 'owner' | null
 }
 
-export function Sidebar({ clinicName, userEmail }: SidebarProps) {
+export function Sidebar({ clinicName, userEmail, role }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const navItems = [
+    { label: 'Overview', href: '/dashboard/overview', icon: LayoutDashboard },
+    { label: 'Operations', href: '/dashboard/operations', icon: CalendarCheck },
+    { label: 'Profiles', href: '/dashboard/doctors', icon: CalendarCheck },
+    { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+    { label: 'Settings', href: '/dashboard/settings', icon: Settings },
+    ...(role === 'admin' || role === 'owner'
+      ? [{ label: 'Admin', href: '/admin', icon: ShieldCheck }]
+      : []),
+  ]
 
   async function handleLogout() {
     const supabase = createClient()
@@ -193,4 +197,3 @@ export function Sidebar({ clinicName, userEmail }: SidebarProps) {
     </>
   )
 }
-

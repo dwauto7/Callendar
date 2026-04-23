@@ -31,6 +31,9 @@ export function ServicesSettingsPanel() {
 
   const supabase = useMemo(() => createClient(), [])
 
+  // All roles (staff, doctor, admin, owner) can view and edit services
+  const canEdit = !!clinicConfigId
+
   const loadServices = useCallback(async () => {
     if (!clinicConfigId) return
     setLoading(true)
@@ -62,8 +65,9 @@ export function ServicesSettingsPanel() {
   }, [clinicConfigId, loadServices])
 
   async function handleAdd() {
-    if (role !== 'admin' && role !== 'owner') {
-      toast.error('Admin access required to update services.')
+    // Guard: clinicConfigId must be a non-null string before inserting
+    if (!clinicConfigId) {
+      toast.error('Clinic not loaded. Please refresh.')
       return
     }
     if (!newName.trim()) {
@@ -79,7 +83,8 @@ export function ServicesSettingsPanel() {
     const { error } = await supabase
       .from('service_pricing')
       .insert({
-        clinic_config_id: clinicConfigId,
+        // clinicConfigId is now guaranteed string (null checked above)
+        clinic_config_id: clinicConfigId as string,
         service_name: newName.trim(),
         price: priceNum,
       })
@@ -98,8 +103,9 @@ export function ServicesSettingsPanel() {
   }
 
   async function handleDelete(id: string) {
-    if (role !== 'admin' && role !== 'owner') {
-      toast.error('Admin access required to update services.')
+    // Guard: clinicConfigId must be a non-null string before deleting
+    if (!clinicConfigId) {
+      toast.error('Clinic not loaded. Please refresh.')
       return
     }
     setDeleting(id)
@@ -107,7 +113,7 @@ export function ServicesSettingsPanel() {
       .from('service_pricing')
       .delete()
       .eq('id', id)
-      .eq('clinic_config_id', clinicConfigId)
+      .eq('clinic_config_id', clinicConfigId as string)
 
     setDeleting(null)
     if (error) {
@@ -130,11 +136,12 @@ export function ServicesSettingsPanel() {
               Manage service list and prices for your clinic.
             </p>
           </div>
+          {/* All roles can add services */}
           <Button
             onClick={() => setDialogOpen(true)}
             size="sm"
             className="h-8 bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold text-xs"
-            disabled={role !== 'admin' && role !== 'owner'}
+            disabled={!canEdit}
           >
             <Plus className="size-3.5 mr-1.5" />
             Add Service
@@ -163,11 +170,12 @@ export function ServicesSettingsPanel() {
                   <span className="text-[11px] font-semibold text-white bg-[#2DD4BF] px-2.5 py-1 rounded-full">
                     RM {service.price}
                   </span>
+                  {/* All roles can delete services */}
                   <Button
                     variant="ghost"
                     size="icon-sm"
                     onClick={() => setDeleteTarget(service)}
-                    disabled={deleting === service.id || (role !== 'admin' && role !== 'owner')}
+                    disabled={deleting === service.id || !canEdit}
                     className="text-white/30 hover:text-red-400 hover:bg-[#EF4444]/10"
                   >
                     {deleting === service.id ? (
@@ -234,7 +242,7 @@ export function ServicesSettingsPanel() {
               className="bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white font-semibold"
             >
               {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
-              {saving ? 'Adding?' : 'Add Service'}
+              {saving ? 'Adding...' : 'Add Service'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -277,4 +285,3 @@ export function ServicesSettingsPanel() {
     </>
   )
 }
-

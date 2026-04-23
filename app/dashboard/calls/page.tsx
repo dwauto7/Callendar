@@ -1,10 +1,9 @@
 ﻿import { redirect } from 'next/navigation'
 import { PhoneCall } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { timeAsync } from '@/lib/perf'
-import { CallsClient } from '@/components/dashboard/calls/CallsClient'
-import type { CallLogRow } from '@/components/dashboard/operations/TranscriptDrawer'
+import { CallsClient, type CallLogRow } from '@/components/dashboard/calls/CallsClient'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
+import { canViewDashboardPage, getRolePermissions } from '@/lib/auth/permissions'
 
 export const metadata = { title: 'Voice Logs — Callendar' }
 
@@ -16,6 +15,10 @@ export default async function CallsPage() {
   const clinicContext = await getClinicContext(supabase, user.id)
 
   if (!clinicContext?.clinicConfigId) redirect('/onboarding')
+  const permissions = getRolePermissions(clinicContext.role)
+  if (!canViewDashboardPage(clinicContext.role, 'calls') || !permissions.canView) {
+    redirect('/dashboard/overview')
+  }
 
   const clinicId = clinicContext.clinicConfigId as string
 
@@ -51,7 +54,7 @@ export default async function CallsPage() {
         )}
       </div>
 
-      <CallsClient initialCalls={(callLogs as any) ?? []} />
+      <CallsClient initialCalls={(callLogs as CallLogRow[]) ?? []} />
     </div>
   )
 }

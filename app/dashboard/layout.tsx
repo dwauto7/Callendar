@@ -117,6 +117,7 @@ export default async function DashboardLayout({
           <Sidebar
             clinicName={clinicName}
             userEmail={userEmail}
+            role={role}
           />
 
           <div className="lg:pl-[260px] pt-16 lg:pt-0 min-h-screen">
@@ -137,4 +138,3 @@ export default async function DashboardLayout({
     </div>
   )
 }
-

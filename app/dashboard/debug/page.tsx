@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
+import { canViewDashboardPage, getRolePermissions } from '@/lib/auth/permissions'
 
 export const metadata = { title: 'Debug - Callendar' }
 
@@ -19,6 +20,10 @@ export default async function DebugPage() {
 
   if (!clinicContext) {
     return <div className="p-8 text-red-500">No clinic record found</div>
+  }
+  const permissions = getRolePermissions(clinicContext.role)
+  if (!canViewDashboardPage(clinicContext.role, 'debug') || !permissions.canView) {
+    redirect('/dashboard/overview')
   }
 
   const clinicId = clinicContext.clinicConfigId

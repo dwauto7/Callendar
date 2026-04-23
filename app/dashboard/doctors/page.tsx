@@ -3,15 +3,9 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
 import { Button } from '@/components/ui/button'
+import { canViewDashboardPage, getRolePermissions, normalizeClinicRole } from '@/lib/auth/permissions'
 
 export const metadata = { title: 'Profiles — Callendar' }
-
-type ClinicRole = 'admin' | 'doctor' | 'receptionist' | 'owner' | null
-
-function normalizeRole(role: ClinicRole) {
-  if (role === 'owner') return 'admin'
-  return role ?? 'receptionist'
-}
 
 export default async function DoctorsPage() {
   const supabase = await createClient()
@@ -23,7 +17,11 @@ export default async function DoctorsPage() {
   const clinicContext = await getClinicContext(supabase, user.id)
   if (!clinicContext?.clinicConfigId) redirect('/onboarding')
 
-  const role = normalizeRole(clinicContext.role)
+  const role = normalizeClinicRole(clinicContext.role)
+  const permissions = getRolePermissions(clinicContext.role)
+  if (!canViewDashboardPage(clinicContext.role, 'doctors') || !permissions.canView) {
+    redirect('/dashboard/overview')
+  }
 
   if (role === 'doctor') {
     const { data: myProfile } = await supabase

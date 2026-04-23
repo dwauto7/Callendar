@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { OverviewContent } from '@/components/dashboard/OverviewContent'
 import { timeAsync } from '@/lib/perf'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
+import { canViewDashboardPage, getRolePermissions } from '@/lib/auth/permissions'
 
 export const metadata = {
   title: 'Overview — Callendar',
@@ -25,6 +26,12 @@ export default async function OverviewPage() {
   const clinicName = clinicContext.clinicName ?? 'Partner'
   const isActive: boolean = clinicContext.isActive ?? false
   const clinicConfigId = clinicContext.clinicConfigId
+  const role = clinicContext.role
+  const permissions = getRolePermissions(role)
+
+  if (!canViewDashboardPage(role, 'overview') || !permissions.canView) {
+    redirect('/dashboard/doctors')
+  }
 
   // Fetch answering_mode on server side (fast, only once)
   const { data: settingsData } = await timeAsync('overview:settings', async () =>
@@ -45,6 +52,7 @@ export default async function OverviewPage() {
       isActive={isActive}
       clinicConfigId={clinicConfigId}
       answeringMode={answeringMode}
+      role={role}
     />
   )
 }

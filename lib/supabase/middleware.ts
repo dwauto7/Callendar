@@ -33,16 +33,17 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthRoute = pathname.startsWith('/auth')
   const isOnboarding = pathname.startsWith('/onboarding')
+  const isPortal = pathname.startsWith('/portal')
   const isDashboard = pathname.startsWith('/dashboard')
 
   // 🔒 NOT LOGGED IN → block protected routes
-  if (!user && (isDashboard || isOnboarding)) {
+  if (!user && (isDashboard || isPortal || isOnboarding)) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
   // 🔁 LOGGED IN → prevent going back to auth pages
   if (user && isAuthRoute && pathname !== '/auth/accept-invite') {
-    return NextResponse.redirect(new URL('/auth/post-auth', request.url))
+    return NextResponse.redirect(new URL('/portal', request.url))
   }
 
   return response

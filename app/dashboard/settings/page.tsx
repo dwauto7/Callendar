@@ -6,6 +6,7 @@ import { ClinicSettingsPanel } from '@/components/dashboard/settings/ClinicSetti
 import { ServicesSettingsPanel } from '@/components/dashboard/settings/ServicesSettingsPanel'
 import { getClinicContext } from '@/lib/clinic/getClinicContext'
 import { StaffSection } from '@/components/dashboard/settings/StaffSection'
+import { canViewDashboardPage, getRolePermissions } from '@/lib/auth/permissions'
 
 export const metadata = { title: 'Settings - Callendar' }
 
@@ -25,6 +26,10 @@ export default async function SettingsPage() {
   const clinicContext = await getClinicContext(supabase, user.id)
 
   if (!clinicContext?.clinicConfigId) redirect('/onboarding')
+  const permissions = getRolePermissions(clinicContext.role)
+  if (!canViewDashboardPage(clinicContext.role, 'settings') || !permissions.canView) {
+    redirect('/dashboard/overview')
+  }
 
   const id = clinicContext.clinicConfigId
 
@@ -113,7 +118,7 @@ export default async function SettingsPage() {
         closures={closures}
         clinicConfigId={id}
       />
-      <StaffSection clinicConfigId={id} />
+      {permissions.canDelete && <StaffSection clinicConfigId={id} />}
     </div>
   )
 }
