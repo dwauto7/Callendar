@@ -22,6 +22,7 @@ const ALLOWED_ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? process.en
   .filter(Boolean)
 
 const normalizeRole = (role) => (role === 'owner' ? 'admin' : role ?? 'receptionist')
+const safeMessage = (error, fallback) => (error && typeof error === 'object' && 'message' in error ? error.message : fallback)
 
 function getPermissions(role) {
   const normalized = normalizeRole(role)
@@ -41,6 +42,13 @@ export default function AdminPanel() {
   const [authError, setAuthError] = useState('')
   const [authNotice, setAuthNotice] = useState('')
   const [isSendingLink, setIsSendingLink] = useState(false)
+  const [authDebug, setAuthDebug] = useState({
+    envAllowListConfigured: ALLOWED_ADMIN_EMAILS.length > 0,
+    emailInAllowList: null,
+    hasSupabaseUser: null,
+    hasClinicMembership: null,
+    roleIsAdmin: null,
+  })
 
   const [activeTab, setActiveTab] = useState('users')
   const [clinicConfigId, setClinicConfigId] = useState(null)
@@ -53,6 +61,23 @@ export default function AdminPanel() {
   const [deleteConfirm, setDeleteConfirm] = useState(null)
 
   const permissions = useMemo(() => getPermissions(currentRole), [currentRole])
+
+  const logSecurityEvent = useCallback(async (message, payload = {}) => {
+    try {
+      await fetch('/api/error-log', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          source: 'AdminPanel',
+          message,
+          payload,
+        }),
+        keepalive: true,
+      })
+    } catch {
+      // Do not block auth flow on telemetry issues
+    }
+  }, [])
 
   const logAdminAction = useCallback(async (action, resourceId, details = {}) => {
     if (!clinicConfigId) return
@@ -117,12 +142,19 @@ export default function AdminPanel() {
     } = await supabase.auth.getUser()
 
     if (userError || !user) {
+      setAuthDebug((prev) => ({
+        ...prev,
+        hasSupabaseUser: false,
+        hasClinicMembership: null,
+        roleIsAdmin: null,
+      }))
       setIsAuthenticated(false)
       setCurrentRole(null)
       setClinicConfigId(null)
       setIsCheckingSession(false)
       return
     }
+    setAuthDebug((prev) => ({ ...prev, hasSupabaseUser: true }))
 
     const { data: membership, error: membershipError } = await supabase
       .from('clinic_users')
@@ -131,6 +163,16 @@ export default function AdminPanel() {
       .maybeSingle()
 
     if (membershipError || !membership?.clinic_config_id) {
+      await logSecurityEvent('admin_session_denied_no_membership', {
+        user_id: user.id,
+        user_email: user.email,
+        error: membershipError?.message ?? null,
+      })
+      setAuthDebug((prev) => ({
+        ...prev,
+        hasClinicMembership: false,
+        roleIsAdmin: false,
+      }))
       setAuthError('No clinic membership found for this account.')
       setIsAuthenticated(false)
       setCurrentRole(null)
@@ -141,7 +183,20 @@ export default function AdminPanel() {
 
     const role = normalizeRole(membership.role)
     const emailAllowed = ALLOWED_ADMIN_EMAILS.length === 0 || ALLOWED_ADMIN_EMAILS.includes((user.email ?? '').toLowerCase())
-    if (!emailAllowed || role !== 'admin') {
+    const roleAllowed = role === 'admin'
+    setAuthDebug((prev) => ({
+      ...prev,
+      emailInAllowList: emailAllowed,
+      hasClinicMembership: true,
+      roleIsAdmin: roleAllowed,
+    }))
+    if (!emailAllowed || !roleAllowed) {
+      await logSecurityEvent('admin_session_denied_not_authorized', {
+        user_id: user.id,
+        user_email: user.email,
+        role,
+        email_allowed: emailAllowed,
+      })
       setAuthError('This account is not authorized for admin access.')
       setIsAuthenticated(false)
       setCurrentRole(null)
@@ -153,8 +208,12 @@ export default function AdminPanel() {
     setCurrentRole(role)
     setClinicConfigId(membership.clinic_config_id)
     setIsAuthenticated(true)
+    await logAdminAction('admin_login_success', user.id, {
+      email: user.email,
+      role,
+    })
     setIsCheckingSession(false)
-  }, [supabase])
+  }, [supabase, logSecurityEvent, logAdminAction])
 
   useEffect(() => {
     void resolveAdminSession()
@@ -176,8 +235,11 @@ export default function AdminPanel() {
     const normalizedEmail = adminEmail.trim().toLowerCase()
     if (!normalizedEmail) return setAuthError('Please enter an admin email.')
     if (ALLOWED_ADMIN_EMAILS.length > 0 && !ALLOWED_ADMIN_EMAILS.includes(normalizedEmail)) {
+      setAuthDebug((prev) => ({ ...prev, emailInAllowList: false }))
+      await logSecurityEvent('admin_magic_link_denied_email_not_allowlisted', { email: normalizedEmail })
       return setAuthError('This email is not in the admin allow-list.')
     }
+    setAuthDebug((prev) => ({ ...prev, emailInAllowList: true }))
 
     setIsSendingLink(true)
     try {
@@ -187,9 +249,11 @@ export default function AdminPanel() {
         options: { emailRedirectTo: `${origin}/admin` },
       })
       if (error) throw error
+      await logSecurityEvent('admin_magic_link_sent', { email: normalizedEmail, redirect_to: `${origin}/admin` })
       setAuthNotice('Magic link sent. Check your inbox and spam folder.')
     } catch (error) {
-      setAuthError(error?.message ?? 'Failed to send magic link.')
+      await logSecurityEvent('admin_magic_link_failed', { email: normalizedEmail, error: safeMessage(error, 'unknown') })
+      setAuthError(safeMessage(error, 'Failed to send magic link.'))
     } finally {
       setIsSendingLink(false)
     }
@@ -228,7 +292,7 @@ export default function AdminPanel() {
       }
       setDeleteConfirm(null)
     } catch (error) {
-      alert(`Delete failed: ${error?.message ?? 'Unknown error'}`)
+      alert(`Delete failed: ${safeMessage(error, 'Unknown error')}`)
     }
   }
 
@@ -245,6 +309,14 @@ export default function AdminPanel() {
             {authNotice && <div className="bg-emerald-900/20 border border-emerald-600 text-emerald-300 px-4 py-3 rounded flex items-start gap-3"><CheckCircle2 size={18} className="mt-0.5 shrink-0" /><span className="text-sm">{authNotice}</span></div>}
             <button type="submit" disabled={!adminEmail || isSendingLink} className="w-full bg-[#40E0FF]/20 hover:bg-[#40E0FF]/30 disabled:bg-slate-700 disabled:text-slate-500 text-[#40E0FF] font-semibold py-2 rounded transition">{isSendingLink ? 'Sending...' : 'Send Magic Link'}</button>
           </form>
+          <div className="mt-5 rounded-xl border border-[#212129] bg-black/20 p-4 text-xs space-y-2">
+            <p className="text-white/80 font-semibold uppercase tracking-widest">Admin Access Checks</p>
+            <p className="text-white/50">Allow-list configured: <span className={authDebug.envAllowListConfigured ? 'text-emerald-300' : 'text-amber-300'}>{authDebug.envAllowListConfigured ? 'yes' : 'no (open mode)'}</span></p>
+            <p className="text-white/50">Email allow-listed: <span className={authDebug.emailInAllowList === false ? 'text-red-300' : 'text-emerald-300'}>{authDebug.emailInAllowList === null ? 'pending' : authDebug.emailInAllowList ? 'yes' : 'no'}</span></p>
+            <p className="text-white/50">Supabase session user: <span className={authDebug.hasSupabaseUser === false ? 'text-red-300' : 'text-emerald-300'}>{authDebug.hasSupabaseUser === null ? 'pending' : authDebug.hasSupabaseUser ? 'yes' : 'no'}</span></p>
+            <p className="text-white/50">Clinic membership found: <span className={authDebug.hasClinicMembership === false ? 'text-red-300' : 'text-emerald-300'}>{authDebug.hasClinicMembership === null ? 'pending' : authDebug.hasClinicMembership ? 'yes' : 'no'}</span></p>
+            <p className="text-white/50">Role is owner/admin: <span className={authDebug.roleIsAdmin === false ? 'text-red-300' : 'text-emerald-300'}>{authDebug.roleIsAdmin === null ? 'pending' : authDebug.roleIsAdmin ? 'yes' : 'no'}</span></p>
+          </div>
         </div>
       </div>
     )

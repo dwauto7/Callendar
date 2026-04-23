@@ -36,7 +36,7 @@ export default async function DebugPage() {
     .single()
 
   // Count call_logs
-  const { data: callLogs, count: callLogsCount } = await supabase
+  const { count: callLogsCount } = await supabase
     .from('call_logs')
     .select('id', { count: 'exact' })
     .eq('clinic_config_id', clinicId)
@@ -50,7 +50,7 @@ export default async function DebugPage() {
     .single()
 
   // Count appointments
-  const { data: appointments, count: appointmentsCount } = await supabase
+  const { count: appointmentsCount } = await supabase
     .from('appointments')
     .select('id', { count: 'exact' })
     .eq('clinic_id', clinicId)
