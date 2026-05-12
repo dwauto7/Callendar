@@ -43,10 +43,29 @@ export default function ContactPage() {
           role: form.role,
         }),
       })
-      if (!res.ok) throw new Error('Failed')
+      if (!res.ok) {
+        let message = 'Something went wrong. Please try again or WhatsApp us directly.'
+        try {
+          const body = await res.json()
+          const detailMessage =
+            typeof body?.details?.message === 'string'
+              ? body.details.message
+              : typeof body?.details?.upstreamResponse === 'string'
+                ? body.details.upstreamResponse
+                : null
+          if (detailMessage) {
+            message = `Something went wrong: ${detailMessage}`
+          } else if (typeof body?.error === 'string') {
+            message = body.error
+          }
+        } catch {
+          // Keep fallback message.
+        }
+        throw new Error(message)
+      }
       setSubmitted(true)
-    } catch {
-      setError('Something went wrong. Please try again or WhatsApp us directly.')
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Something went wrong. Please try again or WhatsApp us directly.')
     } finally {
       setLoading(false)
     }
