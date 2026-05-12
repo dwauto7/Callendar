@@ -21,14 +21,20 @@ export async function POST(req: NextRequest) {
     const clinic_name = typeof body?.clinic_name === 'string' ? body.clinic_name.trim() : ''
     const role = typeof body?.role === 'string' ? body.role.trim() : ''
     const rawPhone = typeof body?.phone === 'string' ? body.phone.trim() : ''
-    const normalizedPhone = rawPhone.replace(/[^\d+]/g, '')
+    const normalizedDigits = rawPhone.replace(/\D/g, '')
 
     if (!name || !email || !rawPhone || !clinic_name || !role) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
     }
 
-    if (!/^\+?\d{8,15}$/.test(normalizedPhone)) {
-      return NextResponse.json({ error: 'Invalid phone' }, { status: 400 })
+    if (normalizedDigits.length < 8 || normalizedDigits.length > 15) {
+      return NextResponse.json(
+        {
+          error: 'Invalid phone',
+          details: { message: 'Phone number must contain 8 to 15 digits.' },
+        },
+        { status: 400 }
+      )
     }
 
     const res = await fetch('https://n8n.beaconhorizons.io/webhook/callendar-demo-request', {
@@ -39,7 +45,7 @@ export async function POST(req: NextRequest) {
         email,
         clinic_name,
         role,
-        phone: normalizedPhone,
+        phone: normalizedDigits,
         phone_raw: rawPhone,
       }),
     })
