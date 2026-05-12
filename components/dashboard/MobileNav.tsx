@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   CalendarCheck,
+  Users,
   BarChart3,
   Settings,
 } from 'lucide-react'
@@ -13,6 +14,7 @@ import { cn } from '@/lib/utils'
 const mobileNavItems = [
   { label: 'Overview',    href: '/dashboard/overview',  icon: LayoutDashboard },
   { label: 'Operations',  href: '/dashboard/operations',icon: CalendarCheck },
+  { label: 'Patients',    href: '/dashboard/patients',  icon: Users },
   { label: 'Profiles',    href: '/dashboard/doctors',   icon: CalendarCheck },
   { label: 'Reports',     href: '/dashboard/reports',   icon: BarChart3 },
   { label: 'Settings',    href: '/dashboard/settings',  icon: Settings },

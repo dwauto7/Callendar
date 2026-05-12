@@ -49,6 +49,13 @@ export default async function SettingsPage() {
 
   const clinicConfig = clinicConfigRes.data
   const clinicConfigError = clinicConfigRes.error
+  const { data: callerRow } = await supabase
+    .from('clinic_users')
+    .select('role')
+    .eq('user_id', user.id)
+    .eq('is_active', true)
+    .single()
+  const isOwner = callerRow?.role === 'owner'
 
   const closures = (closuresRes.data ?? []) as HolidayClosure[]
 
@@ -112,13 +119,49 @@ export default async function SettingsPage() {
         </div>
       )}
 
-      <ClinicSettingsPanel />
-      <ServicesSettingsPanel />
+      <div className="rounded-2xl border border-[#212129] bg-[#121216] p-4 flex flex-wrap items-center gap-3">
+        <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
+          Quick Actions
+        </span>
+        <a
+          href="#system-settings"
+          className="inline-flex items-center rounded-lg border border-[#2DD4BF]/30 bg-[#2DD4BF]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#2DD4BF] hover:bg-[#2DD4BF]/20"
+        >
+          Save System Settings
+        </a>
+        <a
+          href="#services-pricing"
+          className="inline-flex items-center rounded-lg border border-[#2DD4BF]/30 bg-[#2DD4BF]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#2DD4BF] hover:bg-[#2DD4BF]/20"
+        >
+          Add Service
+        </a>
+        {permissions.canDelete ? (
+          <a
+            href="#team-staff"
+            className="inline-flex items-center rounded-lg border border-[#2DD4BF]/30 bg-[#2DD4BF]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#2DD4BF] hover:bg-[#2DD4BF]/20"
+          >
+            Team & Staff
+          </a>
+        ) : null}
+      </div>
+
+      <div id="system-settings">
+        <ClinicSettingsPanel />
+      </div>
+      <div id="services-pricing">
+        <ServicesSettingsPanel />
+      </div>
       <SpecialClosures
         closures={closures}
         clinicConfigId={id}
       />
-      {permissions.canDelete && <StaffSection clinicConfigId={id} />}
+      {permissions.canDelete && (
+        <StaffSection
+          clinicConfigId={id}
+          isOwner={isOwner}
+          currentUserId={user.id}
+        />
+      )}
     </div>
   )
 }

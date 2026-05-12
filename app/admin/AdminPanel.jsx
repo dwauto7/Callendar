@@ -65,7 +65,8 @@ function statusBadgeClass(isActive) {
     : 'bg-gray-500/15 text-gray-300 border-gray-500/30'
 }
 
-function userDisplayName(email) {
+function userDisplayName(email, resolvedName) {
+  if (resolvedName) return resolvedName
   if (!email) return 'Unknown'
   const [name] = email.split('@')
   return name
@@ -376,7 +377,8 @@ export default function AdminPanel() {
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
-      const searchBase = `${user.user_email ?? ''} ${userDisplayName(user.user_email)} ${user.clinic_config?.clinic_name ?? ''}`.toLowerCase()
+      const userEmail = user.resolved_email ?? user.user_email ?? ''
+      const searchBase = `${userEmail} ${userDisplayName(userEmail, user.resolved_name)} ${user.clinic_config?.clinic_name ?? ''}`.toLowerCase()
       const searchMatch = searchBase.includes(userSearch.toLowerCase())
       const roleMatch = userRoleFilter === 'all' || user.role === userRoleFilter
       const clinicMatch = userClinicFilter === 'all' || user.clinic_config_id === userClinicFilter
@@ -894,8 +896,8 @@ export default function AdminPanel() {
                       key={user.id}
                       className={`border-b border-slate-800 hover:bg-white/5 ${index % 2 === 0 ? 'bg-black/10' : ''}`}
                     >
-                      <td className="px-4 py-3">{user.user_email}</td>
-                      <td className="px-4 py-3 text-white/70">{userDisplayName(user.user_email)}</td>
+                        <td className="px-4 py-3">{user.resolved_email ?? user.user_email ?? 'No email on record'}</td>
+                        <td className="px-4 py-3 text-white/70">{userDisplayName(user.resolved_email ?? user.user_email, user.resolved_name)}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 rounded-full text-xs border ${roleBadgeClass(user.role)}`}>
                           {displayRole(user.role)}
@@ -932,7 +934,7 @@ export default function AdminPanel() {
                             {user.is_active ? 'Deactivate' : 'Activate'}
                           </button>
                           <button
-                            onClick={() => setDeleteConfirm({ type: 'user', id: user.id, name: user.user_email })}
+                            onClick={() => setDeleteConfirm({ type: 'user', id: user.id, name: user.resolved_email ?? user.user_email ?? user.id })}
                             className="px-3 py-1.5 rounded-lg text-xs border border-red-500/40 bg-red-500/20"
                           >
                             Delete

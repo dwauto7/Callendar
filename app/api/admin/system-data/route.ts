@@ -30,6 +30,13 @@ async function getAuthorizedUser(request: Request) {
 }
 
 export async function GET(request: Request) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return NextResponse.json(
+      { error: 'Server env missing: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY' },
+      { status: 500 }
+    )
+  }
+
   const auth = await getAuthorizedUser(request)
   if ('error' in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status })
@@ -37,47 +44,80 @@ export async function GET(request: Request) {
 
   const { supabase } = auth
 
-  const [clinicsRes, usersRes, appointmentsRes, auditLogsRes] = await Promise.all([
+  const [clinicsRes, usersRes, appointmentsRes, profilesRes] = await Promise.all([
     supabase
       .from('clinic_configs')
       .select('id, clinic_name, owner_email, plan_type, is_active, clinic_phone, clinic_address, created_at')
       .order('created_at', { ascending: false }),
     supabase
       .from('clinic_users')
-      .select('id, user_email, role, is_active, created_at, last_login_at, clinic_config_id, clinic_config:clinic_config_id(clinic_name)')
+      .select('id, user_id, user_email, role, is_active, created_at, last_login_at, clinic_config_id, clinic_config:clinic_config_id(clinic_name)')
       .order('created_at', { ascending: false }),
     supabase
       .from('appointments')
       .select('id, patient_name, appointment_date, appointment_time, status, service_category, clinic_id, created_at, clinic:clinic_id(clinic_name)')
       .order('appointment_date', { ascending: false }),
     supabase
-      .from('admin_audit_logs')
-      .select('id, admin_id, action, resource_id, clinic_config_id, details, created_at')
-      .order('created_at', { ascending: false })
-      .limit(500),
+      .from('clinic_profiles')
+      .select('user_id, user_email, display_name')
+      .not('user_id', 'is', null),
   ])
 
-  if (clinicsRes.error || usersRes.error || appointmentsRes.error || auditLogsRes.error) {
+  if (clinicsRes.error || usersRes.error || appointmentsRes.error || profilesRes.error) {
     return NextResponse.json(
       {
         error:
           clinicsRes.error?.message ??
           usersRes.error?.message ??
           appointmentsRes.error?.message ??
-          auditLogsRes.error?.message ??
+          profilesRes.error?.message ??
           'Failed to fetch admin data',
       },
       { status: 500 }
     )
   }
 
+  const profileByUserId = new Map<string, { user_email: string | null; display_name: string | null }>()
+  for (const profile of profilesRes.data ?? []) {
+    if (!profile.user_id || profileByUserId.has(profile.user_id)) continue
+    profileByUserId.set(profile.user_id, {
+      user_email: profile.user_email ?? null,
+      display_name: profile.display_name ?? null,
+    })
+  }
+
+  const users = (usersRes.data ?? []).map((user) => {
+    const profile = user.user_id ? profileByUserId.get(user.user_id) : undefined
+    return {
+      ...user,
+      resolved_email: user.user_email ?? profile?.user_email ?? null,
+      resolved_name: profile?.display_name ?? null,
+    }
+  })
+
+  const auditLogsRes = await supabase
+    .from('admin_audit_logs')
+    .select('id, admin_id, action, resource_id, clinic_config_id, details, created_at')
+    .order('created_at', { ascending: false })
+    .limit(500)
+
+  const auditLogsMissingTable = auditLogsRes.error?.code === '42P01'
+  const auditLogs = auditLogsRes.error ? [] : (auditLogsRes.data ?? [])
+  const auditLogsWarning = auditLogsRes.error
+    ? auditLogsMissingTable
+      ? 'admin_audit_logs table not found (run migration).'
+      : auditLogsRes.error.message
+    : null
+
   return NextResponse.json({
     clinics: clinicsRes.data ?? [],
-    users: usersRes.data ?? [],
+    users,
     appointments: appointmentsRes.data ?? [],
-    auditLogs: auditLogsRes.data ?? [],
+    auditLogs,
     meta: {
       admin_emails_configured: getConfiguredAdminEmails().length,
+      audit_logs_available: !auditLogsRes.error,
+      audit_logs_warning: auditLogsWarning,
     },
   })
 }

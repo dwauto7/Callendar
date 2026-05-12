@@ -55,8 +55,9 @@ export default function OnboardingPage() {
   const [form, setForm]       = React.useState<FormData>(DEFAULT)
   const [loading, setLoading] = React.useState(false)
   const [error, setError]     = React.useState<string | null>(null)
+  const submitLockRef         = React.useRef(false)
   const router                = useRouter()
-  const supabase              = createClient()
+  const supabase              = React.useMemo(() => createClient(), [])
 
   // Check if user already completed onboarding
   React.useEffect(() => {
@@ -67,7 +68,7 @@ export default function OnboardingPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data: clinic, error } = await supabase
+      const { data: clinic } = await supabase
         .from('clinic_configs')
         .select('id')
         .eq('user_id', user.id)
@@ -80,7 +81,7 @@ export default function OnboardingPage() {
     }
 
     checkOnboardingStatus()
-  }, [ step])
+  }, [router, step, supabase])
 
   function set<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm(f => ({ ...f, [key]: value }))
@@ -103,6 +104,8 @@ export default function OnboardingPage() {
   }
 
   async function handleSubmit() {
+    if (submitLockRef.current) return
+    submitLockRef.current = true
     setLoading(true)
     setError(null)
 
@@ -130,6 +133,7 @@ export default function OnboardingPage() {
       setError(err instanceof Error ? err.message : 'Submission failed')
     } finally {
       setLoading(false)
+      submitLockRef.current = false
     }
   }
 

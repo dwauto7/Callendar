@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { DoctorHeroBanner } from '@/components/dashboard/profiles/DoctorHeroBanner'
 import { ProfileStatsRow } from '@/components/dashboard/profiles/ProfileStatsRow'
 import { AppointmentListPanel } from '@/components/dashboard/profiles/AppointmentListPanel'
@@ -108,6 +109,9 @@ function NextAppointmentBanner({ appointment }: { appointment: NextAppointment }
   )
 }
 
+// Adjust this to taste — 60s is gentle on your DB
+const REFRESH_INTERVAL_MS = 60_000
+
 export function DoctorProfileClient({
   doctor,
   stats,
@@ -119,9 +123,11 @@ export function DoctorProfileClient({
   nextAppointment: NextAppointment
   appointments: Appointment[]
 }) {
+  const router = useRouter()
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState<'today' | 'week' | 'upcoming'>('today')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date())
 
   const todayKey = useMemo(() => toDateKey(new Date()), [])
 
@@ -136,11 +142,33 @@ export function DoctorProfileClient({
     return { start: toDateKey(start), end: toDateKey(end) }
   }, [])
 
+  useEffect(() => {
+    // Refresh on a fixed interval
+    const interval = setInterval(() => {
+      router.refresh()
+      setLastRefreshed(new Date())
+    }, REFRESH_INTERVAL_MS)
+
+    // Also refresh when user tabs back — catches the common case where
+    // a booking was just made and the user switches back to this page
+    const handleFocus = () => {
+      router.refresh()
+      setLastRefreshed(new Date())
+    }
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [router])
+
   const filteredAppointments = useMemo(() => {
     return appointments.filter((appt) => {
       if (!appt.appointment_date) return false
       if (activeFilter === 'today') return appt.appointment_date === todayKey
-      if (activeFilter === 'week') return appt.appointment_date >= weekRange.start && appt.appointment_date <= weekRange.end
+      if (activeFilter === 'week')
+        return appt.appointment_date >= weekRange.start && appt.appointment_date <= weekRange.end
       return appt.appointment_date > todayKey
     })
   }, [appointments, activeFilter, todayKey, weekRange])
@@ -154,7 +182,12 @@ export function DoctorProfileClient({
     <div className="px-6 py-8 lg:px-10 lg:py-12 max-w-[1600px] mx-auto">
       <DoctorHeroBanner doctor={doctor} stats={stats} />
       <ProfileStatsRow stats={stats} />
-      <NextAppointmentBanner appointment={nextAppointment} />
+      <div className="flex items-center justify-between">
+        <NextAppointmentBanner appointment={nextAppointment} />
+        <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-6">
+          Updated {lastRefreshed.toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AppointmentListPanel

@@ -6,13 +6,15 @@ import { useState } from 'react'
 import {
   LayoutDashboard,
   CalendarCheck,
+  Users,
   Zap,
   BarChart3,
   Settings,
   LogOut,
   Menu,
   X,
-  ShieldCheck
+  ShieldCheck,
+  Stethoscope
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -31,15 +33,17 @@ export function Sidebar({ clinicName, userEmail, role }: SidebarProps) {
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const isOwner = role === 'owner' || role === 'admin'
+
   const navItems = [
     { label: 'Overview', href: '/dashboard/overview', icon: LayoutDashboard },
     { label: 'Operations', href: '/dashboard/operations', icon: CalendarCheck },
-    { label: 'Profiles', href: '/dashboard/doctors', icon: CalendarCheck },
+    { label: 'Patients', href: '/dashboard/patients', icon: Users },
+    { label: 'Profiles', href: '/dashboard/doctors', icon: Stethoscope },
+    ...(!isOwner ? [] : [
     { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
     { label: 'Settings', href: '/dashboard/settings', icon: Settings },
-    ...(role === 'admin' || role === 'owner'
-      ? [{ label: 'Admin', href: '/admin', icon: ShieldCheck }]
-      : []),
+      ]),
   ]
 
   async function handleLogout() {

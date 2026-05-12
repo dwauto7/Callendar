@@ -3,19 +3,18 @@
 import { Appointment } from '@/components/dashboard/profiles/DoctorProfileClient'
 import { cn } from '@/lib/utils'
 
+// FIXED: uses Malaysia timezone
 function toDateKey(date: Date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
+  return date.toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' })
 }
 
+// FIXED: week start calculated in Malaysia timezone
 function getWeekDates() {
-  const now = new Date()
-  const day = now.getDay()
+  const nowMY = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' }))
+  const day = nowMY.getDay()
   const diffToMonday = day === 0 ? -6 : 1 - day
-  const start = new Date(now)
-  start.setDate(now.getDate() + diffToMonday)
+  const start = new Date(nowMY)
+  start.setDate(nowMY.getDate() + diffToMonday)
   return Array.from({ length: 7 }, (_, i) => {
     const date = new Date(start)
     date.setDate(start.getDate() + i)
@@ -37,7 +36,8 @@ export function WeekCalendarPanel({
   onSelect: (id: string) => void
 }) {
   const weekDates = getWeekDates()
-  const todayKey = toDateKey(new Date())
+  // FIXED: Malaysia timezone
+  const todayKey = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' })
 
   return (
     <div className="rounded-2xl border border-[#212129] bg-[#121216] overflow-hidden">

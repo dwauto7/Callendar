@@ -33,6 +33,17 @@ export default async function DashboardLayout({
     redirect('/?auth=required')
   }
 
+  const { data: clinicUser } = await supabase
+    .from('clinic_users')
+    .select('is_active, role')
+    .eq('user_id', user.id)
+    .eq('is_active', true)
+    .single()
+
+  if (!clinicUser) {
+    redirect('/login?reason=deactivated')
+  }
+
   // 2. Resolve clinic context with error handling
   let clinicContext
 

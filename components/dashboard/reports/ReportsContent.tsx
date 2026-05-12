@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart3, TrendingUp, Phone, CalendarCheck, Clock, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react'
+import { TrendingUp, Phone, CalendarCheck, Clock, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react'
 import { formatRM, formatMins } from '@/lib/utils'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { CallsTrendChart, BookingsRevenueChart } from '@/components/dashboard/reports/ReportCharts'
@@ -13,7 +13,7 @@ interface ReportsContentProps {
 }
 
 export function ReportsContent({ clinicConfigId, clinicName }: ReportsContentProps) {
-  const { allReports, liveRevenue, isLoading } = useReportsData(clinicConfigId)
+  const { allReports, liveRevenue } = useReportsData(clinicConfigId)
 
   const currentReport  = allReports[0] ?? null
   const previousReport = allReports[1] ?? null
@@ -33,7 +33,7 @@ export function ReportsContent({ clinicConfigId, clinicName }: ReportsContentPro
   const conversionRate = totalCalls > 0 ? Math.round((totalBookings / totalCalls) * 100) : 0
 
   const chartData = [...allReports].reverse().map((r) => ({
-    period:     r.report_period ?? '???',
+    period:     r.report_period ?? '--',
     calls:      r.total_calls ?? 0,
     bookings:   r.total_bookings ?? 0,
     revenue:    r.gross_revenue_generated ?? 0,
@@ -43,13 +43,13 @@ export function ReportsContent({ clinicConfigId, clinicName }: ReportsContentPro
   const snapshotRows = [
     {
       label: 'Voice Inquiries',
-      value: totalCalls > 0 ? totalCalls.toLocaleString() : '???',
+      value: totalCalls > 0 ? totalCalls.toLocaleString() : '--',
       icon: Phone,
       delta: callsDelta,
     },
     {
       label: 'System Appointments',
-      value: totalBookings > 0 ? totalBookings.toLocaleString() : '???',
+      value: totalBookings > 0 ? totalBookings.toLocaleString() : '--',
       icon: CalendarCheck,
       delta: bookingsDelta,
     },
@@ -88,7 +88,7 @@ export function ReportsContent({ clinicConfigId, clinicName }: ReportsContentPro
           className="text-sm md:text-base uppercase tracking-tight text-white/30 mt-2"
           style={{ fontFamily: 'var(--font-syne)' }}
         >
-          {currentReport?.report_period ?? 'No data yet'} ?? Intelligence Cycle
+          {currentReport?.report_period ?? '--'}
         </p>
       </div>
 
@@ -209,10 +209,10 @@ export function ReportsContent({ clinicConfigId, clinicName }: ReportsContentPro
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <CellWithDelta value={calls > 0 ? calls.toLocaleString() : '???'} delta={delta(r.total_calls, prev?.total_calls)} />
+                          <CellWithDelta value={calls > 0 ? calls.toLocaleString() : '--'} delta={delta(r.total_calls, prev?.total_calls)} />
                         </td>
                         <td className="px-6 py-4">
-                          <CellWithDelta value={bookings > 0 ? bookings.toLocaleString() : '???'} delta={delta(r.total_bookings, prev?.total_bookings)} />
+                          <CellWithDelta value={bookings > 0 ? bookings.toLocaleString() : '--'} delta={delta(r.total_bookings, prev?.total_bookings)} />
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">

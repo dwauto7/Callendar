@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -682,7 +682,7 @@ export type Database = {
         Returns: string
       }
       deduct_credits: {
-        Args: { p_agent_id: string; p_duration_min: number }
+        Args: { p_agent_id: string; p_clinic_config_id: string; p_duration_min: number }
         Returns: undefined
       }
       get_my_clinic_id: { Args: never; Returns: string }
@@ -824,3 +824,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

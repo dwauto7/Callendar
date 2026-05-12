@@ -2,13 +2,16 @@
 
 import dynamic from 'next/dynamic'
 import { useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Search, X, PhoneCall, Clock, Mic, CalendarDays } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, X, PhoneCall, Clock, Mic, CalendarDays, Loader2 } from 'lucide-react'
 import { useOperationsData } from '@/lib/hooks/useOperationsData'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 import type { CallLogRow } from '@/components/dashboard/operations/TranscriptDrawer'
 import { VoiceLogsEnhanced } from '@/components/dashboard/operations/VoiceLogsEnhanced'
+import { toast } from 'sonner'
 
 const TranscriptDrawer = dynamic(
   () => import('@/components/dashboard/operations/TranscriptDrawer').then(m => m.TranscriptDrawer),
@@ -72,6 +75,9 @@ const STATUS_CONFIG = {
   Booked:      { dot: 'bg-[#2DD4BF]', badge: 'bg-[#2DD4BF]/10 text-[#2DD4BF] border-[#2DD4BF]/20' },
   Cancelled:   { dot: 'bg-red-400',     badge: 'bg-red-500/10 text-red-400 border-red-500/20' },
   Rescheduled: { dot: 'bg-amber-400',   badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+  Completed:   { dot: 'bg-indigo-400',  badge: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20' },
+  'No-Show':   { dot: 'bg-rose-400',    badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' },
+  'No Show':   { dot: 'bg-rose-400',    badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' },
 } as const
 
 function statusConfig(status: string | null) {
@@ -80,15 +86,51 @@ function statusConfig(status: string | null) {
 
 export function OperationsClient({ clinicId }: { clinicId: string }) {
   const { appointments: hookAppointments, callLogs, credits, isLoading, error } = useOperationsData(clinicId)
+  const supabase = useMemo(() => createClient(), [])
   const [appointments, setAppointments] = useState<AppointmentRow[]>(hookAppointments)
   const [month, setMonth] = useState(() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1) })
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [visibleAppointments, setVisibleAppointments] = useState(80)
   const [detailAppt, setDetailAppt] = useState<AppointmentRow | null>(null)
+  const [updatingStatus, setUpdatingStatus] = useState(false)
   const deferredSearch = useDeferredValue(search)
 
   useEffect(() => { setAppointments(hookAppointments) }, [hookAppointments])
+
+  async function handleStatusChange(nextStatus: string) {
+    if (!detailAppt || updatingStatus) return
+
+    const current = detailAppt
+    const updates: Pick<AppointmentRow, 'status' | 'projected_revenue'> = {
+      status: nextStatus,
+      projected_revenue:
+        nextStatus === 'Cancelled' || nextStatus === 'No-Show'
+          ? 0
+          : current.projected_revenue,
+    }
+
+    setUpdatingStatus(true)
+    setDetailAppt((prev) => (prev ? { ...prev, ...updates } : prev))
+    setAppointments((prev) => prev.map((a) => (a.id === current.id ? { ...a, ...updates } : a)))
+
+    const { error: updateError } = await supabase
+      .from('appointments')
+      .update(updates)
+      .eq('id', current.id)
+      .eq('clinic_id', clinicId)
+
+    setUpdatingStatus(false)
+
+    if (updateError) {
+      setDetailAppt(current)
+      setAppointments((prev) => prev.map((a) => (a.id === current.id ? current : a)))
+      toast.error('Failed to update appointment status')
+      return
+    }
+
+    toast.success('Appointment status updated')
+  }
 
   const appointmentsByDate = useMemo(() => {
     const map = new Map<string, AppointmentRow[]>()
@@ -359,14 +401,34 @@ export function OperationsClient({ clinicId }: { clinicId: string }) {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {/* Status badge */}
+              {/* Status */}
               <div>
-                <span className={cn(
-                  'text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border',
-                  statusConfig(detailAppt.status).badge
-                )}>
-                  {detailAppt.status || '—'}
-                </span>
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-white/25 mb-2">Status</p>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={detailAppt.status ?? 'Booked'}
+                    onValueChange={handleStatusChange}
+                    disabled={updatingStatus}
+                  >
+                    <SelectTrigger className="h-9 w-[190px] border-[#212129] bg-[#121216] text-xs text-white focus:ring-0 focus:border-[#2DD4BF]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0D1014] border-[#212129]">
+                      <SelectItem value="Booked" className="text-xs text-white">Booked</SelectItem>
+                      <SelectItem value="Rescheduled" className="text-xs text-white">Rescheduled</SelectItem>
+                      <SelectItem value="Cancelled" className="text-xs text-white">Cancelled</SelectItem>
+                      <SelectItem value="Completed" className="text-xs text-white">Completed</SelectItem>
+                      <SelectItem value="No-Show" className="text-xs text-white">No-Show</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {updatingStatus ? <Loader2 className="size-3.5 text-white/35 animate-spin" /> : null}
+                  <span className={cn(
+                    'text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border',
+                    statusConfig(detailAppt.status).badge
+                  )}>
+                    {detailAppt.status || '—'}
+                  </span>
+                </div>
               </div>
 
               {/* Details grid */}

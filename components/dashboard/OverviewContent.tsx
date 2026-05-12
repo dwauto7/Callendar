@@ -13,7 +13,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react'
 import { formatRM, formatMins, formatDateTime, cn } from '@/lib/utils'
-import { getRolePermissions, normalizeClinicRole, type ClinicRole } from '@/lib/auth/permissions'
+import { normalizeClinicRole, type ClinicRole } from '@/lib/auth/permissions'
 
 interface OverviewContentProps {
   clinicName: string
@@ -32,8 +32,8 @@ export function OverviewContent({
 }: OverviewContentProps) {
   const { credits, report, allCalls, appointments, isLoading, error } =
     useOverviewData(clinicConfigId)
-  const permissions = getRolePermissions(role)
   const normalizedRole = normalizeClinicRole(role)
+  const accessRoleLabel = role === 'owner' ? 'owner' : normalizedRole
 
   // Aggregations
   const totalCalls = allCalls.length
@@ -169,7 +169,7 @@ export function OverviewContent({
 
           <div className="flex items-center gap-3 md:mt-1 shrink-0">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#212129] text-[10px] font-black uppercase tracking-widest text-white/60">
-              {normalizedRole} access
+              {accessRoleLabel} access
             </div>
             <div
               className={cn(
@@ -210,18 +210,6 @@ export function OverviewContent({
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="mb-6 rounded-2xl border border-[#212129] bg-[#121216] p-4 flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-widest">
-        <span className={cn('px-3 py-1.5 rounded-full border', permissions.canView ? 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10' : 'text-red-300 border-red-500/30 bg-red-500/10')}>
-          canView: {permissions.canView ? 'yes' : 'no'}
-        </span>
-        <span className={cn('px-3 py-1.5 rounded-full border', permissions.canEdit ? 'text-[#2DD4BF] border-[#2DD4BF]/30 bg-[#2DD4BF]/10' : 'text-white/40 border-[#212129]')}>
-          canEdit: {permissions.canEdit ? 'yes' : 'no'}
-        </span>
-        <span className={cn('px-3 py-1.5 rounded-full border', permissions.canDelete ? 'text-red-300 border-red-500/30 bg-red-500/10' : 'text-white/40 border-[#212129]')}>
-          canDelete: {permissions.canDelete ? 'yes' : 'no'}
-        </span>
       </div>
 
       {/* Stats */}

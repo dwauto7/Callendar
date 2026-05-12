@@ -50,19 +50,18 @@ export async function GET(request: Request) {
       );
     }
 
-    if (requesterClinicUser.role !== "admin") {
+    if (requesterClinicUser.role !== "admin" && requesterClinicUser.role !== "owner") {
       return Response.json(
         { error: "Only admins can view clinic staff" },
         { status: 403 }
       );
     }
 
-    // Fetch all active staff for this clinic
+    // Fetch all staff rows for this clinic (active + inactive + pending invites)
     const { data: staffList, error: fetchError } = await supabase
       .from("clinic_users")
-      .select("id, user_email, role, is_active, created_at, last_login_at, invite_expires_at")
+      .select("id, user_email, role, is_active, created_at, last_login_at, invite_expires_at, user_id, invite_token")
       .eq("clinic_config_id", clinic_config_id)
-      .eq("is_active", true)
       .order("created_at", { ascending: false });
 
     if (fetchError) {
@@ -76,16 +75,19 @@ export async function GET(request: Request) {
     // Compute invite status for each staff member
     const staffWithStatus = (staffList || []).map((staff) => {
       let inviteStatus = "active";
-      if (staff.invite_expires_at) {
+      if (staff.invite_token && !staff.user_id) {
+        inviteStatus = "pending";
+      }
+      if (staff.invite_expires_at && staff.invite_token && !staff.user_id) {
         const expiresAt = new Date(staff.invite_expires_at);
         if (expiresAt > new Date()) {
-          inviteStatus = "pending"; // Invite still valid
+          inviteStatus = "pending";
         } else {
-          inviteStatus = "expired"; // Invite expired
+          inviteStatus = "expired";
         }
       }
       if (staff.last_login_at) {
-        inviteStatus = "active"; // User has logged in
+        inviteStatus = "active";
       }
 
       return {

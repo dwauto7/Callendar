@@ -1,8 +1,33 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { Redis } from '@upstash/redis'
+import { Ratelimit } from '@upstash/ratelimit'
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+})
+
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(20, '10s'), // 20 requests per 10s per IP
+})
+
+const OWNER_ONLY_ROUTES = ['/dashboard/settings', '/dashboard/reports']
+const RATE_LIMITED_PATHS = ['/', '/onboarding'] // login page + onboarding
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
+  const { pathname } = request.nextUrl
+
+  // Rate limit public entry points
+  if (RATE_LIMITED_PATHS.includes(pathname)) {
+    const ip = request.headers.get('x-forwarded-for') ?? 'anonymous'
+    const { success } = await ratelimit.limit(ip)
+    if (!success) {
+      return new NextResponse('Too many requests', { status: 429 })
+    }
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,9 +47,7 @@ export async function proxy(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-  const { pathname } = request.nextUrl
 
-  // Protect dashboard routes
   if (pathname.startsWith('/dashboard') && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
@@ -32,14 +55,35 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Protect onboarding — must be logged in
   if (pathname === '/onboarding' && !user) {
     return NextResponse.redirect(new URL('/', request.url))
+  }
+
+  // Role-gate with Redis cache — avoids DB hit on every request
+  if (user && OWNER_ONLY_ROUTES.some(r => pathname.startsWith(r))) {
+    const cacheKey = `role:${user.id}`
+    let role = await redis.get<string>(cacheKey)
+
+    if (!role) {
+      const { data: clinicUser } = await supabase
+        .from('clinic_users')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+
+      role = clinicUser?.role ?? 'staff'
+      await redis.set(cacheKey, role, { ex: 300 }) // cache for 5 minutes
+    }
+
+    const isOwner = role === 'owner' || role === 'admin'
+    if (!isOwner) {
+      return NextResponse.redirect(new URL('/dashboard/overview', request.url))
+    }
   }
 
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/onboarding'],
+  matcher: ['/dashboard/:path*', '/onboarding', '/'],
 }
