@@ -10,19 +10,36 @@ type ConsultancyRequest = {
   message: string
 }
 
-// Configure your email service
+// Use the same SMTP/Brevo scheme as staff invite route.
+const smtpHost = process.env.EMAIL_HOST || 'smtp-relay.brevo.com'
+const smtpPort = parseInt(process.env.EMAIL_PORT || '587')
+const smtpSecure = process.env.EMAIL_SECURE === 'true'
+const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER
+const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASSWORD
+
+if (!smtpUser || !smtpPass) {
+  console.warn('SMTP credentials missing: set SMTP_USER/SMTP_PASS (or EMAIL_USER/EMAIL_PASSWORD fallback).')
+}
+
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT || '587'),
-  secure: process.env.EMAIL_SECURE === 'true',
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
+    user: smtpUser,
+    pass: smtpPass,
   },
 })
 
 export async function POST(request: NextRequest) {
   try {
+    if (!smtpUser || !smtpPass) {
+      return NextResponse.json(
+        { error: 'Email service not configured: missing SMTP credentials' },
+        { status: 500 }
+      )
+    }
+
     const body: ConsultancyRequest = await request.json()
 
     // Validate required fields
