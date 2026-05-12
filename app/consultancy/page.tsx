@@ -52,7 +52,23 @@ export default function ConsultancyPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to send consultancy request')
+        let errorMessage = 'Failed to send consultancy request'
+        try {
+          const body = await response.json()
+          const message = typeof body?.error === 'string' ? body.error : null
+          const detailMessage =
+            typeof body?.details?.message === 'string' ? body.details.message : null
+
+          if (detailMessage) {
+            errorMessage = `${errorMessage}: ${detailMessage}`
+          } else if (message) {
+            errorMessage = message
+          }
+        } catch {
+          // Keep default fallback error message.
+        }
+
+        throw new Error(errorMessage)
       }
 
       setSubmitted(true)

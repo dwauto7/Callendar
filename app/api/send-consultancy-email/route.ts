@@ -129,9 +129,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
-    console.error('Consultancy email error:', error)
+    const err = error as {
+      message?: string
+      code?: string
+      responseCode?: number
+      response?: string
+      command?: string
+    }
+
+    const details = {
+      message: err?.message ?? 'Unknown email error',
+      code: err?.code ?? null,
+      responseCode: err?.responseCode ?? null,
+      response: err?.response ?? null,
+      command: err?.command ?? null,
+    }
+
+    console.error('Consultancy email error:', details)
     return NextResponse.json(
-      { error: 'Failed to send consultancy request' },
+      { error: 'Failed to send consultancy request', details },
       { status: 500 }
     )
   }
