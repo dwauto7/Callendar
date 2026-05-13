@@ -8,7 +8,8 @@ const tiers = [
     period: '/ month',
     setupFee: '+ RM 2,500 setup fee',
     description: 'Best for steady inbound volume.',
-    credits: '~200 appointments / month',
+    outcome: '~200 appointments captured / month',
+    credits: '500 AI voice minutes included',
     highlight: false,
     cta: 'Book Demo',
     features: [
@@ -20,6 +21,7 @@ const tiers = [
       'English language',
     ],
     overageRate: 'Overage: RM 2.00 / min',
+    roi: 'Typically covered by 3-6 extra booked treatments.',
   },
   {
     name: 'Growth',
@@ -27,7 +29,8 @@ const tiers = [
     period: '/ month',
     setupFee: '+ RM 3,000 setup fee',
     description: 'Built for high-volume clinics.',
-    credits: '~ Est. 400 appointments / month',
+    outcome: '~400 appointments captured / month',
+    credits: '1,000 AI voice minutes included',
     highlight: true,
     cta: 'Book Demo',
     badge: 'Most popular',
@@ -40,14 +43,16 @@ const tiers = [
       'English language',
     ],
     overageRate: 'Overage: RM 1.50 / min',
+    roi: 'Designed for clinics losing revenue to missed calls.',
   },
   {
-    name: 'Network',
+    name: 'Multi-Branch',
     price: 'RM 5,000',
     period: '/ month',
     setupFee: '+ RM 4,000 setup fee',
     description: 'Ideal for multi-branch operations.',
-    credits: '~ Est. 800 appointments / month',
+    outcome: '~800 appointments captured / month',
+    credits: '2,000 AI voice minutes included',
     highlight: false,
     cta: 'Book Demo',
     features: [
@@ -59,6 +64,7 @@ const tiers = [
       'Multi-branch synchronisation',
     ],
     overageRate: 'Overage: RM 1.20 / min',
+    roi: 'Centralize call handling across locations.',
   },
 ]
 
@@ -74,7 +80,7 @@ export function Pricing() {
             Simple, transparent pricing
           </h2>
           <p className="text-white/40 text-sm max-w-2xl mx-auto leading-relaxed">
-            Flat monthly rates with no surprises. All plans include dashboard access, full call handling, transcripts, and 24/7 support.
+            Pricing is framed around recovered appointments, not software seats. All plans include dashboard access, full call handling, transcripts, and 24/7 support.
           </p>
         </div>
 
@@ -112,6 +118,15 @@ export function Pricing() {
 
                 <p className="text-sm text-white/40 mb-6 leading-relaxed">{tier.description}</p>
 
+                <div className="mb-6 rounded-xl border border-[#2DD4BF]/20 bg-[#2DD4BF]/10 p-4">
+                  <p className="text-sm font-semibold text-white" style={{ fontFamily: 'var(--font-syne)' }}>
+                    {tier.outcome}
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed text-white/45">
+                    {tier.roi}
+                  </p>
+                </div>
+
                 <Button
                   asChild
                   className={
@@ -137,9 +152,9 @@ export function Pricing() {
                 </ul>
 
                 <div className="border-t border-[#212129] pt-6">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-white/40">
-                      <span className="font-semibold text-white/60">{tier.credits}</span>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-xs text-white/45">
+                      <span className="font-semibold text-white/65">{tier.credits}</span>
                     </p>
                     <p className="text-xs text-white/40">{tier.overageRate}</p>
                   </div>
@@ -152,6 +167,9 @@ export function Pricing() {
         <div className="mt-16 text-center">
           <p className="text-white/40 text-sm">
             Need something custom? <a href="tel:+601114399466" className="text-[#2DD4BF] hover:text-[#2DD4BF]/80 font-semibold">Contact us</a>
+          </p>
+          <p className="text-xs text-white/35 mt-4 max-w-xl mx-auto leading-relaxed">
+            Most clinics recover the monthly fee with only a handful of additional booked treatments, especially during lunch rushes, after-hours calls, and peak periods.
           </p>
           <p className="text-xs text-white/30 mt-4">
             All plans include on-site staff training for PJ/KL clinics
