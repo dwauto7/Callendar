@@ -79,8 +79,8 @@ export function Pricing() {
           <h2 className="text-5xl md:text-6xl font-semibold text-white mb-4" style={{ fontFamily: 'var(--font-syne)' }}>
             Simple, transparent pricing
           </h2>
-          <p className="text-white/40 text-sm max-w-2xl mx-auto leading-relaxed">
-            Pricing is framed around recovered appointments, not software seats. All plans include dashboard access, full call handling, transcripts, and 24/7 support.
+          <p className="text-[#D9E4E6]/65 text-sm max-w-2xl mx-auto leading-relaxed">
+            All plans include dashboard access, full call handling, transcripts, and 24/7 support.
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export function Pricing() {
             Need something custom? <a href="tel:+601114399466" className="text-[#2DD4BF] hover:text-[#2DD4BF]/80 font-semibold">Contact us</a>
           </p>
           <p className="text-xs text-white/35 mt-4 max-w-xl mx-auto leading-relaxed">
-            Most clinics recover the monthly fee with only a handful of additional booked treatments, especially during lunch rushes, after-hours calls, and peak periods.
+            Most clinics recover the monthly fee with a handful of extra booked treatments.
           </p>
           <p className="text-xs text-white/30 mt-4">
             All plans include on-site staff training for PJ/KL clinics
